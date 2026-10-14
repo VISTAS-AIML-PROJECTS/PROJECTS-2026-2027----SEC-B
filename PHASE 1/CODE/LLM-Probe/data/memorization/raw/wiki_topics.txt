@@ -1,0 +1,1207 @@
+Albert Einstein
+Isaac Newton
+Marie Curie
+Charles Darwin
+Abraham Lincoln
+George Washington
+Julius Caesar
+Cleopatra
+Alexander the Great
+Napoleon
+William Shakespeare
+Leonardo da Vinci
+Michelangelo
+Mahatma Gandhi
+Nelson Mandela
+Martin Luther King Jr.
+Winston Churchill
+Queen Victoria
+Joan of Arc
+Galileo Galilei
+Thomas Edison
+Nikola Tesla
+Aristotle
+Plato
+Socrates
+Gautama Buddha
+Genghis Khan
+Karl Marx
+Sigmund Freud
+Alan Turing
+Quantum mechanics
+Theory of relativity
+Photosynthesis
+Plate tectonics
+Evolution
+Gravity
+Thermodynamics
+DNA
+Big Bang
+Atomic theory
+Natural selection
+Periodic table
+Cell division
+Double helix
+Electromagnetism
+Superconductivity
+Black hole
+Dark matter
+Mitosis
+Meiosis
+Acid rain
+Global warming
+Greenhouse effect
+Ozone depletion
+Nuclear fission
+Nuclear fusion
+Continental drift
+United States
+United Kingdom
+Canada
+Australia
+Germany
+France
+Italy
+Spain
+Japan
+China
+India
+Brazil
+Russia
+South Africa
+Mexico
+Egypt
+Argentina
+New Zealand
+Sweden
+Norway
+Switzerland
+Netherlands
+Belgium
+Austria
+Denmark
+Finland
+Greece
+Turkey
+Saudi Arabia
+South Korea
+Singapore
+Hamlet
+Romeo and Juliet
+Macbeth
+Moby-Dick
+Pride and Prejudice
+Jane Eyre
+Frankenstein
+Dracula
+The Odyssey
+The Iliad
+Don Quixote
+Divine Comedy
+Greek mythology
+Norse mythology
+Egyptian mythology
+Roman Empire
+Renaissance
+Industrial Revolution
+French Revolution
+World War I
+World War II
+Cold War
+Middle Ages
+Ancient Egypt
+Ancient Greece
+Magna Carta
+American Civil War
+United Nations
+Artificial intelligence
+Machine learning
+Internet
+World Wide Web
+Computer
+Microprocessor
+Database
+Operating system
+Cryptography
+Cloud computing
+Blockchain
+Quantum computing
+Software engineering
+Python (programming language)
+C++
+Java (programming language)
+Algorithm
+Compiler
+Neural network
+Deep learning
+Supercomputer
+Central processing unit
+Random-access memory
+Virtual reality
+Cybersecurity
+Robotics
+Data science
+Information theory
+Open-source software
+Linux
+Unix
+Git (software)
+SQL
+Computer network
+Ethernet
+IP address
+Router (computing)
+Domain Name System
+Virtual private network
+Firewall (computing)
+Object-oriented programming
+Functional programming
+Recursion (computer science)
+Data structure
+Linked list
+Binary tree
+Graph (abstract data type)
+Stack (abstract data type)
+Queue (abstract data type)
+Hash table
+Sorting algorithm
+Big O notation
+Halting problem
+P versus NP problem
+Turing machine
+Von Neumann architecture
+HTML
+Cascading Style Sheets
+JavaScript
+Web browser
+Client-server model
+API
+JSON
+XML
+Relational database
+NoSQL
+SQL injection
+Cross-site scripting
+Software development process
+Agile software development
+DevOps
+Software testing
+Unit testing
+Compiler optimization
+Regular expression
+Huffman coding
+Dijkstra's algorithm
+A* search algorithm
+Quicksort
+Merge sort
+Bubble sort
+Linear regression
+Logistic regression
+Decision tree learning
+Support vector machine
+K-means clustering
+Dimensionality reduction
+Principal component analysis
+Gradient descent
+Backpropagation
+Overfitting
+Cross-validation (statistics)
+Natural language processing
+Computer vision
+Speech recognition
+Reinforcement learning
+Generative adversarial network
+Transformer (deep learning architecture)
+Large language model
+Prompt engineering
+Retrieval-augmented generation
+Attention (machine learning)
+Vector database
+Embedding
+Tokenization (natural language processing)
+Byte pair encoding
+Temperature (sampling)
+Perplexity
+Semantic search
+Hyperparameter (machine learning)
+Batch normalization
+Dropout (neural networks)
+Activation function
+Rectified linear unit
+Sigmoid function
+Softmax function
+Loss function
+Mean squared error
+Cross-entropy
+Gradient explosion
+Vanishing gradient problem
+Stochastic gradient descent
+Adam (optimization algorithm)
+Precision and recall
+F-score
+ROC curve
+Confusion matrix
+Bias-variance tradeoff
+Supervised learning
+Unsupervised learning
+Semi-supervised learning
+Self-supervised learning
+Feature engineering
+Feature selection
+Regularization (mathematics)
+L1 regularization
+L2 regularization
+Markov decision process
+Q-learning
+Policy gradient method
+Convolutional neural network
+Recurrent neural network
+Long short-term memory
+Gated recurrent unit
+Autoencoder
+Variational autoencoder
+Diffusion model
+Stable Diffusion
+Midjourney
+DALL-E
+GPT-3
+GPT-4
+BERT (language model)
+RoBERTa
+T5 (transformer model)
+Llama (language model)
+Mistral AI
+Gemini (chatbot)
+Claude (language model)
+Reinforcement learning from human feedback
+Direct preference optimization
+Constitutional AI
+AI safety
+Alignment (artificial intelligence)
+Turing test
+Chinese room
+Artificial general intelligence
+Superintelligence
+Technological singularity
+Moore's law
+Amdahl's law
+Brooks's law
+Conway's law
+CAP theorem
+ACID
+Normal forms (database normalization)
+Relational algebra
+MapReduce
+Hadoop
+Apache Spark
+Kafka (software)
+Message queue
+Publish-subscribe pattern
+Microservices
+Serverless computing
+Docker (software)
+Kubernetes
+REST
+GraphQL
+gRPC
+WebSockets
+OAuth
+JSON Web Token
+Transport Layer Security
+Secure Sockets Layer
+HTTP
+HTTPS
+TCP/IP
+User Datagram Protocol
+ICMP
+ARP (protocol)
+DHCP
+BGP
+DNS spoofing
+Man-in-the-middle attack
+Denial-of-service attack
+Distributed denial-of-service attack
+Phishing
+Ransomware
+Malware
+Trojan horse (computing)
+Computer worm
+Spyware
+Adware
+Zero-day (computing)
+Penetration test
+Social engineering (security)
+Multi-factor authentication
+Public-key cryptography
+Symmetric-key algorithm
+RSA (cryptosystem)
+Advanced Encryption Standard
+Data Encryption Standard
+Diffie-Hellman key exchange
+Elliptic-curve cryptography
+SHA-2
+MD5
+Digital signature
+Public key infrastructure
+Certificate authority
+Pretty Good Privacy
+Tor (network)
+Bitcoin
+Ethereum
+Smart contract
+Decentralized finance
+Non-fungible token
+Web3
+Solid-state drive
+Hard disk drive
+Flash memory
+Read-only memory
+Cache (computing)
+Virtual memory
+Paging
+Segmentation (memory)
+Memory leak
+Buffer overflow
+Stack overflow
+Dangling pointer
+Garbage collection (computer science)
+Reference counting
+Mark-and-sweep
+Just-in-time compilation
+Interpreter (computing)
+Assembler (computing)
+Linker (computing)
+Loader (computing)
+Assembly language
+Machine code
+Instruction set architecture
+Reduced instruction set computer
+Complex instruction set computer
+X86
+ARM architecture
+Graphics processing unit
+Tensor Processing Unit
+Application-specific integrated circuit
+Field-programmable gate array
+Motherboard
+ROM
+BIOS
+Unified Extensible Firmware Interface
+Device driver
+Kernel (operating system)
+Monolithic kernel
+Microkernel
+Process (computing)
+Thread (computing)
+Multithreading (computer science)
+Concurrency (computer science)
+Parallel computing
+Distributed computing
+Deadlock
+Race condition
+Mutual exclusion
+Semaphore (programming)
+Monitor (synchronization)
+Spinlock
+Context switch
+Scheduling (computing)
+Round-robin scheduling
+First-come, first-served
+Shortest job next
+Priority scheduling
+Page fault
+Thrashing (computer science)
+Working set
+Belady's anomaly
+File system
+NTFS
+FAT32
+ext4
+Journaling file system
+Virtual file system
+Inode
+Directory (computing)
+Path (computing)
+Hard link
+Symbolic link
+Mount (computing)
+Disk partitioning
+RAID
+Network-attached storage
+Storage area network
+Cloud storage
+Amazon Web Services
+Microsoft Azure
+Google Cloud Platform
+Virtual machine
+Hypervisor
+Containerization (computing)
+LXC
+Continuous integration
+Continuous delivery
+Infrastructure as code
+Terraform
+Ansible
+Puppet (software)
+Chef (software)
+Site reliability engineering
+Load balancing (computing)
+Reverse proxy
+Content delivery network
+High availability
+Failover
+Disaster recovery
+Backup
+Data replication
+Database replication
+Sharding
+Database indexing
+B-tree
+Hash index
+Query optimization
+Execution plan
+Transaction (databases)
+Rollback (data management)
+Commit (data management)
+Isolation (database systems)
+Two-phase commit protocol
+Write-ahead logging
+Checkpointing (database systems)
+Document-oriented database
+Key-value database
+Wide-column store
+Graph database
+Neo4j
+MongoDB
+Cassandra (database)
+Redis
+Memcached
+DynamoDB
+Bigtable
+HBase
+HDFS
+Google File System
+Chubby (lock service)
+Spanner (database)
+Paxos (computer science)
+Raft (algorithm)
+Consensus (computer science)
+Byzantine fault tolerance
+Decentralized autonomous organization
+Solidity
+Hyperledger
+IPFS
+Zero-knowledge proof
+Homomorphic encryption
+Secure multi-party computation
+Differential privacy
+Federated learning
+Explainable artificial intelligence
+AI ethics
+Bias in artificial intelligence
+Hallucination (artificial intelligence)
+Prompt injection
+Adversarial machine learning
+Model collapse
+Data poisoning
+Model poisoning
+Watermarking (artificial intelligence)
+Copyright infringement by artificial intelligence
+Fair use
+Machine unlearning
+Model editing
+Mechanistic interpretability
+Superposition (machine learning)
+Linear representation hypothesis
+Activation patching
+Probing (machine learning)
+Influence function (machine learning)
+Sparsity (machine learning)
+Sparse autoencoder
+Neural circuit
+Induction head
+Feature visualization
+Integrated gradients
+Shapley value
+LIME (machine learning)
+Saliency map
+Attention map
+Deconvolutional network
+Guided backpropagation
+Activation maximization
+Representational similarity analysis
+Canonical correlation analysis
+Singular vector CCA
+Linear probe
+Log-linear probe
+Structural probe
+Probing classifier
+Control task (machine learning)
+Amortized inference
+Variational inference
+Markov chain Monte Carlo
+Gibbs sampling
+Metropolis-Hastings algorithm
+Importance sampling
+Rejection sampling
+Monte Carlo integration
+Bootstrap aggregating
+Boosting (machine learning)
+AdaBoost
+Gradient boosting
+XGBoost
+LightGBM
+CatBoost
+Random forest
+Extra Trees
+Gradient boosted trees
+Stacking (machine learning)
+Voting classifier
+Ensemble learning
+Mixture of experts
+Routing (machine learning)
+Sparse mixture of experts
+Switch Transformer
+MoE routing
+Expert capacity
+Expert gating
+Dense model
+Sparse model
+Pruning (artificial intelligence)
+Weight pruning
+Structured pruning
+Unstructured pruning
+Magnitude pruning
+Movement pruning
+Lottery ticket hypothesis
+Quantization (signal processing)
+Post-training quantization
+Quantization-aware training
+Integer quantization
+8-bit quantization
+4-bit quantization
+NF4 (normal float 4)
+FP8
+FP4
+Weight sharing
+Low-rank adaptation
+LoRA
+QLoRA
+IA3
+Prefix tuning
+Prompt tuning
+Parameter-efficient fine-tuning
+PEFT
+Adapter (machine learning)
+Fine-tuning (machine learning)
+Pre-training (machine learning)
+Self-supervised pre-training
+Masked language modeling
+Causal language modeling
+Contrastive learning
+SimCLR
+CLIP (neural network)
+ImageBind
+Multimodal learning
+Vision-language model
+Vision Transformer
+ViT
+Patch projection
+Positional embedding
+Classification token
+Multi-head self-attention
+Scaled dot-product attention
+Softmax attention
+FlashAttention
+FlashAttention-2
+PagedAttention
+vLLM
+TensorRT
+ONNX
+TorchScript
+JAX (programming language)
+XLA (compiler)
+TPU compilation
+Distributed training
+Data parallelism
+Model parallelism
+Pipeline parallelism
+Tensor parallelism
+Megatron-LM
+DeepSpeed
+ZeRO (Zero Redundancy Optimizer)
+FSDP (Fully Sharded Data Parallel)
+Parameter server
+AllReduce
+Ring AllReduce
+Collective communication
+NCCL
+MPI
+InfiniBand
+RDMA
+Ethernet networking
+GPUDirect RDMA
+CUDA
+ROCm
+OpenCL
+SYCL
+Metal (API)
+Vulkan (API)
+DirectX
+DirectCompute
+Shader
+Compute shader
+OpenMP
+TBB (Threading Building Blocks)
+CUDA C
+CUDA C++
+CUDA kernel
+Thread block
+Grid (CUDA)
+Warp (CUDA)
+Warp shuffle
+Shared memory (CUDA)
+Global memory (CUDA)
+L1 cache (CUDA)
+L2 cache (CUDA)
+Register file (CUDA)
+Memory coalescence
+Branch divergence
+Warp divergence
+Occupancy (CUDA)
+Tensor Core
+Matrix multiply-accumulate
+MMA instruction
+Warp matrix multiply-accumulate
+WMMA
+Cutlass (library)
+CuBLAS
+CuDNN
+CuSparse
+Confucius
+Homer
+Virgil
+Dante Alighieri
+Geoffrey Chaucer
+Miguel de Cervantes
+Johann Wolfgang von Goethe
+Leo Tolstoy
+Fyodor Dostoevsky
+Mark Twain
+Charles Dickens
+Jane Austen
+Emily Dickinson
+Walt Whitman
+Ernest Hemingway
+Franz Kafka
+George Orwell
+Virginia Woolf
+James Joyce
+Gabriel Garcia Marquez
+Toni Morrison
+Maya Angelou
+Rabindranath Tagore
+Rumi
+Omar Khayyam
+Voltaire
+Immanuel Kant
+Friedrich Nietzsche
+Rene Descartes
+John Locke
+David Hume
+Thomas Aquinas
+Adam Smith
+Niccolo Machiavelli
+Jean-Jacques Rousseau
+Simone de Beauvoir
+Jean-Paul Sartre
+Michel Foucault
+Noam Chomsky
+Carl Jung
+B. F. Skinner
+Jean Piaget
+Wolfgang Amadeus Mozart
+Ludwig van Beethoven
+Johann Sebastian Bach
+Frederic Chopin
+Pyotr Ilyich Tchaikovsky
+Richard Wagner
+Giuseppe Verdi
+Claude Debussy
+Igor Stravinsky
+The Beatles
+Elvis Presley
+Bob Dylan
+Michael Jackson
+Pablo Picasso
+Vincent van Gogh
+Claude Monet
+Salvador Dali
+Rembrandt
+Johannes Vermeer
+Frida Kahlo
+Andy Warhol
+Georgia O'Keeffe
+Auguste Rodin
+Marie Antoinette
+Louis XIV
+Otto von Bismarck
+Vladimir Lenin
+Joseph Stalin
+Mao Zedong
+Franklin D. Roosevelt
+Theodore Roosevelt
+Thomas Jefferson
+Benjamin Franklin
+John F. Kennedy
+Ronald Reagan
+Margaret Thatcher
+Angela Merkel
+Barack Obama
+Elizabeth I
+Henry VIII
+Catherine the Great
+Peter the Great
+Kublai Khan
+Attila the Hun
+Hannibal
+Spartacus
+Marco Polo
+Christopher Columbus
+Ferdinand Magellan
+Vasco da Gama
+James Cook
+Amelia Earhart
+Charles Lindbergh
+Neil Armstrong
+Yuri Gagarin
+Sally Ride
+Wright brothers
+Henry Ford
+Steve Jobs
+Bill Gates
+Jeff Bezos
+Elon Musk
+Warren Buffett
+Andrew Carnegie
+John D. Rockefeller
+Walt Disney
+Coco Chanel
+Louis Pasteur
+Gregor Mendel
+Rosalind Franklin
+James Watson
+Francis Crick
+Stephen Hawking
+Richard Feynman
+Erwin Schrodinger
+Werner Heisenberg
+Niels Bohr
+Max Planck
+Enrico Fermi
+J. Robert Oppenheimer
+Robert Boyle
+Antoine Lavoisier
+Dmitri Mendeleev
+Michael Faraday
+James Clerk Maxwell
+Ada Lovelace
+Grace Hopper
+John von Neumann
+Claude Shannon
+Norbert Wiener
+Tim Berners-Lee
+Vint Cerf
+Linus Torvalds
+Guido van Rossum
+Dennis Ritchie
+Ken Thompson
+Grace Murray Hopper
+Katherine Johnson
+Mae Jemison
+Jane Goodall
+Rachel Carson
+Ivan Pavlov
+Florence Nightingale
+Clara Barton
+Elizabeth Blackwell
+Edward Jenner
+Alexander Fleming
+Jonas Salk
+Louis Braille
+Helen Keller
+Malala Yousafzai
+Desmond Tutu
+Dalai Lama
+Pope Francis
+Muhammad Ali
+Jesse Owens
+Babe Ruth
+Pele
+Diego Maradona
+Michael Jordan
+Serena Williams
+Usain Bolt
+Roger Federer
+Renaissance art
+Baroque
+Romanticism
+Impressionism
+Cubism
+Surrealism
+Modernism
+Postmodernism
+Gothic architecture
+Byzantine Empire
+Ottoman Empire
+Mughal Empire
+Aztec Empire
+Inca Empire
+Maya civilization
+Mesopotamia
+Indus Valley civilisation
+Ancient China
+Silk Road
+Crusades
+Black Death
+Spanish Inquisition
+Age of Enlightenment
+Scientific Revolution
+Protestant Reformation
+American Revolution
+Russian Revolution
+Chinese Revolution
+Vietnam War
+Korean War
+Great Depression
+Space Race
+Berlin Wall
+Apartheid
+Holocaust
+Treaty of Versailles
+United Nations Security Council
+European Union
+NATO
+World Trade Organization
+International Monetary Fund
+World Health Organization
+Amazon rainforest
+Sahara desert
+Mount Everest
+Great Barrier Reef
+Grand Canyon
+Niagara Falls
+Amazon River
+Nile River
+Great Wall of China
+Pyramids of Giza
+Machu Picchu
+Colosseum
+Eiffel Tower
+Statue of Liberty
+Taj Mahal
+Stonehenge
+Petra
+Angkor Wat
+Acropolis of Athens
+Sistine Chapel
+Solar System
+Milky Way
+Andromeda Galaxy
+Jupiter
+Saturn
+Mars
+Venus
+Mercury (planet)
+Neptune
+Uranus
+Pluto
+Moon
+Sun
+Comet
+Asteroid belt
+Exoplanet
+Red giant
+White dwarf
+Neutron star
+Supernova
+Wormhole
+General relativity
+Special relativity
+String theory
+Quantum entanglement
+Higgs boson
+Standard Model
+Particle physics
+Nuclear physics
+Astrophysics
+Cosmology
+Geology
+Volcanology
+Seismology
+Meteorology
+Oceanography
+Climatology
+Ecology
+Biodiversity
+Endangered species
+Extinction event
+Coral reef
+Rainforest
+Tundra
+Savanna
+Ocean current
+El Nino
+Monsoon
+Hurricane
+Earthquake
+Tsunami
+Volcano
+Glacier
+Ice age
+Continental drift theory
+Plate tectonics theory
+Fossil
+Dinosaur
+Tyrannosaurus rex
+Velociraptor
+Woolly mammoth
+Saber-toothed cat
+Neanderthal
+Homo sapiens
+Human evolution
+On the Origin of Species
+Genetics
+Chromosome
+Gene
+Mutation
+Heredity
+Cloning
+Stem cell
+Vaccine
+Antibiotic
+Penicillin
+Immune system
+Virus
+Bacteria
+Pandemic
+Influenza
+HIV/AIDS
+Cancer
+Diabetes
+Alzheimer's disease
+Parkinson's disease
+Mental health
+Depression (mood)
+Anxiety
+Psychology
+Psychiatry
+Neuroscience
+Human brain
+Nervous system
+Cardiovascular system
+Respiratory system
+Digestive system
+Skeletal system
+Muscle
+Blood
+DNA sequencing
+Human Genome Project
+Nutrition
+Vitamin
+Protein
+Carbohydrate
+Fat
+Metabolism
+Exercise
+Obesity
+Public health
+Epidemiology
+World economy
+Stock market
+Inflation
+Recession
+Gross domestic product
+Supply and demand
+Capitalism
+Socialism
+Communism
+Free market
+Central bank
+Federal Reserve
+Cryptocurrency
+Stock exchange
+International trade
+Globalization
+Poverty
+Income inequality
+Unemployment
+Labor union
+Minimum wage
+Tax
+Government
+Democracy
+Monarchy
+Dictatorship
+Constitution
+Human rights
+Civil rights movement
+Feminism
+Women's suffrage
+Slavery
+Colonialism
+Imperialism
+Nationalism
+Fascism
+Anarchism
+Liberalism
+Conservatism
+Political party
+Election
+Voting
+Parliament
+Congress
+Supreme Court
+Law
+Justice system
+Police
+Military
+War
+Peace treaty
+Diplomacy
+Espionage
+Terrorism
+Genocide
+Refugee
+Immigration
+Religion
+Christianity
+Islam
+Judaism
+Hinduism
+Buddhism
+Sikhism
+Taoism
+Atheism
+Agnosticism
+Bible
+Quran
+Torah
+Bhagavad Gita
+Mecca
+Vatican
+Jerusalem
+Pilgrimage
+Meditation
+Yoga
+Philosophy
+Ethics
+Logic
+Metaphysics
+Epistemology
+Aesthetics
+Existentialism
+Stoicism
+Utilitarianism
+Free will
+Consciousness
+Mind-body problem
+Language
+Linguistics
+Grammar
+Phonetics
+Semantics
+Etymology
+Translation
+Sign language
+Writing system
+Alphabet
+Printing press
+Book
+Library
+Newspaper
+Radio
+Television
+Film
+Photography
+Theatre
+Opera
+Ballet
+Dance
+Sculpture
+Architecture
+Fashion
+Cuisine
+Wine
+Coffee
+Tea
+Chocolate
+Agriculture
+Farming
+Irrigation
+Crop rotation
+Genetically modified organism
+Fishing industry
+Mining
+Petroleum
+Natural gas
+Coal
+Renewable energy
+Solar energy
+Wind power
+Hydroelectricity
+Nuclear power
+Electric vehicle
+Automobile
+Airplane
+Train
+Ship
+Bicycle
+Public transportation
+Highway
+Bridge
+Skyscraper
+Urban planning
+Suburb
+Slum
+Homelessness
+Education system
+University
+Literacy
+Standardized test
+Scholarship
+Sports
+Olympic Games
+FIFA World Cup
+Marathon
+Chess
+Video game
+Board game
+Gambling
+Tourism
+Hotel
+Airline
+Passport
+Visa
+Currency
+Banking
+Insurance
+Real estate
+Contract law
+Intellectual property
+Patent
+Trademark
+Copyright law
+Advertising
+Marketing
+Public relations
+Journalism
+Censorship
+Freedom of speech
+Propaganda
+Social media
+Internet censorship
+Privacy
+Surveillance
+Encryption
+Identity theft

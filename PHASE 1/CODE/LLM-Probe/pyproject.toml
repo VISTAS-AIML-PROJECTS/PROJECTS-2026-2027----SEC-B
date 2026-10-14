@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-probe"
+version = "0.1.0"
+description = "Activation-based probes for detecting memorization and hallucination in LLMs"
+requires-python = ">=3.10"
+dependencies = [
+    "torch",
+    "transformers",
+    "accelerate",
+    "bitsandbytes",
+    "datasets",
+    "scikit-learn",
+    "joblib",
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "seaborn",
+    "rouge-score",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

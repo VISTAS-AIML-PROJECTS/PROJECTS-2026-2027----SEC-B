@@ -1,0 +1,183 @@
+A* search algorithm
+Ackermann function
+Aho–Corasick algorithm
+Amicable pairs
+Anagrams
+Arithmetic-geometric mean
+Arithmetic/Complex
+Arithmetic/Rational
+Associative array
+AVL tree
+24 game
+Balanced brackets
+Base64 decode data
+Base64 encode data
+Bell numbers
+Bernoulli numbers
+Binary search
+Bitwise operations
+Bogosort
+Boyer-Moore string search
+Bresenham's line algorithm
+Bulls and cows
+Caesar cipher
+Call a function
+Catalan numbers
+Chinese remainder theorem
+Cholesky decomposition
+Collatz conjecture
+Combinations
+Conway's Game of Life
+Convex hull
+Counting sort
+Create a file
+CRC-32
+Day of the week
+Dijkstra's algorithm
+Discrete Fourier transform
+Dot product
+Doubly-linked list/Definition
+Euler method
+Fast Fourier transform
+Factorial
+Fibonacci sequence
+Fibonacci word
+Find limit of recursion
+Five weekends
+FizzBuzz
+Floyd-Warshall algorithm
+Gaussian elimination
+Greatest common divisor
+Hamming numbers
+Happy numbers
+Haversine formula
+Hofstadter Figure-Figure sequences
+Hofstadter Q sequence
+Huffman coding
+Identity matrix
+Insertion sort
+Integer sequence
+Inverted index
+Josephus problem
+JSON
+Julia set
+K-d tree
+Kaprekar numbers
+Knapsack problem/0-1
+Knapsack problem/Bounded
+Knapsack problem/Continuous
+Knight's tour
+Knuth shuffle
+Knuth's algorithm S
+LCM
+Leap year
+Levenshtein distance
+Linear congruential generator
+List comprehensions
+Logical operations
+Longest common subsequence
+Longest common substring
+Look-and-say sequence
+Loops/Break
+Loops/Continue
+Loops/For
+Loops/For with a specified step
+Loops/Infinite
+Loops/N plus one half
+Loops/Nested
+Loops/While
+LU decomposition
+Lucas-Lehmer test
+LZW compression
+Mandelbrot set
+Matrix multiplication
+Matrix transposition
+Maze generation
+Maze solving
+MD5
+Merge sort
+Mersenne primes
+Miller-Rabin primality test
+Middle-square method
+Modular exponentiation
+Modular inverse
+Monte Carlo methods
+Motzkin numbers
+N-queens problem
+Narcissistic decimal number
+Numerical integration
+Palindrome detection
+Pascal's triangle
+Perfect numbers
+Permutations
+Polynomial long division
+Polynomial regression
+Power set
+Prime decomposition
+Priority queue
+Pythagorean triples
+QR decomposition
+Queue/Definition
+Quickselect algorithm
+Quicksort
+Radix sort
+Read a file line by line
+Read entire file
+Regular expressions
+Remove duplicate elements
+Reverse a string
+Rock-paper-scissors
+RSA code
+Run-length encoding
+Runge-Kutta method
+Search a list
+Selection sort
+Self-describing numbers
+Semiprime
+Set consolidation
+SHA-1
+SHA-256
+Shell sort
+Sieve of Eratosthenes
+Singly-linked list/Element insertion
+Singular value decomposition
+Smith numbers
+Sorting algorithms/Bubble sort
+Sorting algorithms/Cocktail sort
+Sorting algorithms/Comb sort
+Sorting algorithms/Gnome sort
+Sorting algorithms/Heapsort
+Sorting algorithms/Insertion sort
+Sorting algorithms/Merge sort
+Sorting algorithms/Quicksort
+Sorting algorithms/Radix sort
+Sorting algorithms/Selection sort
+Sorting algorithms/Shell sort
+Soundex
+Sphenic numbers
+Stack
+Stable marriage problem
+Stern-Brocot sequence
+Stirling numbers of the first kind
+Stirling numbers of the second kind
+Sudoku
+Symmetric difference
+System time
+Terminal control
+Tic-tac-toe
+Tokenize a string
+Topological sort
+Towers of Hanoi
+Tree traversal
+Truncate a file
+Twin primes
+URL decoding
+URL encoding
+Vampire number
+Van Eck sequence
+Vigenere cipher
+Word ladder
+Word wrap
+Xiaolin Wu's line algorithm
+XML
+YAML

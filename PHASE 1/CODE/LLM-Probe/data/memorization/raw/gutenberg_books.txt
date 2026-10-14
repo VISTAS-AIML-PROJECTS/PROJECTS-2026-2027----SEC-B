@@ -1,0 +1,654 @@
+Pride and Prejudice|1342
+Moby Dick|2701
+Frankenstein|84
+Dracula|345
+The Adventures of Sherlock Holmes|1661
+Alice's Adventures in Wonderland|11
+The Adventures of Tom Sawyer|74
+A Tale of Two Cities|98
+Great Expectations|1400
+The Picture of Dorian Gray|174
+Jane Eyre|1260
+Wuthering Heights|768
+The Time Machine|35
+The War of the Worlds|36
+A Christmas Carol|46
+The Odyssey|1727
+The Iliad|6130
+Ulysses|4300
+Metamorphosis|5200
+The Importance of Being Earnest|844
+Heart of Darkness|526
+Gulliver's Travels|829
+The Scarlet Letter|33
+Treasure Island|120
+The Strange Case of Dr. Jekyll and Mr. Hyde|43
+Peter Pan|16
+The Wonderful Wizard of Oz|55
+The Count of Monte Cristo|1184
+Les Misérables|135
+Crime and Punishment|2554
+The Brothers Karamazov|28054
+War and Peace|2600
+Anna Karenina|1399
+Don Quixote|996
+The Divine Comedy|8800
+Walden|205
+Grimms' Fairy Tales|2591
+Hans Christian Andersen's Fairy Tales|1597
+The Legend of Sleepy Hollow|1900
+The Call of the Wild|215
+The Hound of the Baskervilles|2852
+The Prince|1232
+Beyond Good and Evil|4363
+Thus Spoke Zarathustra|1998
+The Republic|1497
+Siddhartha|2500
+Emma|158
+Sense and Sensibility|161
+Persuasion|105
+Mansfield Park|141
+Northanger Abbey|121
+Oliver Twist|730
+David Copperfield|766
+Bleak House|1023
+Hard Times|786
+Nicholas Nickleby|967
+The Pickwick Papers|580
+Our Mutual Friend|883
+Little Dorrit|968
+The Old Curiosity Shop|700
+Dombey and Son|821
+Robinson Crusoe|521
+The Invisible Man|5230
+The Island of Doctor Moreau|159
+The First Men in the Moon|1013
+Kidnapped|421
+The Master of Ballantrae|1348
+A Portrait of the Artist as a Young Man|4217
+Dubliners|2814
+The Trial|7849
+Candide|19942
+Madame Bovary|14155
+Fathers and Sons|307
+The Idiot|2638
+Notes from Underground|600
+Dead Souls|13957
+Uncle Vanya|2907
+The Cherry Orchard|30556
+Three Sisters|30257
+The Seagull|28554
+The Jungle Book|236
+Kim|219
+The Turn of the Screw|209
+The Portrait of a Lady|208
+The Golden Bowl|4322
+Daisy Miller|207
+The Awakening|160
+The House of Mirth|284
+The Age of Innocence|541
+Ethan Frome|5203
+Sister Carrie|233
+This Side of Paradise|6695
+The Beautiful and Damned|9830
+Winesburg, Ohio|416
+Main Street|244
+Babbitt|1158
+Arrowsmith|32757
+My Ántonia|242
+O Pioneers!|24
+The Song of the Lark|3090
+The Red Badge of Courage|73
+Maggie: A Girl of the Streets|72
+The Iron Heel|1162
+Martin Eden|1056
+White Fang|910
+The Sea-Wolf|1075
+Tarzan of the Apes|78
+The Return of Tarzan|81
+A Princess of Mars|62
+The Gods of Mars|83
+The Warlord of Mars|114
+The Lost World|139
+Through the Looking-Glass|12
+Sons and Lovers|289
+The Rainbow|2880
+Women in Love|287
+Uncle Tom's Cabin|203
+The Last of the Mohicans|940
+Beowulf|163
+Little Women|514
+Anne of Green Gables|45
+The Adventures of Huckleberry Finn|76
+The Three Musketeers|1257
+The Hunchback of Notre-Dame|2610
+Around the World in Eighty Days|103
+Twenty Thousand Leagues Under the Sea|164
+Journey to the Center of the Earth|18857
+The Sign of Four|2097
+The Valley of Fear|3289
+The Memoirs of Sherlock Holmes|834
+The Return of Sherlock Holmes|108
+His Last Bow|2350
+The Master of Ballantrae|873
+Dr Jekyll and Mr Hyde and Other Stories|42
+The Canterbury Tales|22120
+Paradise Lost|26
+The Pilgrim's Progress|131
+Beowulf|16328
+The Aeneid|228
+Metamorphoses|21765
+Meditations|2680
+Nicomachean Ethics|8438
+Utopia|2130
+Leviathan|3207
+The Wealth of Nations|3300
+On the Origin of Species|1228
+The Descent of Man|2300
+Common Sense|147
+The Federalist Papers|1404
+The Communist Manifesto|61
+Civil Disobedience|71
+Self-Reliance|16643
+Leaves of Grass|1322
+The Waste Land|1321
+Songs of Innocence and of Experience|1934
+The Raven|17192
+A Modest Proposal|1080
+The Legend of Sleepy Hollow|41
+Rip Van Winkle|2048
+The Fall of the House of Usher|932
+The Tell-Tale Heart|2148
+The Murders in the Rue Morgue|2151
+The Cask of Amontillado|1063
+The Pit and the Pendulum|2149
+Just So Stories|2781
+Kim|2226
+The Secret Garden|113
+A Little Princess|146
+Black Beauty|271
+Lord Jim|5658
+Nostromo|2021
+The Secret Agent|974
+Typhoon|1142
+Vanity Fair|599
+Barchester Towers|2431
+The Way We Live Now|4358
+North and South|4276
+Mary Barton|2153
+Cranford|394
+Middlemarch|145
+Silas Marner|550
+The Mill on the Floss|6688
+Adam Bede|507
+Daniel Deronda|9548
+Far from the Madding Crowd|107
+Tess of the d'Urbervilles|110
+Jude the Obscure|153
+The Return of the Native|122
+The Mayor of Casterbridge|143
+Madame Bovary|2413
+The Red and the Black|44747
+The Sorrows of Young Werther|2527
+Faust|14591
+The Castle|32869
+A Doll's House|2542
+Hedda Gabler|4093
+An Enemy of the People|4055
+The Cherry Orchard|7986
+Uncle Vanya|1756
+Three Sisters|1755
+The Seagull|1754
+Fathers and Sons|30723
+Dead Souls|1081
+The Overcoat|39972
+The Nose|21856
+The Diary of a Madman|33112
+A Hero of Our Time|913
+Twelve Years a Slave|45631
+Narrative of the Life of Frederick Douglass|23
+Up from Slavery|2376
+The Souls of Black Folk|408
+Walden Two|64155
+Democracy in America|815
+On Liberty|34901
+Utilitarianism|11224
+The Subjection of Women|27083
+A Vindication of the Rights of Woman|3420
+Frankenstein in Baghdad|58117
+The Yellow Wallpaper|1952
+Little Dorrit|963
+Barnaby Rudge|917
+The Man in the Iron Mask|2759
+Twenty Years After|1259
+The Woman in White|583
+The Moonstone|155
+No Name|3603
+Armadale|1155
+East Lynne|642
+Lady Audley's Secret|8954
+The Portrait of a Lady|2833
+Washington Square|2870
+The Wings of the Dove|8558
+The Ambassadors|432
+Ethan Frome|4517
+Song of the Lark|3200
+The Great Gatsby|64317
+This Side of Paradise|805
+Main Street|543
+Babbitt|1156
+Arrowsmith|64158
+The Financier|21873
+An American Tragedy|64289
+Maggie A Girl of the Streets|56695
+The Octopus|2802
+McTeague|246
+The Jungle|140
+The Rise of Silas Lapham|154
+A Modern Instance|56693
+The Portrait of a Lady Volume 2|2834
+Ben-Hur|2145
+Quo Vadis|2853
+The Last Days of Pompeii|2493
+Ivanhoe|82
+Rob Roy|7025
+Waverley|4964
+The Bride of Lammermoor|470
+The Heart of Midlothian|9723
+Old Mortality|6942
+Kenilworth|1962
+The Talisman|1377
+Guy Mannering|3106
+Redgauntlet|17944
+Woodstock|3486
+Anne of Avonlea|47
+Anne of the Island|51
+Rebecca of Sunnybrook Farm|2044
+Pollyanna|1450
+Heidi|1448
+The Story of My Life|2397
+The Gods of Mars|64
+The Warlord of Mars|69
+The Beasts of Tarzan|85
+The Son of Tarzan|91
+At the Earth's Core|123
+The Land That Time Forgot|551
+The Poison Belt|126
+The Moon Maid|547
+Twenty Years of Hus'ling|20301
+The Mysterious Affair at Styles|863
+The Innocence of Father Brown|204
+The Man Who Was Thursday|1695
+Orthodoxy|130
+The Napoleon of Notting Hill|20058
+The Riddle of the Sands|1268
+Erewhon|1906
+The Way of All Flesh|2084
+Three Men in a Boat|308
+The Diary of a Nobody|3612
+Lady Windermere's Fan|790
+An Ideal Husband|885
+A Woman of No Importance|854
+De Profundis|921
+The Ballad of Reading Gaol|1554
+Salome|20009
+The Happy Prince and Other Tales|902
+The Water-Babies|1018
+Alice's Adventures Underground|19002
+Sylvie and Bruno|48795
+The Hunting of the Snark|13
+Phantastes|325
+Lilith|39168
+The Princess and the Goblin|708
+At the Back of the North Wind|999
+The Coral Island|11009
+Swiss Family Robinson|11707
+The Boy's King Arthur|1837
+King Arthur and His Knights of the Round Table|12753
+Le Morte d'Arthur Volume 1|1251
+Le Morte d'Arthur Volume 2|1252
+Sir Gawain and the Green Knight|22562
+The Song of Roland|391
+El Cid|1421
+The Nibelungenlied|7321
+Njal's Saga|13721
+Grettir's Saga|17205
+The Prose Edda|18947
+The Poetic Edda|14726
+Popol Vuh|21238
+The Epic of Gilgamesh|11000
+Bhagavad Gita|2388
+The Analects|3330
+Tao Te Ching|216
+The Art of War|132
+The Book of Five Rings|63764
+Meditations on First Philosophy|59
+Ethics Spinoza|3800
+Critique of Pure Reason|4280
+The Genealogy of Morals|52319
+Twilight of the Idols|52263
+The Birth of Tragedy|51356
+Human All Too Human|38145
+The Antichrist|19322
+Ecce Homo|52190
+The Gay Science|52881
+Beyond Good and Evil German|7204
+Symposium|1600
+Phaedo|1658
+Apology|1656
+Crito|1657
+Timaeus|1572
+Theaetetus|1726
+Gorgias|1672
+Meno|1643
+Protagoras|1591
+Euthyphro|1642
+Paimenides|1687
+The Sophist|1735
+Statesman|1738
+Laws|1750
+Politics|6762
+Poetics|1974
+Rhetoric|38108
+Metaphysics|38327
+Physics|37944
+De Anima|41438
+Organon|26095
+On the Heavens|9250
+Categories|2412
+Prior Analytics|38809
+Posterior Analytics|41848
+An Enquiry Concerning Human Understanding|9662
+A Treatise of Human Nature|4705
+Two Treatises of Government|7370
+An Essay Concerning Human Understanding|10615
+Discourse on Inequality|11136
+The Social Contract|46333
+Emile|5427
+Confessions Rousseau|3913
+Confessions Augustine|3296
+The City of God|45304
+Summa Theologica|17611
+Novum Organum|45988
+The Advancement of Learning|5500
+New Atlantis|2434
+Essays Bacon|2225
+Areopagitica|608
+Of Education|9370
+The Prelude|12383
+Lyrical Ballads|9622
+Songs of Experience|1935
+Kubla Khan|4058
+The Rime of the Ancient Mariner|151
+Biographia Literaria|6081
+Adonais|4699
+Prometheus Unbound|20954
+Ode to the West Wind|17170
+A Defence of Poetry|5428
+Don Juan|21700
+Childe Harold's Pilgrimage|5131
+The Corsair|2064
+Manfred|9646
+Endymion|2490
+Ode to a Nightingale|17193
+La Belle Dame sans Merci|18780
+The Eve of St Agnes|18956
+Hyperion Keats|8209
+Idylls of the King|3155
+In Memoriam|8916
+The Charge of the Light Brigade|18960
+Maud|24280
+The Lady of Shalott|10611
+Sonnets from the Portuguese|2002
+Aurora Leigh|2091
+The Ring and the Book|10052
+Men and Women Browning|10221
+Dramatic Lyrics|10310
+Pippa Passes|3316
+Fra Lippo Lippi|13583
+Goblin Market|30235
+The Blessed Damozel|38907
+Poems and Ballads|46745
+Atalanta in Calydon|13396
+A Shropshire Lad|5720
+Prufrock and Other Observations|1965
+North of Boston|3021
+A Boy's Will|32955
+Mountain Interval|4014
+New Hampshire|58681
+Chicago Poems|3011
+Smoke and Steel|61048
+The People Yes|61139
+Complete Poems Dickinson|12242
+Democratic Vistas|8813
+The Vision of Sir Launfal|10164
+Snow-Bound|21809
+Evangeline|1927
+The Song of Hiawatha|19
+The Courtship of Miles Standish|24888
+Thanatopsis|21879
+The Fireside Poets|8195
+Poems Poe|10031
+Tamerlane and Other Poems|31258
+The Gold-Bug|2147
+The Masque of the Red Death|1064
+The Prisoner of Zenda|95
+Rupert of Hentzau|1085
+The Scarlet Pimpernel|60
+The Corsican Brothers|2758
+Twenty Thousand Leagues Under the Seas|2488
+Michael Strogoff|1842
+Around the Moon|9741
+Five Weeks in a Balloon|3526
+A Journey to the Centre of the Earth|3748
+The Adventures of Captain Hatteras|24581
+In Search of the Castaways|2083
+Off on a Comet|21939
+The Begum's Fortune|21099
+Master of the World|3808
+Robur the Conqueror|17573
+The Purchase of the North Pole|20469
+Facing the Flag|20419
+The Steam House|24967
+Hector Servadac|9799
+The Underground City|21203
+The Survivors of the Chancellor|22137
+Doctor Ox's Experiment|8973
+A Floating City|9629
+The Fur Country|6297
+Dick Sand A Captain at Fifteen|20064
+Adrift in the Pacific|10008
+César Cascabel|29566
+The Village in the Treetops|24771
+For the Flag|30870
+The Golden Volcano|24756
+The Secret of Wilhelm Storitz|3801
+Moll Flanders|370
+A Journal of the Plague Year|8548
+Roxana|1937
+Colonel Jack|9702
+Captain Singleton|9703
+The Life of Jonathan Wild|2895
+Tom Jones|6593
+Amelia Fielding|6098
+Shamela|5827
+Pamela|6124
+Clarissa|1338
+Sir Charles Grandison|9611
+Evelina|6053
+Cecilia|6082
+Camilla|9660
+The Wanderer Burney|9683
+Castle Rackrent|6947
+Belinda Edgeworth|20515
+The Absentee|1949
+Castle of Otranto|696
+The Mysteries of Udolpho|3268
+The Italian Radcliffe|8974
+The Romance of the Forest|20560
+The Monk|601
+Melmoth the Wanderer|14167
+Vathek|58419
+Zastrozzi|11746
+St Irvyne|18135
+The Last Man Shelley|18247
+Lodore|18521
+St Leon|1953
+The Vicar of Wakefield|2607
+She Stoops to Conquer|383
+The Deserted Village|2668
+Rasselas|652
+Lives of the Poets|1564
+The Rambler|8567
+Dictionary of the English Language|38801
+A Tale of a Tub|4737
+The Beggar's Opera|29315
+Fables Gay|21798
+The Shepherd's Calendar|10609
+The Faerie Queene|30177
+Astrophel and Stella|43727
+Arcadia Sidney|41093
+Tamburlaine the Great|1094
+Doctor Faustus Marlowe|811
+The Jew of Malta|1057
+Edward II|1005
+Hero and Leander|1073
+The Duchess of Malfi|2232
+The White Devil|22334
+Volpone|4039
+The Alchemist Jonson|4081
+Every Man in His Humour|4809
+Bartholomew Fair|3694
+Sejanus His Fall|22694
+The Revenger's Tragedy|17272
+'Tis Pity She's a Whore|2402
+The Broken Heart|20654
+The Changeling Middleton|10983
+Women Beware Women|24072
+A Chaste Maid in Cheapside|17580
+The Spanish Tragedy|9615
+Arden of Faversham|20762
+Massacre at Paris|1101
+Dido Queen of Carthage|1123
+All for Love|3055
+The Country Wife|2277
+The Rivals|2242
+The School for Scandal|1929
+The Beaux Stratagem|17849
+Oroonoko|21361
+An Essay Upon Projects|4087
+The King James Bible|10
+The Apocrypha|8300
+The Book of Common Prayer|33787
+Grace Abounding|654
+The Holy War Bunyan|17436
+Fox's Book of Martyrs|21378
+The Imitation of Christ|1653
+The Rule of Saint Benedict|24468
+The Cloud of Unknowing|22662
+Revelations of Divine Love|55869
+The Interior Castle|15898
+Dark Night of the Soul|3269
+Introduction to the Devout Life|21167
+Theologia Germanica|32540
+The Little Flowers of St Francis|53194
+The Golden Legend|53225
+Ecclesiastical History Bede|38326
+The Anglo-Saxon Chronicle|657
+The Wanderer Old English|18935
+Pearl Poem|21447
+Piers Plowman|18027
+The Book of Margery Kempe|55361
+Troilus and Criseyde|257
+The Canterbury Tales Modern English|2383
+Amadis of Gaul|17515
+Orlando Furioso|615
+Orlando Innamorato|41756
+Jerusalem Delivered|29732
+The Decameron|3726
+Il Cortegiano|70659
+Discourses on Livy|10827
+The Art of War Machiavelli|31984
+Mandragola|33227
+History of Florence|2464
+The Divine Comedy Inferno|1001
+Purgatorio|1004
+Paradiso|8799
+Vita Nuova|9014
+The Rime of Petrarch|43427
+In Praise of Folly|30201
+Gargantua and Pantagruel|1200
+Essays Montaigne|3600
+Don Quixote Part Two|5921
+Lazarillo de Tormes|1128
+Hamlet|1524
+Macbeth|1533
+Othello|1531
+King Lear|1532
+Romeo and Juliet|1513
+A Midsummer Night's Dream|1514
+The Merchant of Venice|1515
+Much Ado About Nothing|1519
+Twelfth Night|1526
+As You Like It|1523
+The Tempest|1540
+Julius Caesar|1522
+Antony and Cleopatra|1121
+Coriolanus|1112
+Richard III|1103
+Richard II|1105
+Henry IV Part 1|1106
+Henry IV Part 2|1107
+Henry V|1119
+Henry VI Part 1|2251
+Henry VI Part 2|2252
+Henry VI Part 3|2253
+Henry VIII|2254
+King John|1120
+Titus Andronicus|1541
+Timon of Athens|1539
+Troilus and Cressida|1542
+The Taming of the Shrew|1508
+Sonnets Shakespeare|1041
+Venus and Adonis|1045
+The Rape of Lucrece|1046
+The Sea Around Us|63550
+Little Men|2726
+Jo's Boys|2777
+Eight Cousins|2734
+Under the Lilacs|1924
+Jack and Jill|2756
+An Old-Fashioned Girl|2787
+Work A Story of Experience|2691
+A Modern Mephistopheles|10598
+Behind a Mask|22381
+Hospital Sketches|17781
+Flower Fables|2782
+Bayou Folk|17540
+Herland|32
+With Her in Ourland|63258
+What Diantha Did|4712
+The Home Its Work and Influence|4713
+Women and Economics|65999
+Christmas Jenny|9691
+The Green Door|1444
+The Gift of the Magi|7256
+Cabbages and Kings|1573
+The Four Million|2776
+Salammbo|1650
+Bouvard et Pecuchet|38414
+Sentimental Education|23042
+Three Tales Flaubert|9420
+The Wild Ass's Skin|39597
+Eugenie Grandet|1715
+Pere Goriot|1237
+Cousin Pons|1739
+Lost Illusions|48132
+Seraphita|38924
+Anna of the Five Towns|3629
+The Old Wives' Tale|3557
+Clayhanger|3556
+Piccadilly Jim|8635
+Right Ho Jeeves|10554
+The Inimitable Jeeves|8164
+Carry On Jeeves|9848
