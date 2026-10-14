@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Uploaded / captured images and model files
+uploads/
+captures/
+*.jpg
+*.jpeg
+*.webp
+*.task
+*.tflite
+*.onnx
+*.pt
+*.pth
+*.h5
+
+# Node (if you ever add a build step to the component)
+node_modules/
+
+# IDEs / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
