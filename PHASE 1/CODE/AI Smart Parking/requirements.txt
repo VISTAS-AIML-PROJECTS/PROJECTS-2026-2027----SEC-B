@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+numpy
+pandas
+scikit-learn
+easyocr
+requests
+ultralytics
+pytest
+opencv-python==4.11.0.86

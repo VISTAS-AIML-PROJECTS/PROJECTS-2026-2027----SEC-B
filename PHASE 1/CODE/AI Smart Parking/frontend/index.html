@@ -1,0 +1,5557 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Smart Parking</title>
+
+<style>
+
+/* ============================================================
+   GLOBAL
+============================================================ */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",Arial,sans-serif;
+}
+
+html{
+    scroll-behavior:smooth;
+    scroll-padding-top:90px;
+}
+
+body{
+    background:#f4f7fb;
+    color:#172033;
+}
+
+
+/* ============================================================
+   LOGIN PAGE
+============================================================ */
+
+#loginPage{
+    position:fixed;
+    inset:0;
+    background:#0f172a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.login-box{
+    background:white;
+    border-radius:16px;
+    padding:36px 32px;
+    width:100%;
+    max-width:380px;
+    box-shadow:0 25px 60px rgba(0,0,0,.4);
+}
+
+.login-logo{
+    text-align:center;
+    margin-bottom:24px;
+}
+
+.login-logo div{
+    width:56px;
+    height:56px;
+    background:#2563eb;
+    border-radius:14px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+    margin-bottom:10px;
+}
+
+.login-logo h2{
+    font-size:20px;
+    color:#172033;
+}
+
+.login-logo p{
+    font-size:11px;
+    color:#64748b;
+    margin-top:3px;
+}
+
+.login-error{
+    display:none;
+    background:#fef2f2;
+    color:#991b1b;
+    border:1px solid #fecaca;
+    border-radius:8px;
+    padding:10px;
+    font-size:11px;
+    margin-bottom:13px;
+}
+
+
+/* ============================================================
+   ANOMALY BADGE
+============================================================ */
+
+.anomaly-badge{
+    background:#fee2e2;
+    color:#b91c1c;
+    padding:8px 12px;
+    border-radius:20px;
+    font-size:10px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.anomaly-badge.none{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+
+/* ANOMALY PANEL */
+
+.anomaly-panel{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:13px;
+    padding:21px;
+    margin-bottom:28px;
+    box-shadow:0 4px 15px rgba(15,23,42,.04);
+    display:none;
+}
+
+.anomaly-item{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    padding:11px;
+    border-radius:9px;
+    margin-bottom:8px;
+    font-size:11px;
+}
+
+.anomaly-high{   background:#fef2f2; border:1px solid #fecaca; }
+.anomaly-medium{ background:#fffbeb; border:1px solid #fcd34d; }
+.anomaly-low{    background:#eff6ff; border:1px solid #bfdbfe; }
+
+.anomaly-icon{ font-size:18px; }
+
+.anomaly-title{
+    font-weight:700;
+    font-size:11px;
+    margin-bottom:2px;
+}
+
+.anomaly-msg{ color:#475569; }
+
+.anomaly-slot-map .slot{ cursor:default; }
+.anomaly-slot-map .slot:hover{ transform:none; box-shadow:none; }
+.anomaly-slot{ border-color:#f97316 !important; box-shadow:0 0 0 2px #fed7aa; }
+
+
+/* FUZZY SUGGESTIONS */
+
+.fuzzy-box{
+    background:white;
+    border:1px solid #bfdbfe;
+    border-radius:8px;
+    margin-top:4px;
+    overflow:hidden;
+    display:none;
+    position:absolute;
+    z-index:200;
+    width:100%;
+    box-shadow:0 8px 20px rgba(0,0,0,.1);
+}
+
+.fuzzy-item{
+    padding:9px 12px;
+    font-size:12px;
+    cursor:pointer;
+    border-bottom:1px solid #f1f5f9;
+    display:flex;
+    justify-content:space-between;
+}
+
+.fuzzy-item:hover{ background:#eff6ff; }
+
+.input-wrap{ position:relative; }
+
+
+/* ============================================================
+   SIDEBAR
+============================================================ */
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:245px;
+    height:100vh;
+    background:#0f172a;
+    color:white;
+    padding:22px 16px;
+    z-index:100;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:8px 8px 28px;
+}
+
+.logo-icon{
+    width:43px;
+    height:43px;
+    background:#2563eb;
+    border-radius:12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:21px;
+}
+
+.logo-text h2{
+    font-size:17px;
+    font-weight:700;
+}
+
+.logo-text p{
+    font-size:10px;
+    color:#94a3b8;
+    margin-top:3px;
+}
+
+
+/* MENU */
+
+.menu-title{
+    color:#64748b;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1.2px;
+    margin:18px 10px 9px;
+}
+
+.menu-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:12px 13px;
+    margin:5px 0;
+
+    border-radius:9px;
+
+    color:#cbd5e1;
+    font-size:13px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.menu-item:hover{
+    background:#1e293b;
+    color:white;
+}
+
+.menu-item.active{
+    background:#2563eb;
+    color:white;
+}
+
+.menu-icon{
+    width:20px;
+    text-align:center;
+    font-size:15px;
+}
+
+
+/* SYSTEM STATUS */
+
+.system-status{
+    position:absolute;
+    left:16px;
+    right:16px;
+    bottom:20px;
+
+    background:#172033;
+
+    padding:13px;
+
+    border-radius:10px;
+
+    font-size:11px;
+    color:#cbd5e1;
+}
+
+.online-dot{
+    display:inline-block;
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:#22c55e;
+
+    margin-right:6px;
+}
+
+
+/* ============================================================
+   MAIN
+============================================================ */
+
+.main{
+    margin-left:245px;
+    min-height:100vh;
+}
+
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+
+.topbar{
+    position:sticky;
+    top:0;
+
+    height:76px;
+
+    background:rgba(255,255,255,.96);
+
+    backdrop-filter:blur(10px);
+
+    border-bottom:1px solid #e5e7eb;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 32px;
+
+    z-index:50;
+}
+
+.page-title h1{
+    font-size:22px;
+}
+
+.page-title p{
+    margin-top:4px;
+
+    color:#64748b;
+
+    font-size:12px;
+}
+
+.top-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.live{
+    background:#dcfce7;
+
+    color:#15803d;
+
+    padding:8px 12px;
+
+    border-radius:20px;
+
+    font-size:10px;
+
+    font-weight:700;
+}
+
+.auto-refresh{
+    background:#eff6ff;
+
+    color:#2563eb;
+
+    padding:8px 12px;
+
+    border-radius:20px;
+
+    font-size:10px;
+
+    font-weight:600;
+}
+
+.refresh-btn{
+    border:1px solid #bfdbfe;
+
+    background:#eff6ff;
+
+    color:#2563eb;
+
+    padding:9px 14px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:12px;
+
+    font-weight:600;
+}
+
+.refresh-btn:hover{
+    background:#dbeafe;
+}
+
+
+/* ============================================================
+   CONTENT
+============================================================ */
+
+.content{
+    padding:28px 32px;
+}
+
+.section{
+    margin-bottom:28px;
+
+    scroll-margin-top:95px;
+}
+
+.section-title{
+    font-size:17px;
+
+    font-weight:700;
+
+    margin-bottom:15px;
+}
+
+
+/* ============================================================
+   STAT CARDS
+============================================================ */
+
+.stats{
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:15px;
+}
+
+.stat-card{
+    background:white;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:13px;
+
+    padding:19px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(15,23,42,.04);
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.stat-card:hover{
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 8px 20px
+        rgba(15,23,42,.08);
+}
+
+.stat-top{
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+}
+
+.stat-icon{
+    width:39px;
+    height:39px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:10px;
+
+    font-size:17px;
+}
+
+.blue{
+    background:#dbeafe;
+}
+
+.green{
+    background:#dcfce7;
+}
+
+.red{
+    background:#fee2e2;
+}
+
+.orange{
+    background:#fef3c7;
+}
+
+.stat-label{
+    color:#64748b;
+
+    font-size:10px;
+
+    font-weight:600;
+
+    margin-top:15px;
+}
+
+.stat-number{
+    font-size:28px;
+
+    font-weight:750;
+
+    margin-top:3px;
+}
+
+.stat-note{
+    font-size:10px;
+
+    color:#94a3b8;
+
+    margin-top:5px;
+}
+
+
+/* ============================================================
+   MAIN GRID
+============================================================ */
+
+.main-grid{
+    display:grid;
+
+    grid-template-columns:
+        1.45fr 1fr;
+
+    gap:20px;
+}
+
+
+/* ============================================================
+   CARD
+============================================================ */
+
+.card{
+    background:white;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:13px;
+
+    padding:21px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(15,23,42,.04);
+}
+
+.card-header{
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    margin-bottom:18px;
+}
+
+.card-title{
+    font-size:15px;
+
+    font-weight:700;
+}
+
+.card-subtitle{
+    font-size:10px;
+
+    color:#94a3b8;
+
+    margin-top:4px;
+}
+
+
+/* ============================================================
+   PARKING MAP
+============================================================ */
+
+.floor{
+    margin-bottom:20px;
+}
+
+.floor-header{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:10px 13px;
+
+    background:#f8fafc;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:8px;
+
+    margin-bottom:10px;
+}
+
+.floor-name{
+    font-size:12px;
+
+    font-weight:700;
+}
+
+.floor-available{
+    font-size:10px;
+
+    color:#64748b;
+}
+
+.slot-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(5,1fr);
+
+    gap:8px;
+}
+
+
+/* SLOT */
+
+.slot{
+    height:69px;
+
+    border-radius:9px;
+
+    border:1px solid;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    position:relative;
+
+    user-select:none;
+}
+
+.slot:hover{
+    transform:translateY(-3px);
+
+    box-shadow:
+        0 7px 15px
+        rgba(0,0,0,.12);
+}
+
+.slot-id{
+    font-size:14px;
+
+    font-weight:750;
+}
+
+.slot-status{
+    font-size:8px;
+
+    text-transform:uppercase;
+
+    margin-top:3px;
+
+    font-weight:600;
+}
+
+.slot-click{
+    font-size:7px;
+
+    opacity:.65;
+
+    margin-top:3px;
+}
+
+
+/* AVAILABLE */
+
+.available-slot{
+    background:#ecfdf5;
+
+    border-color:#86efac;
+
+    color:#15803d;
+}
+
+.available-slot:hover{
+    background:#dcfce7;
+}
+
+
+/* OCCUPIED */
+
+.occupied-slot{
+    background:#fef2f2;
+
+    border-color:#fca5a5;
+
+    color:#b91c1c;
+}
+
+.occupied-slot:hover{
+    background:#fee2e2;
+}
+
+
+/* RESERVED */
+
+.reserved-slot{
+    background:#fffbeb;
+
+    border-color:#fcd34d;
+
+    color:#b45309;
+}
+
+.reserved-slot:hover{
+    background:#fef3c7;
+}
+
+
+/* LEGEND */
+
+.legend{
+    display:flex;
+
+    gap:17px;
+
+    margin-top:15px;
+
+    flex-wrap:wrap;
+
+    font-size:9px;
+
+    color:#64748b;
+}
+
+.legend-item{
+    display:flex;
+
+    align-items:center;
+
+    gap:5px;
+}
+
+.legend-dot{
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+}
+
+.green-dot{
+    background:#22c55e;
+}
+
+.red-dot{
+    background:#ef4444;
+}
+
+.yellow-dot{
+    background:#f59e0b;
+}
+
+
+/* ============================================================
+   PREDICTION
+============================================================ */
+
+.prediction-list{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:13px;
+}
+
+.prediction-box{
+    border:1px solid #e2e8f0;
+
+    border-radius:10px;
+
+    padding:13px;
+}
+
+.prediction-top{
+    display:flex;
+
+    justify-content:space-between;
+
+    font-size:11px;
+
+    margin-bottom:8px;
+}
+
+.prediction-name{
+    font-weight:600;
+}
+
+.prediction-number{
+    color:#2563eb;
+
+    font-weight:700;
+}
+
+.progress{
+    height:7px;
+
+    background:#e2e8f0;
+
+    border-radius:10px;
+
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+
+    background:#2563eb;
+
+    border-radius:10px;
+
+    transition:.5s;
+}
+
+.prediction-info{
+    margin-top:13px;
+
+    background:#eff6ff;
+
+    padding:11px;
+
+    border-radius:8px;
+
+    font-size:10px;
+
+    line-height:1.5;
+
+    color:#475569;
+}
+
+
+/* ============================================================
+   MANAGEMENT
+============================================================ */
+
+.management-grid{
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:20px;
+}
+
+.form-group{
+    margin-bottom:13px;
+}
+
+.form-label{
+    display:block;
+
+    font-size:9px;
+
+    color:#475569;
+
+    font-weight:700;
+
+    margin-bottom:6px;
+}
+
+input,
+select{
+    width:100%;
+
+    height:41px;
+
+    border:1px solid #dbe1ea;
+
+    background:#f8fafc;
+
+    border-radius:8px;
+
+    padding:0 11px;
+
+    outline:none;
+
+    font-size:12px;
+
+    color:#172033;
+}
+
+input:focus,
+select:focus{
+    border-color:#2563eb;
+
+    background:white;
+}
+
+.button{
+    width:100%;
+
+    height:41px;
+
+    border:none;
+
+    border-radius:8px;
+
+    color:white;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+.blue-button{
+    background:#2563eb;
+}
+
+.blue-button:hover{
+    background:#1d4ed8;
+}
+
+.red-button{
+    background:#dc2626;
+}
+
+.red-button:hover{
+    background:#b91c1c;
+}
+
+
+/* ============================================================
+   FIND VEHICLE
+============================================================ */
+
+.find-row{
+    display:flex;
+
+    gap:10px;
+}
+
+.find-row input{
+    flex:1;
+}
+
+.find-row button{
+    width:135px;
+}
+
+
+/* FIND RESULT */
+
+.find-result{
+    display:none;
+
+    margin-top:16px;
+
+    background:#eff6ff;
+
+    border:1px solid #bfdbfe;
+
+    border-radius:10px;
+
+    padding:16px;
+}
+
+.find-title{
+    font-size:13px;
+
+    font-weight:700;
+
+    margin-bottom:13px;
+}
+
+.location-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:8px;
+}
+
+.location-item{
+    background:white;
+
+    border:1px solid #dbeafe;
+
+    border-radius:8px;
+
+    padding:10px;
+}
+
+.location-item span{
+    display:block;
+
+    color:#64748b;
+
+    font-size:8px;
+
+    margin-bottom:3px;
+}
+
+.location-item strong{
+    font-size:11px;
+}
+
+
+/* ============================================================
+   MODALS
+============================================================ */
+
+.modal-overlay{
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(15,23,42,.62);
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:500;
+
+    padding:20px;
+}
+
+.modal{
+    width:100%;
+
+    max-width:510px;
+
+    background:white;
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+    box-shadow:
+        0 25px 60px
+        rgba(0,0,0,.25);
+
+    animation:modalShow .2s ease;
+}
+
+@keyframes modalShow{
+
+    from{
+        opacity:0;
+        transform:translateY(12px) scale(.97);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+
+}
+
+.modal-header{
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 21px;
+
+    border-bottom:1px solid #e5e7eb;
+}
+
+.modal-header h2{
+    font-size:17px;
+}
+
+.close{
+    width:32px;
+
+    height:32px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#f1f5f9;
+
+    font-size:18px;
+
+    cursor:pointer;
+}
+
+.modal-body{
+    padding:21px;
+}
+
+.modal-footer{
+    padding:14px 21px;
+
+    border-top:1px solid #e5e7eb;
+
+    display:flex;
+
+    gap:9px;
+}
+
+.modal-footer button{
+    flex:1;
+}
+
+
+/* DETAIL */
+
+.detail-grid{
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:9px;
+}
+
+.detail-box{
+    background:#f8fafc;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:8px;
+
+    padding:11px;
+}
+
+.detail-box span{
+    display:block;
+
+    color:#64748b;
+
+    font-size:8px;
+
+    margin-bottom:4px;
+}
+
+.detail-box strong{
+    font-size:11px;
+}
+
+
+/* SELECTED SLOT */
+
+.selected-slot{
+    background:#eff6ff;
+
+    border:1px solid #bfdbfe;
+
+    border-radius:10px;
+
+    padding:13px;
+
+    margin-bottom:17px;
+}
+
+.selected-slot span{
+    display:block;
+
+    font-size:8px;
+
+    color:#64748b;
+}
+
+.selected-slot strong{
+    display:block;
+
+    color:#2563eb;
+
+    font-size:21px;
+
+    margin-top:3px;
+}
+
+
+/* MESSAGE */
+
+.message{
+    display:none;
+
+    margin-top:11px;
+
+    padding:10px;
+
+    border-radius:8px;
+
+    font-size:10px;
+}
+
+.success{
+    display:block;
+
+    background:#ecfdf5;
+
+    color:#166534;
+
+    border:1px solid #bbf7d0;
+}
+
+.error{
+    display:block;
+
+    background:#fef2f2;
+
+    color:#991b1b;
+
+    border:1px solid #fecaca;
+}
+
+.admin-data-table{ width:100%; border-collapse:collapse; font-size:11px; }
+.admin-data-table th,.admin-data-table td{ padding:9px 10px; border-bottom:1px solid #e5e7eb; text-align:left; white-space:nowrap; }
+.admin-data-table th{ color:#64748b; font-weight:700; background:#f8fafc; }
+.action-toast{
+    position:fixed; top:20px; right:22px; z-index:10001; width:min(390px,calc(100vw - 32px));
+    padding:14px 17px; border-radius:8px; color:#fff; font-size:13px; font-weight:650;
+    box-shadow:0 12px 32px rgba(15,23,42,.24); opacity:0; transform:translateY(-10px);
+    pointer-events:none; transition:opacity .2s ease,transform .2s ease;
+}
+.action-toast.show{ opacity:1; transform:translateY(0); }
+.action-toast.success{ background:#166534; }
+.action-toast.error{ background:#991b1b; }
+.action-toast.info{ background:#1e40af; }
+
+
+/* ============================================================
+    FLOOR CONGESTION
+============================================================ */
+
+.floor-card{
+    border:1px solid #e2e8f0;
+    border-radius:11px;
+    padding:15px;
+    background:white;
+}
+
+.floor-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.floor-badge{
+    font-size:18px;
+    font-weight:800;
+    color:#172033;
+}
+
+.floor-score{
+    font-size:26px;
+    font-weight:800;
+    margin:4px 0 2px;
+}
+
+.floor-meta{
+    font-size:9px;
+    color:#64748b;
+    line-height:1.7;
+}
+
+.floor-bar-wrap{
+    height:6px;
+    background:#e2e8f0;
+    border-radius:10px;
+    margin-top:10px;
+    overflow:hidden;
+}
+
+.floor-bar{
+    height:100%;
+    border-radius:10px;
+    transition:.5s;
+}
+
+.congestion-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:13px;
+}
+
+.congestion-card{
+    border:1px solid #e2e8f0;
+    border-radius:11px;
+    padding:15px;
+    background:white;
+}
+
+.congestion-level{
+    font-size:11px;
+    font-weight:700;
+    padding:4px 9px;
+    border-radius:20px;
+    display:inline-block;
+    margin-bottom:8px;
+}
+
+.level-critical{ background:#fee2e2; color:#b91c1c; }
+.level-high{     background:#fef3c7; color:#b45309; }
+.level-medium{   background:#dbeafe; color:#1d4ed8; }
+.level-low{      background:#dcfce7; color:#15803d; }
+
+.congestion-pct{
+    font-size:24px;
+    font-weight:800;
+    margin:3px 0;
+}
+
+.fill-warning{
+    font-size:9px;
+    color:#dc2626;
+    font-weight:700;
+    margin-top:5px;
+}
+
+@media(max-width:1100px){
+    .floor-summary-grid,
+    .congestion-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:600px){
+    .floor-summary-grid,
+    .congestion-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media(max-width:1100px){
+
+    .stats{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .main-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media(max-width:850px){
+
+    .sidebar{
+        width:70px;
+
+        padding:20px 9px;
+    }
+
+    .logo-text,
+    .menu-title,
+    .menu-item span,
+    .system-status{
+        display:none;
+    }
+
+    .logo{
+        justify-content:center;
+    }
+
+    .menu-item{
+        justify-content:center;
+    }
+
+    .main{
+        margin-left:70px;
+    }
+
+    .management-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media(max-width:600px){
+
+    .content{
+        padding:18px;
+    }
+
+    .topbar{
+        padding:0 18px;
+    }
+
+    .top-actions .live{
+        display:none;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .slot-grid{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .location-grid{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .find-row{
+        flex-direction:column;
+    }
+
+    .find-row button{
+        width:100%;
+    }
+
+    .detail-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="actionToast" class="action-toast" role="status" aria-live="polite"></div>
+
+<!-- ============================================================
+     LOGIN PAGE
+============================================================ -->
+
+<div id="loginPage">
+
+    <div class="login-box">
+
+        <div class="login-logo">
+            <div>🚗</div>
+            <h2>Smart Parking</h2>
+            <p>Admin Dashboard — Please sign in</p>
+        </div>
+
+        <div class="login-error" id="loginError"></div>
+
+        <div class="form-group">
+            <label class="form-label">USERNAME</label>
+            <input
+                id="loginUsername"
+                type="text"
+                placeholder="admin"
+                onkeydown="if(event.key==='Enter') doLogin()"
+            >
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">PASSWORD</label>
+            <input
+                id="loginPassword"
+                type="password"
+                placeholder="••••••••"
+                onkeydown="if(event.key==='Enter') doLogin()"
+            >
+        </div>
+
+        <button
+            class="button blue-button"
+            onclick="doLogin()"
+            id="loginBtn"
+        >
+            Sign In
+        </button>
+
+        <div style="text-align:center;margin-top:14px;font-size:10px;color:#94a3b8;">
+            Default: admin / admin123
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     SIDEBAR
+============================================================ -->
+
+<aside class="sidebar">
+
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            🚗
+        </div>
+
+        <div class="logo-text">
+
+            <h2>Smart Parking</h2>
+
+            <p>AI Management System</p>
+
+        </div>
+
+    </div>
+
+
+    <div class="menu-title">
+        Dashboard
+    </div>
+
+
+    <div
+        class="menu-item active"
+        onclick="navigateTo('overview',this,'Dashboard overview opened.')"
+    >
+
+        <div class="menu-icon">📊</div>
+
+        <span>Overview</span>
+
+    </div>
+
+
+    <div
+        class="menu-item"
+        onclick="navigateTo('parkingSection',this,'Live parking slots opened.')"
+    >
+
+        <div class="menu-icon">🅿️</div>
+
+        <span>Parking Slots</span>
+
+    </div>
+
+
+    <div
+        class="menu-item"
+        onclick="navigateTo('predictionSection',this,'Parking prediction opened.')"
+    >
+
+        <div class="menu-icon">🤖</div>
+
+        <span>AI Prediction</span>
+
+    </div>
+
+
+    <div class="menu-title">
+        Management
+    </div>
+
+
+    <div
+        class="menu-item"
+        onclick="navigateTo('adminSummarySection',this,'Admin reports opened.')"
+    >
+        <div class="menu-icon">📊</div>
+        <span>Admin Summary</span>
+    </div>
+
+
+    <div
+        class="menu-item"
+        onclick="navigateTo('entrySection',this,'Vehicle entry form opened.')"
+    >
+
+        <div class="menu-icon">🚗</div>
+
+        <span>Vehicle Entry</span>
+
+    </div>
+
+
+    <div
+        class="menu-item"
+        onclick="navigateTo('findCarSection',this,'Vehicle lookup opened.')"
+    >
+
+        <div class="menu-icon">🔎</div>
+
+        <span>Find My Vehicle</span>
+
+    </div>
+
+
+    <div
+        class="menu-item"
+        onclick="navigateTo('exitSection',this,'Vehicle exit and billing opened.')"
+    >
+
+        <div class="menu-icon">🚪</div>
+
+        <span>Vehicle Exit</span>
+
+    </div>
+
+    <div class="menu-item" onclick="navigateTo('vehiclesSection',this,'Vehicle register opened.')">
+        <div class="menu-icon">🚙</div><span>Vehicles</span>
+    </div>
+    <div class="menu-item" onclick="navigateTo('bookingManagement',this,'Booking records opened.')">
+        <div class="menu-icon">🗓️</div><span>Bookings</span>
+    </div>
+    <div class="menu-item" onclick="navigateTo('walkInSection',this,'Walk-in vehicle records opened.')">
+        <div class="menu-icon">🚘</div><span>Walk-in Vehicles</span>
+    </div>
+    <div class="menu-item" onclick="navigateTo('anomalySection',this,'Anomaly alerts opened.')">
+        <div class="menu-icon">⚠️</div><span>Anomaly Alerts</span>
+    </div>
+    <div class="menu-item" onclick="navigateTo('billingSection',this,'Billing records opened.')">
+        <div class="menu-icon">₹</div><span>Billing</span>
+    </div>
+    <div class="menu-item" onclick="navigateTo('floorCongestionSection',this,'Congestion prediction opened.')">
+        <div class="menu-icon">📈</div><span>Prediction</span>
+    </div>
+    <div class="menu-item" onclick="navigateTo('adminSummarySection',this,'Reports opened.')">
+        <div class="menu-icon">📋</div><span>Reports</span>
+    </div>
+
+
+    <div class="system-status">
+
+        <span class="online-dot"></span>
+
+        System Online
+
+        <div
+            style="
+            color:#64748b;
+            margin-top:5px;
+            font-size:9px;"
+        >
+
+            AI services running normally
+
+        </div>
+
+    </div>
+
+
+</aside>
+
+
+<!-- ============================================================
+     MAIN
+============================================================ -->
+
+<main class="main">
+
+
+<!-- TOP BAR -->
+
+<header class="topbar">
+
+
+    <div class="page-title">
+
+        <h1>
+            Parking Dashboard
+        </h1>
+
+        <p>
+            Real-time parking monitoring & intelligent management
+        </p>
+
+    </div>
+
+
+    <div class="top-actions">
+
+        <div class="live">
+            ● LIVE SYSTEM
+        </div>
+
+        <div class="auto-refresh" id="autoRefreshBadge">
+            ↻ Auto-refresh: ON
+        </div>
+
+        <div
+            class="anomaly-badge none"
+            id="anomalyBadge"
+            onclick="toggleAnomalyPanel()"
+        >
+            ✔ No Anomalies
+        </div>
+
+        <button
+            class="refresh-btn"
+            onclick="refreshDashboard(true)"
+        >
+            ↻ Refresh
+        </button>
+
+        <button
+            class="refresh-btn"
+            style="background:#fef2f2;color:#b91c1c;border-color:#fecaca;"
+            onclick="doLogout()"
+        >
+            🔒 Logout
+        </button>
+
+    </div>
+
+
+</header>
+
+
+<div class="content">
+
+
+<!-- ANOMALY PANEL -->
+<div class="anomaly-panel" id="anomalyPanel">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px;">
+        ⚠️ Anomaly Alerts
+    </div>
+    <div id="anomalyList">Loading...</div>
+</div>
+
+
+<!-- ============================================================
+     OVERVIEW
+============================================================ -->
+
+<section
+    class="section"
+    id="overview"
+>
+
+
+    <div class="section-title">
+        Parking Overview
+    </div>
+
+
+    <div class="stats">
+
+
+        <!-- TOTAL -->
+
+        <div
+            class="stat-card"
+            onclick="navigateTo('parkingSection')"
+        >
+
+            <div class="stat-top">
+
+                <div class="stat-icon blue">
+                    🅿️
+                </div>
+
+            </div>
+
+            <div class="stat-label">
+                TOTAL PARKING SLOTS
+            </div>
+
+            <div
+                class="stat-number"
+                id="totalSlots"
+            >
+                --
+            </div>
+
+            <div class="stat-note">
+                Registered capacity
+            </div>
+
+        </div>
+
+
+        <!-- AVAILABLE -->
+
+        <div
+            class="stat-card"
+            onclick="focusAvailableSlot()"
+        >
+
+            <div class="stat-top">
+
+                <div class="stat-icon green">
+                    ✓
+                </div>
+
+            </div>
+
+            <div class="stat-label">
+                AVAILABLE SLOTS
+            </div>
+
+            <div
+                class="stat-number"
+                id="availableSlots"
+            >
+                --
+            </div>
+
+            <div class="stat-note">
+                Click a green slot to book
+            </div>
+
+        </div>
+
+
+        <!-- OCCUPIED -->
+
+        <div
+            class="stat-card"
+            onclick="focusOccupiedSlot()"
+        >
+
+            <div class="stat-top">
+
+                <div class="stat-icon red">
+                    🚘
+                </div>
+
+            </div>
+
+            <div class="stat-label">
+                OCCUPIED SLOTS
+            </div>
+
+            <div
+                class="stat-number"
+                id="occupiedSlots"
+            >
+                --
+            </div>
+
+            <div class="stat-note">
+                Click red slot for vehicle
+            </div>
+
+        </div>
+
+
+        <!-- RESERVED -->
+
+        <div
+            class="stat-card"
+            onclick="focusReservedSlot()"
+        >
+
+            <div class="stat-top">
+
+                <div class="stat-icon orange">
+                    🔒
+                </div>
+
+            </div>
+
+            <div class="stat-label">
+                RESERVED SLOTS
+            </div>
+
+            <div
+                class="stat-number"
+                id="reservedSlots"
+            >
+                --
+            </div>
+
+            <div class="stat-note">
+                Active reservations
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+<!-- ============================================================
+     PARKING + AI
+============================================================ -->
+
+<div class="main-grid">
+
+
+<!-- PARKING -->
+
+<section
+    class="section"
+    id="parkingSection"
+>
+
+
+<div class="card">
+
+
+    <div class="card-header">
+
+        <div>
+
+            <div class="card-title">
+                🅿️ Live Parking Map
+            </div>
+
+            <div class="card-subtitle">
+                Select a slot to view details or book
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div id="parkingArea">
+
+        Loading parking slots...
+
+    </div>
+
+
+    <div class="legend">
+
+        <div class="legend-item">
+
+            <div class="legend-dot green-dot"></div>
+
+            Available — Book
+
+        </div>
+
+
+        <div class="legend-item">
+
+            <div class="legend-dot red-dot"></div>
+
+            Occupied — Vehicle
+
+        </div>
+
+
+        <div class="legend-item">
+
+            <div class="legend-dot yellow-dot"></div>
+
+            Reserved — Booking
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+</section>
+
+
+<!-- RIGHT -->
+
+<div>
+
+
+<!-- ============================================================
+     AI PREDICTION
+============================================================ -->
+
+<section
+    class="section"
+    id="predictionSection"
+>
+
+
+<div class="card">
+
+
+    <div class="card-header">
+
+        <div>
+
+            <div class="card-title">
+                🤖 AI Availability Prediction
+            </div>
+
+            <div class="card-subtitle">
+                Machine learning based future availability
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="prediction-list">
+
+
+        <div class="prediction-box">
+
+            <div class="prediction-top">
+
+                <span class="prediction-name">
+                    Next 30 Minutes
+                </span>
+
+                <span
+                    class="prediction-number"
+                    id="pred30"
+                >
+                    --
+                </span>
+
+            </div>
+
+            <div class="progress">
+
+                <div
+                    class="progress-bar"
+                    id="bar30"
+                    style="width:0%"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="prediction-box">
+
+            <div class="prediction-top">
+
+                <span class="prediction-name">
+                    Next 60 Minutes
+                </span>
+
+                <span
+                    class="prediction-number"
+                    id="pred60"
+                >
+                    --
+                </span>
+
+            </div>
+
+            <div class="progress">
+
+                <div
+                    class="progress-bar"
+                    id="bar60"
+                    style="width:0%"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="prediction-box">
+
+            <div class="prediction-top">
+
+                <span class="prediction-name">
+                    Next 90 Minutes
+                </span>
+
+                <span
+                    class="prediction-number"
+                    id="pred90"
+                >
+                    --
+                </span>
+
+            </div>
+
+            <div class="progress">
+
+                <div
+                    class="progress-bar"
+                    id="bar90"
+                    style="width:0%"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="prediction-info">
+
+        💡 The AI model estimates future parking
+        availability using occupancy and historical
+        parking demand patterns.
+
+    </div>
+
+
+</div>
+
+
+</section>
+
+
+<section class="section" id="allocationPolicySection">
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="card-title">Dynamic Slot Allocation</div>
+                <div class="card-subtitle">Bookings retain their reserved bay; walk-ins are assigned to the least-occupied floor.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+</div>
+
+
+</div>
+
+
+<!-- ============================================================
+     VEHICLE MANAGEMENT
+============================================================ -->
+
+<section
+    class="section"
+    id="vehicleManagement"
+>
+
+
+    <div class="section-title">
+        Vehicle Management
+    </div>
+
+
+    <div class="management-grid">
+
+
+    <!-- ENTRY -->
+
+    <div
+        class="card"
+        id="entrySection"
+    >
+
+
+        <div class="card-header">
+
+            <div>
+
+                <div class="card-title">
+                    🚗 Vehicle Entry
+                </div>
+
+                <div class="card-subtitle">
+                    Register vehicle and assign parking
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                NUMBER PLATE
+            </label>
+
+            <div class="input-wrap">
+            <input
+                id="entryPlate"
+                type="text"
+                placeholder="TN14AB234"
+                autocomplete="off"
+                oninput="fuzzySearch('entryPlate','entrySuggestions')"
+            >
+            <div class="fuzzy-box" id="entrySuggestions"></div>
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                VEHICLE TYPE
+            </label>
+
+            <select id="entryType">
+
+                <option value="Car">
+                    🚗 Car
+                </option>
+
+                <option value="Bike">
+                    🏍️ Bike
+                </option>
+
+                <option value="Bus">
+                    🚌 Bus
+                </option>
+
+                <option value="Truck">
+                    🚚 Truck
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            class="button blue-button"
+            onclick="vehicleEntry()"
+        >
+
+            Assign Parking Slot
+
+        </button>
+
+
+        <div
+            id="entryMessage"
+            class="message"
+        ></div>
+
+
+    </div>
+
+
+    <!-- EXIT -->
+
+    <div
+        class="card"
+        id="exitSection"
+    >
+
+
+        <div class="card-header">
+
+            <div>
+
+                <div class="card-title">
+                    🚪 Vehicle Exit
+                </div>
+
+                <div class="card-subtitle">
+                    Complete session and calculate fee
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                NUMBER PLATE
+            </label>
+
+            <div class="input-wrap">
+            <input
+                id="exitPlate"
+                type="text"
+                placeholder="TN14AB234"
+                autocomplete="off"
+                oninput="fuzzySearch('exitPlate','exitSuggestions')"
+            >
+            <div class="fuzzy-box" id="exitSuggestions"></div>
+            </div>
+
+        </div>
+
+
+        <div
+            style="
+            background:#f8fafc;
+            border-radius:8px;
+            padding:12px;
+            margin-bottom:13px;
+            color:#64748b;
+            font-size:10px;"
+        >
+
+            💳 Fee is calculated automatically.
+
+            <br>
+
+            <strong
+                style="
+                color:#172033;
+                display:block;
+                margin-top:3px;"
+            >
+
+                Minimum parking fee: ₹20
+
+            </strong>
+
+        </div>
+
+
+        <button
+            class="button red-button"
+            onclick="vehicleExit()"
+        >
+
+            Process Vehicle Exit
+
+        </button>
+
+
+        <div
+            id="exitMessage"
+            class="message"
+        ></div>
+
+
+        <!-- PAY NOW (shown after exit) -->
+
+        <button
+            class="button blue-button"
+            id="payNowBtn"
+            style="display:none;margin-top:10px;"
+            onclick="openPayment()"
+        >
+
+            💳 Pay Now
+
+        </button>
+
+
+    </div>
+
+
+    </div>
+
+
+</section>
+
+
+<!-- ============================================================
+     FIND MY VEHICLE
+============================================================ -->
+
+<section
+    class="section"
+    id="findCarSection"
+>
+
+
+    <div class="section-title">
+        Find My Vehicle
+    </div>
+
+
+    <div class="card">
+
+
+        <div class="card-header">
+
+            <div>
+
+                <div class="card-title">
+                    🔎 Locate Your Vehicle
+                </div>
+
+                <div class="card-subtitle">
+                    Find your car, bike, bus or truck
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="find-row">
+
+            <div class="input-wrap" style="flex:1;">
+            <input
+                id="findPlate"
+                type="text"
+                placeholder="Enter number plate"
+                autocomplete="off"
+                oninput="fuzzySearch('findPlate','findSuggestions')"
+            >
+            <div class="fuzzy-box" id="findSuggestions"></div>
+            </div>
+
+            <button
+                class="button blue-button"
+                onclick="findVehicle()"
+            >
+
+                Find Vehicle
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="findResult"
+            class="find-result"
+        >
+
+            <div class="find-title">
+                📍 Vehicle Location
+            </div>
+
+
+            <div class="location-grid">
+
+
+                <div class="location-item">
+
+                    <span>VEHICLE</span>
+
+                    <strong id="foundVehicle">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="location-item">
+
+                    <span>TYPE</span>
+
+                    <strong id="foundType">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="location-item">
+
+                    <span>FLOOR</span>
+
+                    <strong id="foundFloor">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="location-item">
+
+                    <span>SECTION</span>
+
+                    <strong id="foundSection">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="location-item">
+
+                    <span>SLOT</span>
+
+                    <strong id="foundSlot">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="location-item">
+
+                    <span>OWNER</span>
+
+                    <strong id="foundOwner">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="location-item">
+
+                    <span>STATUS</span>
+
+                    <strong id="foundStatus">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="location-item">
+
+                    <span>ENTRY TIME</span>
+
+                    <strong id="foundEntryTime">
+                        --
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+<!-- ============================================================
+     ADMIN SUMMARY
+============================================================ -->
+
+<section class="section" id="adminSummarySection">
+
+    <div class="section-title">
+        📊 Admin Summary
+    </div>
+
+    <div class="stats" style="margin-bottom:18px;">
+
+        <div class="stat-card">
+            <div class="stat-top"><div class="stat-icon blue">🚗</div></div>
+            <div class="stat-label">TOTAL VEHICLES</div>
+            <div class="stat-number" id="adminTotalVehicles">--</div>
+            <div class="stat-note">Registered in system</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top"><div class="stat-icon red">🔴</div></div>
+            <div class="stat-label">CURRENTLY PARKED</div>
+            <div class="stat-number" id="adminActiveNow">--</div>
+            <div class="stat-note">Active sessions</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top"><div class="stat-icon green">₹</div></div>
+            <div class="stat-label">TOTAL REVENUE</div>
+            <div class="stat-number" id="adminTotalRevenue">--</div>
+            <div class="stat-note">All time</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top"><div class="stat-icon orange">⏳</div></div>
+            <div class="stat-label">PENDING PAYMENTS</div>
+            <div class="stat-number" id="adminPending">--</div>
+            <div class="stat-note">Awaiting collection</div>
+        </div>
+
+    </div>
+
+    <!-- RECENT SESSIONS TABLE -->
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="card-title">🗒️ Recent Parking Sessions</div>
+                <div class="card-subtitle">Last 15 sessions</div>
+            </div>
+        </div>
+        <div style="overflow-x:auto;">
+            <table id="adminSessionsTable" style="width:100%;border-collapse:collapse;font-size:11px;">
+                <thead>
+                    <tr style="background:#f8fafc;">
+                        <th style="padding:9px 10px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">#</th>
+                        <th style="padding:9px 10px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">PLATE</th>
+                        <th style="padding:9px 10px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">TYPE</th>
+                        <th style="padding:9px 10px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">SLOT</th>
+                        <th style="padding:9px 10px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">ENTRY</th>
+                        <th style="padding:9px 10px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">DURATION</th>
+                        <th style="padding:9px 10px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">AMOUNT</th>
+                        <th style="padding:9px 10px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">PAYMENT</th>
+                        <th style="padding:9px 10px;text-align:left;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0;">STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="adminSessionsBody">
+                    <tr><td colspan="9" style="padding:16px;text-align:center;color:#94a3b8;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+
+<section class="section" id="vehiclesSection">
+    <div class="section-title">Vehicles</div>
+    <div class="card" style="overflow-x:auto">
+        <table class="admin-data-table">
+            <thead><tr><th>PLATE</th><th>TYPE</th><th>OWNER</th><th>PHONE</th><th>SLOT</th><th>STATUS</th></tr></thead>
+            <tbody id="adminVehiclesBody"><tr><td colspan="6">Loading...</td></tr></tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section" id="bookingManagement">
+    <div class="section-title">Bookings</div>
+    <div class="card" style="overflow-x:auto">
+        <table class="admin-data-table">
+            <thead><tr><th>BOOKING</th><th>PLATE</th><th>SLOT</th><th>BOOKED AT</th><th>START</th><th>END</th><th>STATUS</th></tr></thead>
+            <tbody id="adminBookingsBody"><tr><td colspan="7">Loading...</td></tr></tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section" id="walkInSection">
+    <div class="section-title">Walk-in Vehicles</div>
+    <div class="card" style="overflow-x:auto">
+        <table class="admin-data-table">
+            <thead><tr><th>PLATE</th><th>TYPE</th><th>OWNER</th><th>SLOT</th><th>ENTRY</th><th>STATUS</th></tr></thead>
+            <tbody id="adminWalkInsBody"><tr><td colspan="6">Loading...</td></tr></tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section" id="anomalySection">
+    <div class="section-title">Anomaly Alerts</div>
+    <div class="card" style="margin-bottom:12px;">
+        <div class="card-title">All Parking Slots</div>
+        <div class="card-sub">Current recorded status by floor; outlined slots have related alerts.</div>
+        <div id="anomalySlotMap" class="anomaly-slot-map">Loading slots...</div>
+        <div class="legend">
+            <span><span class="ldot" style="background:#22c55e;"></span>Available</span>
+            <span><span class="ldot" style="background:#ef4444;"></span>Occupied</span>
+            <span><span class="ldot" style="background:#f59e0b;"></span>Reserved</span>
+            <span><span class="ldot" style="background:#f97316;"></span>Alert</span>
+        </div>
+    </div>
+    <div class="card" id="adminAlertsList">Loading...</div>
+</section>
+
+<section class="section" id="billingSection">
+    <div class="section-title">Billing</div>
+    <div class="card" style="overflow-x:auto">
+        <table class="admin-data-table">
+            <thead><tr><th>PLATE</th><th>TYPE</th><th>SLOT</th><th>DURATION</th><th>AMOUNT</th><th>PAYMENT</th><th>TIME</th></tr></thead>
+            <tbody id="adminBillingBody"><tr><td colspan="7">Loading...</td></tr></tbody>
+        </table>
+    </div>
+</section>
+
+
+<!-- ============================================================
+     FLOOR CONGESTION PREDICTION
+============================================================ -->
+
+<section class="section" id="floorCongestionSection">
+
+    <div class="section-title">
+        🤖 Floor Congestion Prediction
+        <span
+            style="
+            font-size:11px;
+            font-weight:400;
+            color:#64748b;
+            margin-left:10px;"
+        >
+            Next 30 minutes
+        </span>
+    </div>
+
+    <div class="congestion-grid" id="floorCongestionGrid">
+        Loading...
+    </div>
+
+</section>
+
+
+</div>
+
+
+</main>
+
+
+<!-- ============================================================
+     SLOT DETAILS MODAL
+============================================================ -->
+
+<div
+    class="modal-overlay"
+    id="slotModal"
+>
+
+
+<div class="modal">
+
+
+    <div class="modal-header">
+
+        <h2 id="slotModalTitle">
+            Parking Slot
+        </h2>
+
+        <button
+            class="close"
+            onclick="closeModal('slotModal');showToast('Slot details closed.','info')"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <div
+        class="modal-body"
+        id="slotModalBody"
+    ></div>
+
+
+    <div class="modal-footer">
+
+        <button
+            class="button blue-button"
+            onclick="closeModal('slotModal');showToast('Slot details closed.','info')"
+        >
+
+            Close
+
+        </button>
+
+    </div>
+
+
+</div>
+
+
+</div>
+
+
+<!-- ============================================================
+     BOOKING MODAL
+============================================================ -->
+
+<div
+    class="modal-overlay"
+    id="bookingModal"
+>
+
+
+<div class="modal">
+
+
+    <div class="modal-header">
+
+        <h2>
+            🅿️ Book Parking Slot
+        </h2>
+
+        <button
+            class="close"
+            onclick="closeModal('bookingModal');showToast('Booking cancelled.','info')"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+
+        <div class="selected-slot">
+
+            <span>
+                SELECTED PARKING SLOT
+            </span>
+
+            <strong id="bookingSlot">
+                --
+            </strong>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                OWNER NAME
+            </label>
+
+            <input
+                id="bookingName"
+                type="text"
+                placeholder="Enter owner name"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                NUMBER PLATE
+            </label>
+
+            <input
+                id="bookingPlate"
+                type="text"
+                placeholder="TN14AB234"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                VEHICLE TYPE
+            </label>
+
+            <select id="bookingType">
+
+                <option value="Car">
+                    🚗 Car
+                </option>
+
+                <option value="Bike">
+                    🏍️ Bike
+                </option>
+
+                <option value="Bus">
+                    🚌 Bus
+                </option>
+
+                <option value="Truck">
+                    🚚 Truck
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                PHONE
+            </label>
+
+            <input
+                id="bookingPhone"
+                type="text"
+                placeholder="9876543210"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                EMAIL
+            </label>
+
+            <input
+                id="bookingEmail"
+                type="email"
+                placeholder="example@gmail.com"
+            >
+
+        </div>
+
+
+        <div
+            id="bookingMessage"
+            class="message"
+        ></div>
+
+
+    </div>
+
+
+    <div class="modal-footer">
+
+        <button
+            class="button"
+            style="background:#64748b"
+            onclick="closeModal('bookingModal');showToast('Booking cancelled.','info')"
+        >
+
+            Cancel
+
+        </button>
+
+
+        <button
+            class="button blue-button"
+            onclick="confirmBooking()"
+        >
+
+            Confirm Booking
+
+        </button>
+
+    </div>
+
+
+</div>
+
+
+</div>
+
+
+<!-- ============================================================
+     PAYMENT MODAL
+============================================================ -->
+
+<div
+    class="modal-overlay"
+    id="paymentModal"
+>
+
+<div class="modal">
+
+
+    <div class="modal-header">
+
+        <h2>
+            💳 Payment Receipt
+        </h2>
+
+        <button
+            class="close"
+            onclick="closeModal('paymentModal');showToast('Payment window closed.','info')"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <div class="modal-body" id="paymentModalBody">
+    </div>
+
+
+    <div class="modal-footer">
+
+        <button
+            class="button"
+            style="background:#64748b"
+            onclick="closeModal('paymentModal');showToast('Payment window closed.','info')"
+        >
+            Close
+        </button>
+
+        <button
+            class="button blue-button"
+            id="confirmPayBtn"
+            onclick="confirmPayment()"
+        >
+            ✓ Confirm Payment
+        </button>
+
+    </div>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+
+/* ============================================================
+   GLOBAL
+============================================================ */
+
+let selectedBookingSlot = null;
+let pendingPaymentSessionId = null;
+
+
+/* ============================================================
+   AUTH
+============================================================ */
+
+let authToken = sessionStorage.getItem('adminParkingToken') || null;
+
+
+async function doLogin(){
+
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const errEl    = document.getElementById('loginError');
+    const btn      = document.getElementById('loginBtn');
+
+    if(!username || !password){
+        errEl.textContent = 'Please enter username and password.';
+        errEl.style.display = 'block';
+        showToast('Enter your admin username and password.','error');
+        return;
+    }
+
+    btn.textContent = 'Signing in...';
+    btn.disabled = true;
+
+    try{
+
+        const res  = await fetch('/api/auth/login', {
+            method:  'POST',
+            headers: {'Content-Type': 'application/json'},
+            body:    JSON.stringify({username, password})
+        });
+
+        const data = await res.json();
+
+        if(!res.ok){
+            errEl.textContent = data.detail || 'Login failed.';
+            errEl.style.display = 'block';
+            showToast(data.detail || 'Admin sign in failed.','error');
+            btn.textContent = 'Sign In';
+            btn.disabled = false;
+            return;
+        }
+
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+        authToken = data.token;
+        sessionStorage.setItem('adminParkingToken', authToken);
+
+        document.getElementById('loginPage').style.display = 'none';
+        refreshDashboard();
+        showToast('Admin sign in successful.');
+
+    } catch(e){
+        errEl.textContent = 'Unable to connect to server.';
+        errEl.style.display = 'block';
+        showToast('Could not connect to the parking server.','error');
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+    }
+
+}
+
+
+async function doLogout(){
+
+    if(authToken){
+        await fetch('/api/auth/logout', {
+            method:  'POST',
+            headers: {'x-token': authToken}
+        }).catch(()=>{});
+    }
+
+    authToken = null;
+    sessionStorage.removeItem('adminParkingToken');
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginError').style.display = 'none';
+    showToast('Admin signed out.','info');
+
+}
+
+
+// Auto-verify stored token on page load
+async function checkStoredToken(){
+
+    if(!authToken) return;
+
+    try{
+        const res = await fetch('/api/auth/verify', {
+            headers: {'x-token': authToken}
+        });
+        if(res.ok){
+            const data = await res.json();
+            if(data.role === 'admin'){
+                document.getElementById('loginPage').style.display = 'none';
+                refreshDashboard();
+            } else {
+                authToken = null;
+                sessionStorage.removeItem('adminParkingToken');
+            }
+        } else {
+            authToken = null;
+            sessionStorage.removeItem('adminParkingToken');
+        }
+    } catch(e){
+        // server not reachable, hide login so user can retry
+    }
+
+}
+
+
+// Helper: add token to all fetch calls
+function authHeaders(){
+    return {
+        'Content-Type': 'application/json',
+        'x-token': authToken || ''
+    };
+}
+
+
+/* ============================================================
+   ANOMALY
+============================================================ */
+
+let anomalyPanelOpen = false;
+
+
+function toggleAnomalyPanel(){
+    anomalyPanelOpen = !anomalyPanelOpen;
+    document.getElementById('anomalyPanel').style.display =
+        anomalyPanelOpen ? 'block' : 'none';
+    if(anomalyPanelOpen) loadAnomalies();
+    showToast(anomalyPanelOpen ? 'Anomaly alerts opened.' : 'Anomaly alerts closed.','info');
+}
+
+
+async function loadAnomalies(){
+
+    try{
+
+        const [res, slotsRes] = await Promise.all([
+            fetch('/api/anomalies', {
+                headers: {'x-token': authToken || ''}
+            }),
+            fetch('/api/slots')
+        ]);
+        const data = await res.json();
+        const slotData = await slotsRes.json();
+        renderAnomalySlots(slotData.slots || [], data.anomalies || []);
+
+        const badge = document.getElementById('anomalyBadge');
+
+        if(data.total === 0){
+            badge.textContent = '\u2714 No Anomalies';
+            badge.className   = 'anomaly-badge none';
+        } else {
+            badge.textContent = '\u26a0\ufe0f ' + data.total + ' Anomaly' + (data.total > 1 ? 'ies' : '');
+            badge.className   = 'anomaly-badge';
+        }
+
+        const list = document.getElementById('anomalyList');
+
+        if(data.total === 0){
+            list.innerHTML = `
+                <div style="
+                    background:#ecfdf5;
+                    color:#166534;
+                    border-radius:9px;
+                    padding:14px;
+                    font-size:12px;">
+                    \u2714 No anomalies detected. All systems normal.
+                </div>`;
+            document.getElementById('adminAlertsList').textContent = 'No open anomalies.';
+            return;
+        }
+
+        const icons = {
+            'No-Show Booking':  '\ud83d\udcec',
+            'Duplicate Session':'\u26a0\ufe0f',
+            'Slot Mismatch':    '\u26a0\ufe0f',
+            'Double Parking':   '\u26a0\ufe0f',
+            'Improper Parking': '\u26a0\ufe0f',
+            'Aisle Obstruction':'\u26a0\ufe0f',
+        };
+
+        list.innerHTML = data.anomalies.map(a => `
+            <div class="anomaly-item anomaly-${a.severity.toLowerCase()}">
+                <div class="anomaly-icon">${icons[a.type || a.alert_type] || '\u26a0\ufe0f'}</div>
+                <div>
+                    <div class="anomaly-title">${a.type || a.alert_type} — ${a.severity}</div>
+                    <div class="anomaly-msg">${a.message}</div>
+                </div>
+            </div>
+        `).join('');
+
+        const alerts = document.getElementById('adminAlertsList');
+        alerts.innerHTML = data.total
+            ? data.anomalies.map(a => `<div class="anomaly-item anomaly-${a.severity.toLowerCase()}"><div><strong>${a.type || a.alert_type} · ${a.severity}</strong><div class="anomaly-msg">${a.message}</div></div></div>`).join('')
+            : 'No open anomalies.';
+
+    } catch(e){
+        console.error('Anomaly error:', e);
+    }
+
+}
+
+function renderAnomalySlots(slots, anomalies){
+    const root = document.getElementById('anomalySlotMap');
+    root.innerHTML = '';
+
+    const alertsBySlot = new Map();
+    const addAlertSlot = (slotId, alert) => {
+        if(!slotId) return;
+        const key = String(slotId).trim().toUpperCase();
+        if(!alertsBySlot.has(key)) alertsBySlot.set(key, []);
+        alertsBySlot.get(key).push(alert);
+    };
+
+    anomalies.forEach(alert => {
+        addAlertSlot(alert.slot_id, alert);
+        addAlertSlot(alert.details?.slot_id, alert);
+        if(typeof alert.slots === 'string'){
+            alert.slots.split(',').forEach(slotId => addAlertSlot(slotId, alert));
+        }
+    });
+
+    const floors = new Map();
+    slots.forEach(slot => {
+        if(!floors.has(slot.floor)) floors.set(slot.floor, []);
+        floors.get(slot.floor).push(slot);
+    });
+
+    [...floors.keys()].sort((a, b) => Number(a) - Number(b)).forEach(floor => {
+        const floorSlots = floors.get(floor);
+        const section = document.createElement('div');
+        section.className = 'floor';
+
+        const header = document.createElement('div');
+        header.className = 'floor-header';
+        const name = document.createElement('div');
+        name.className = 'floor-name';
+        name.textContent = `Floor ${floor}`;
+        const summary = document.createElement('div');
+        summary.className = 'floor-available';
+        summary.textContent = `${floorSlots.filter(slot => slot.status === 'Available').length} available · ${floorSlots.filter(slot => slot.status === 'Occupied').length} occupied · ${floorSlots.filter(slot => slot.status === 'Reserved').length} reserved`;
+        header.append(name, summary);
+        section.appendChild(header);
+
+        const grid = document.createElement('div');
+        grid.className = 'slot-grid';
+        floorSlots.forEach(slot => {
+            const slotElement = document.createElement('div');
+            slotElement.className = 'slot';
+            const statusClass = {
+                Available: 'available-slot',
+                Occupied: 'occupied-slot',
+                Reserved: 'reserved-slot'
+            }[slot.status];
+            if(statusClass) slotElement.classList.add(statusClass);
+
+            const slotAlerts = alertsBySlot.get(String(slot.slot_id).toUpperCase()) || [];
+            if(slotAlerts.length){
+                slotElement.classList.add('anomaly-slot');
+                slotElement.title = slotAlerts.map(alert => alert.message).filter(Boolean).join('\n');
+            }
+
+            const id = document.createElement('div');
+            id.className = 'slot-id';
+            id.textContent = slot.slot_id;
+            const status = document.createElement('div');
+            status.className = 'slot-status';
+            status.textContent = slot.status;
+            const note = document.createElement('div');
+            note.className = 'slot-click';
+            note.textContent = slotAlerts.length ? 'Alert detected' : 'No alert reported';
+            slotElement.append(id, status, note);
+            grid.appendChild(slotElement);
+        });
+        section.appendChild(grid);
+        root.appendChild(section);
+    });
+
+    if(!slots.length) root.textContent = 'No parking slots are available.';
+}
+
+
+function adminEscape(value){
+    return String(value ?? '--').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function fillAdminTable(elementId, columns, rows){
+    const body=document.getElementById(elementId);
+    if(!rows.length){ body.innerHTML=`<tr><td colspan="${columns.length}">No records found.</td></tr>`; return; }
+    body.innerHTML=rows.map(row=>`<tr>${columns.map(column=>`<td>${adminEscape(row[column])}</td>`).join('')}</tr>`).join('');
+}
+
+async function loadAdminCollections(){
+    const paths=[
+        '/api/admin/vehicles', '/api/bookings', '/api/admin/walk-ins', '/api/admin/billing'
+    ];
+    const results=await Promise.allSettled(paths.map(path=>fetch(path).then(response=>response.json())));
+    const data=index=>results[index].status==='fulfilled' ? results[index].value : {};
+
+    fillAdminTable('adminVehiclesBody',[
+        'number_plate','vehicle_type','owner_name','phone','slot_id','parking_status'
+    ],data(0).vehicles||[]);
+    fillAdminTable('adminBookingsBody',[
+        'booking_id','number_plate','slot_id','booking_time','start_time','end_time','status'
+    ],data(1).bookings||[]);
+    fillAdminTable('adminWalkInsBody',[
+        'number_plate','vehicle_type','owner_name','slot_id','entry_time','status'
+    ],data(2).sessions||[]);
+    fillAdminTable('adminBillingBody',[
+        'number_plate','vehicle_type','slot_id','duration_minutes','amount','payment_status','payment_time'
+    ],data(3).payments||[]);
+}
+
+
+/* ============================================================
+   FUZZY PLATE SEARCH
+============================================================ */
+
+let fuzzyTimer = null;
+
+
+async function fuzzySearch(inputId, suggestId){
+
+    const input = document.getElementById(inputId);
+    const box   = document.getElementById(suggestId);
+    const q     = input.value.trim();
+
+    if(q.length < 3){
+        box.style.display = 'none';
+        return;
+    }
+
+    clearTimeout(fuzzyTimer);
+
+    fuzzyTimer = setTimeout(async () => {
+
+        try{
+
+            const res  = await fetch(
+                '/api/vehicles/search?q=' + encodeURIComponent(q),
+                { headers: {'x-token': authToken || ''} }
+            );
+
+            const data = await res.json();
+
+            if(!data.matches || data.matches.length === 0){
+                box.style.display = 'none';
+                return;
+            }
+
+            box.innerHTML = data.matches.map(m => `
+                <div
+                    class="fuzzy-item"
+                    onclick="selectPlate('${inputId}','${suggestId}','${m.number_plate}')"
+                >
+                    <span>${m.number_plate}</span>
+                    <span style="color:#64748b;font-size:10px;">${m.vehicle_type}</span>
+                </div>
+            `).join('');
+
+            box.style.display = 'block';
+
+        } catch(e){
+            box.style.display = 'none';
+        }
+
+    }, 300);
+
+}
+
+
+function selectPlate(inputId, suggestId, plate){
+    document.getElementById(inputId).value  = plate;
+    document.getElementById(suggestId).style.display = 'none';
+}
+
+
+// Close fuzzy boxes on outside click
+document.addEventListener('click', function(e){
+    ['entrySuggestions','exitSuggestions','findSuggestions'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.style.display = 'none';
+    });
+});
+
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+
+function navigateTo(
+    sectionId,
+    clickedItem = null,
+    message = 'Section opened.'
+){
+
+    const section =
+        document.getElementById(
+            sectionId
+        );
+
+    if(!section){
+        return;
+    }
+
+
+    if(clickedItem){
+
+        document
+            .querySelectorAll(
+                ".menu-item"
+            )
+            .forEach(
+                item => {
+
+                    item.classList.remove(
+                        "active"
+                    );
+
+                }
+            );
+
+        clickedItem.classList.add(
+            "active"
+        );
+
+    }
+
+
+    section.scrollIntoView({
+
+        behavior:"smooth",
+
+        block:"start"
+
+    });
+    showToast(message,'info');
+
+}
+
+
+/* ============================================================
+   FOCUS SLOT FUNCTIONS
+============================================================ */
+
+function focusAvailableSlot(){
+
+    navigateTo(
+        "parkingSection"
+    );
+
+    setTimeout(
+        function(){
+
+            const slot =
+                document.querySelector(
+                    ".available-slot"
+                );
+
+            if(slot){
+
+                slot.scrollIntoView({
+                    behavior:"smooth",
+                    block:"center"
+                });
+
+            }
+
+        },
+        500
+    );
+
+}
+
+
+function focusOccupiedSlot(){
+
+    navigateTo(
+        "parkingSection"
+    );
+
+    setTimeout(
+        function(){
+
+            const slot =
+                document.querySelector(
+                    ".occupied-slot"
+                );
+
+            if(slot){
+
+                slot.scrollIntoView({
+                    behavior:"smooth",
+                    block:"center"
+                });
+
+            }
+
+        },
+        500
+    );
+
+}
+
+
+function focusReservedSlot(){
+
+    navigateTo(
+        "parkingSection"
+    );
+
+    setTimeout(
+        function(){
+
+            const slot =
+                document.querySelector(
+                    ".reserved-slot"
+                );
+
+            if(slot){
+
+                slot.scrollIntoView({
+                    behavior:"smooth",
+                    block:"center"
+                });
+
+            }
+
+        },
+        500
+    );
+
+}
+
+
+/* ============================================================
+   STATISTICS
+============================================================ */
+
+async function loadStatistics(){
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/statistics"
+            );
+
+        const data =
+            await response.json();
+
+
+        document.getElementById(
+            "totalSlots"
+        ).textContent =
+            data.total;
+
+
+        document.getElementById(
+            "availableSlots"
+        ).textContent =
+            data.available;
+
+
+        document.getElementById(
+            "occupiedSlots"
+        ).textContent =
+            data.occupied;
+
+
+        document.getElementById(
+            "reservedSlots"
+        ).textContent =
+            data.reserved;
+
+    }
+    catch(error){
+
+        console.error(
+            "Statistics error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   LOAD PARKING SLOTS
+============================================================ */
+
+async function loadSlots(){
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/slots"
+            );
+
+        const data =
+            await response.json();
+
+
+        const parkingArea =
+            document.getElementById(
+                "parkingArea"
+            );
+
+
+        parkingArea.innerHTML = "";
+
+
+        const floors = {};
+
+
+        data.slots.forEach(
+            slot => {
+
+                if(
+                    !floors[slot.floor]
+                ){
+
+                    floors[slot.floor] = [];
+
+                }
+
+                floors[
+                    slot.floor
+                ].push(slot);
+
+            }
+        );
+
+
+        Object
+            .keys(floors)
+            .sort(
+                (a,b) =>
+                    Number(a) -
+                    Number(b)
+            )
+            .forEach(
+                floor => {
+
+
+                    const floorContainer =
+                        document.createElement(
+                            "div"
+                        );
+
+                    floorContainer.className =
+                        "floor";
+
+
+                    const header =
+                        document.createElement(
+                            "div"
+                        );
+
+                    header.className =
+                        "floor-header";
+
+
+                    const floorName =
+                        document.createElement(
+                            "div"
+                        );
+
+                    floorName.className =
+                        "floor-name";
+
+                    floorName.textContent =
+                        "Floor " +
+                        floor;
+
+
+                    const available =
+                        floors[floor].filter(
+                            slot =>
+                                slot.status ===
+                                "Available"
+                        ).length;
+
+
+                    const count =
+                        document.createElement(
+                            "div"
+                        );
+
+                    count.className =
+                        "floor-available";
+
+                    count.textContent =
+                        available +
+                        " available";
+
+
+                    header.appendChild(
+                        floorName
+                    );
+
+                    header.appendChild(
+                        count
+                    );
+
+
+                    floorContainer.appendChild(
+                        header
+                    );
+
+
+                    const grid =
+                        document.createElement(
+                            "div"
+                        );
+
+                    grid.className =
+                        "slot-grid";
+
+
+                    floors[floor]
+                        .forEach(
+                            slot => {
+
+
+                                const slotElement =
+                                    document.createElement(
+                                        "div"
+                                    );
+
+
+                                slotElement.className =
+                                    "slot";
+
+
+                                if(
+                                    slot.status ===
+                                    "Available"
+                                ){
+
+                                    slotElement.classList.add(
+                                        "available-slot"
+                                    );
+
+                                }
+
+                                else if(
+                                    slot.status ===
+                                    "Occupied"
+                                ){
+
+                                    slotElement.classList.add(
+                                        "occupied-slot"
+                                    );
+
+                                }
+
+                                else{
+
+                                    slotElement.classList.add(
+                                        "reserved-slot"
+                                    );
+
+                                }
+
+
+                                let clickText;
+
+
+                                if(
+                                    slot.status ===
+                                    "Available"
+                                ){
+
+                                    clickText =
+                                        "Click to book";
+
+                                }
+
+                                else if(
+                                    slot.status ===
+                                    "Occupied"
+                                ){
+
+                                    clickText =
+                                        "View vehicle";
+
+                                }
+
+                                else{
+
+                                    clickText =
+                                        "View booking";
+
+                                }
+
+
+                                slotElement.innerHTML = `
+
+                                    <div class="slot-id">
+                                        ${slot.slot_id}
+                                    </div>
+
+                                    <div class="slot-status">
+                                        ${slot.status}
+                                    </div>
+
+                                    <div class="slot-click">
+                                        ${clickText}
+                                    </div>
+
+                                `;
+
+
+                                slotElement.onclick =
+                                    function(){
+
+                                        handleSlotClick(
+                                            slot
+                                        );
+
+                                    };
+
+
+                                grid.appendChild(
+                                    slotElement
+                                );
+
+                            }
+                        );
+
+
+                    floorContainer.appendChild(
+                        grid
+                    );
+
+
+                    parkingArea.appendChild(
+                        floorContainer
+                    );
+
+                }
+            );
+
+    }
+    catch(error){
+
+        console.error(
+            "Slot loading error:",
+            error
+        );
+
+        document.getElementById(
+            "parkingArea"
+        ).innerHTML = `
+
+            <div style="
+                padding:20px;
+                background:#fef2f2;
+                color:#991b1b;
+                border-radius:10px;
+                font-size:12px;">
+
+                Unable to load parking slots.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* ============================================================
+   SLOT CLICK
+============================================================ */
+
+async function handleSlotClick(slot){
+
+    /* AVAILABLE */
+
+    if(
+        slot.status ===
+        "Available"
+    ){
+
+        openBooking(
+            slot
+        );
+
+        return;
+
+    }
+
+
+    /* OCCUPIED / RESERVED */
+
+    try{
+
+        const response =
+            await fetch(
+                `/api/slots/${encodeURIComponent(
+                    slot.slot_id
+                )}/details`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            alert(
+                data.detail ||
+                "Unable to load slot."
+            );
+
+            return;
+
+        }
+
+
+        showSlotDetails(
+            data
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Unable to connect to server."
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   SLOT DETAILS
+============================================================ */
+
+function showSlotDetails(data){
+
+    const title =
+        document.getElementById(
+            "slotModalTitle"
+        );
+
+
+    const body =
+        document.getElementById(
+            "slotModalBody"
+        );
+
+
+    title.textContent =
+        "🅿️ Slot " +
+        data.slot.slot_id;
+
+
+    /* OCCUPIED */
+
+    if(
+        data.slot_type ===
+        "Occupied"
+    ){
+
+        if(data.vehicle){
+
+            const vehicle =
+                data.vehicle;
+
+
+            body.innerHTML = `
+
+                <div style="
+                    background:#fef2f2;
+                    color:#991b1b;
+                    border:1px solid #fecaca;
+                    padding:12px;
+                    border-radius:9px;
+                    font-size:11px;
+                    font-weight:700;
+                    margin-bottom:15px;">
+
+                    🔴 VEHICLE CURRENTLY PARKED
+
+                </div>
+
+
+                <div class="detail-grid">
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            NUMBER PLATE
+                        </span>
+
+                        <strong>
+                            ${vehicle.number_plate}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            VEHICLE TYPE
+                        </span>
+
+                        <strong>
+                            ${vehicleIcon(
+                                vehicle.vehicle_type
+                            )}
+                            ${vehicle.vehicle_type}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            OWNER
+                        </span>
+
+                        <strong>
+                            ${vehicle.owner_name ||
+                              "Not Available"}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            PHONE
+                        </span>
+
+                        <strong>
+                            ${vehicle.phone ||
+                              "Not Available"}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            FLOOR
+                        </span>
+
+                        <strong>
+                            Floor ${data.slot.floor}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            SECTION
+                        </span>
+
+                        <strong>
+                            ${data.slot.section}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            PARKING SLOT
+                        </span>
+
+                        <strong>
+                            ${data.slot.slot_id}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            SESSION
+                        </span>
+
+                        <strong>
+                            #${vehicle.session_id}
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+                <div style="
+                    margin-top:13px;
+                    background:#f8fafc;
+                    border-radius:8px;
+                    padding:11px;
+                    font-size:10px;
+                    color:#64748b;">
+
+                    🕐 Entry Time
+
+                    <strong
+                        style="
+                        color:#172033;
+                        margin-left:5px;"
+                    >
+
+                        ${vehicle.entry_time}
+
+                    </strong>
+
+                </div>
+
+            `;
+
+        }
+        else{
+
+            body.innerHTML = `
+
+                <div style="
+                    background:#fef2f2;
+                    color:#991b1b;
+                    padding:15px;
+                    border-radius:9px;
+                    font-size:11px;">
+
+                    🔴 This slot is occupied,
+                    but vehicle session information
+                    is unavailable.
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+    /* RESERVED */
+
+    else if(
+        data.slot_type ===
+        "Reserved"
+    ){
+
+        const booking =
+            data.booking;
+
+
+        if(booking){
+
+            body.innerHTML = `
+
+                <div style="
+                    background:#fffbeb;
+                    color:#92400e;
+                    border:1px solid #fcd34d;
+                    padding:12px;
+                    border-radius:9px;
+                    font-size:11px;
+                    font-weight:700;
+                    margin-bottom:15px;">
+
+                    🟠 PARKING SLOT RESERVED
+
+                </div>
+
+
+                <div class="detail-grid">
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            BOOKING ID
+                        </span>
+
+                        <strong>
+                            #${booking.booking_id}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            NUMBER PLATE
+                        </span>
+
+                        <strong>
+                            ${booking.number_plate}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            VEHICLE TYPE
+                        </span>
+
+                        <strong>
+                            ${vehicleIcon(
+                                booking.vehicle_type
+                            )}
+                            ${booking.vehicle_type}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            OWNER
+                        </span>
+
+                        <strong>
+                            ${booking.name ||
+                              "Not Available"}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            FLOOR
+                        </span>
+
+                        <strong>
+                            Floor ${data.slot.floor}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            SECTION
+                        </span>
+
+                        <strong>
+                            ${data.slot.section}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            SLOT
+                        </span>
+
+                        <strong>
+                            ${data.slot.slot_id}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+                            STATUS
+                        </span>
+
+                        <strong>
+                            Confirmed
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+            `;
+
+        }
+        else{
+
+            body.innerHTML = `
+
+                <div style="
+                    background:#fffbeb;
+                    color:#92400e;
+                    padding:15px;
+                    border-radius:9px;
+                    font-size:11px;">
+
+                    🟠 Slot is reserved.
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+    document.getElementById(
+        "slotModal"
+    ).style.display =
+        "flex";
+
+    showToast(
+        data.slot_type + " slot " + data.slot.slot_id + " details opened.",
+        "info"
+    );
+
+}
+
+
+/* ============================================================
+   OPEN BOOKING
+============================================================ */
+
+function openBooking(slot){
+
+    selectedBookingSlot =
+        slot.slot_id;
+
+
+    document.getElementById(
+        "bookingSlot"
+    ).textContent =
+
+        slot.slot_id +
+        " • Floor " +
+        slot.floor +
+        " • Section " +
+        slot.section;
+
+
+    document.getElementById(
+        "bookingName"
+    ).value = "";
+
+
+    document.getElementById(
+        "bookingPlate"
+    ).value = "";
+
+
+    document.getElementById(
+        "bookingPhone"
+    ).value = "";
+
+
+    document.getElementById(
+        "bookingEmail"
+    ).value = "";
+
+
+    document.getElementById(
+        "bookingType"
+    ).value = "Car";
+
+
+    clearMessage(
+        "bookingMessage"
+    );
+
+
+    document.getElementById(
+        "bookingModal"
+    ).style.display =
+        "flex";
+
+    showToast("Slot " + slot.slot_id + " selected. Complete the booking form.", "info");
+
+}
+
+
+/* ============================================================
+   CONFIRM BOOKING
+============================================================ */
+
+async function confirmBooking(){
+
+    clearActionMessages();
+
+    const name =
+        document.getElementById(
+            "bookingName"
+        ).value.trim();
+
+
+    const plate =
+        document.getElementById(
+            "bookingPlate"
+        ).value.trim();
+
+
+    const type =
+        document.getElementById(
+            "bookingType"
+        ).value;
+
+
+    const phone =
+        document.getElementById(
+            "bookingPhone"
+        ).value.trim();
+
+
+    const email =
+        document.getElementById(
+            "bookingEmail"
+        ).value.trim();
+
+
+    if(!name){
+
+        showMessage(
+            "bookingMessage",
+            "Please enter owner name.",
+            false
+        );
+
+        return;
+
+    }
+
+
+    if(!plate){
+
+        showMessage(
+            "bookingMessage",
+            "Please enter number plate.",
+            false
+        );
+
+        return;
+
+    }
+
+
+    if(!selectedBookingSlot){
+
+        showMessage(
+            "bookingMessage",
+            "Please select a parking slot.",
+            false
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/book",
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        name:name,
+
+                        number_plate:plate,
+
+                        vehicle_type:type,
+
+                        slot_id:
+                            selectedBookingSlot,
+
+                        phone:phone,
+
+                        email:email
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            showMessage(
+                "bookingMessage",
+                data.detail ||
+                "Booking failed.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        showMessage(
+
+            "bookingMessage",
+
+            "✓ Booking confirmed for " +
+            data.vehicle_number +
+            ". Slot " +
+            data.slot_id +
+            " is now reserved.",
+
+            true
+
+        );
+
+        setTimeout(
+            function(){
+
+                closeModal(
+                    "bookingModal"
+                );
+
+                refreshDashboard();
+
+            },
+            1300
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "bookingMessage",
+            "Unable to connect to server.",
+            false
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   VEHICLE ICON
+============================================================ */
+
+function vehicleIcon(type){
+
+    if(type === "Bike"){
+        return "🏍️";
+    }
+
+    if(type === "Bus"){
+        return "🚌";
+    }
+
+    if(type === "Truck"){
+        return "🚚";
+    }
+
+    return "🚗";
+
+}
+
+
+/* ============================================================
+   VEHICLE ENTRY
+============================================================ */
+
+async function vehicleEntry(){
+
+    clearActionMessages();
+
+    const plate =
+        document.getElementById(
+            "entryPlate"
+        ).value.trim();
+
+
+    const type =
+        document.getElementById(
+            "entryType"
+        ).value;
+
+
+    if(!plate){
+
+        showMessage(
+            "entryMessage",
+            "Please enter vehicle number plate.",
+            false
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/entry",
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        number_plate:plate,
+
+                        vehicle_type:type
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            showMessage(
+                "entryMessage",
+                data.detail ||
+                data.message ||
+                "Entry failed.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        if(!data.success){
+
+            showMessage(
+                "entryMessage",
+                data.message ||
+                "Entry failed.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        showMessage(
+
+            "entryMessage",
+
+            "✓ Slot assigned: " +
+            data.slot_id +
+            " for " +
+            data.number_plate +
+            " (" +
+            data.vehicle_type +
+            ").",
+
+            true
+
+        );
+
+        refreshDashboard();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "entryMessage",
+            "Unable to connect to server.",
+            false
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   VEHICLE EXIT
+============================================================ */
+
+async function vehicleExit(){
+
+    clearActionMessages();
+
+    const plate =
+        document.getElementById(
+            "exitPlate"
+        ).value.trim();
+
+
+    if(!plate){
+
+        showMessage(
+            "exitMessage",
+            "Please enter vehicle number plate.",
+            false
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/exit",
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        number_plate:plate
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            showMessage(
+                "exitMessage",
+                data.detail ||
+                data.message ||
+                "Exit failed.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        if(!data.success){
+
+            showMessage(
+                "exitMessage",
+                data.message ||
+                "Exit failed.",
+                false
+            );
+
+            return;
+
+        }
+
+
+        showMessage(
+
+            "exitMessage",
+
+            "Exit recorded. Payment of ₹" +
+            data.amount +
+            " is due. Slot " +
+            data.slot_id +
+            " will be released after payment.",
+
+            true
+
+        );
+
+        // Show Pay Now button
+        pendingPaymentSessionId = data.session_id;
+
+        document.getElementById(
+            "payNowBtn"
+        ).style.display = "block";
+
+
+        refreshDashboard();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "exitMessage",
+            "Unable to connect to server.",
+            false
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   FIND VEHICLE
+============================================================ */
+
+async function findVehicle(){
+
+    clearActionMessages();
+
+    const plate =
+        document.getElementById(
+            "findPlate"
+        ).value.trim();
+
+
+    if(!plate){
+
+        showToast("Enter a vehicle number plate to search.", "error");
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/find-car/" +
+                encodeURIComponent(
+                    plate
+                )
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            document.getElementById(
+                "findResult"
+            ).style.display =
+                "none";
+
+            showToast(data.detail || "No active parking record found for " + plate + ".", "error");
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            "findResult"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "foundVehicle"
+        ).textContent =
+            data.vehicle_number;
+
+
+        document.getElementById(
+            "foundType"
+        ).textContent =
+            vehicleIcon(
+                data.vehicle_type
+            ) +
+            " " +
+            data.vehicle_type;
+
+
+        document.getElementById(
+            "foundFloor"
+        ).textContent =
+            "Floor " +
+            data.floor;
+
+
+        document.getElementById(
+            "foundSection"
+        ).textContent =
+            data.section;
+
+
+        document.getElementById(
+            "foundSlot"
+        ).textContent =
+            data.slot_id;
+
+
+        document.getElementById(
+            "foundOwner"
+        ).textContent =
+            data.owner_name;
+
+
+        document.getElementById(
+            "foundStatus"
+        ).textContent =
+            data.status;
+
+
+        document.getElementById(
+            "foundEntryTime"
+        ).textContent =
+            data.entry_time;
+
+        showToast(
+            "Vehicle " + data.vehicle_number + " found at slot " + data.slot_id + " on floor " + data.floor + "."
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        showToast("Vehicle search could not reach the server.", "error");
+
+    }
+
+}
+
+
+/* ============================================================
+   PREDICTION
+============================================================ */
+
+async function loadPrediction(){
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/prediction"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!data.success){
+            return;
+        }
+
+
+        const total =
+            data.current_status
+                .total_slots;
+
+
+        const p30 =
+            data.prediction[
+                "30_minutes"
+            ];
+
+
+        const p60 =
+            data.prediction[
+                "60_minutes"
+            ];
+
+
+        const p90 =
+            data.prediction[
+                "90_minutes"
+            ];
+
+
+        document.getElementById(
+            "pred30"
+        ).textContent =
+            p30 +
+            " available";
+
+
+        document.getElementById(
+            "pred60"
+        ).textContent =
+            p60 +
+            " available";
+
+
+        document.getElementById(
+            "pred90"
+        ).textContent =
+            p90 +
+            " available";
+
+
+        if(total > 0){
+
+            document.getElementById(
+                "bar30"
+            ).style.width =
+                Math.min(
+                    100,
+                    (p30 / total) * 100
+                ) +
+                "%";
+
+
+            document.getElementById(
+                "bar60"
+            ).style.width =
+                Math.min(
+                    100,
+                    (p60 / total) * 100
+                ) +
+                "%";
+
+
+            document.getElementById(
+                "bar90"
+            ).style.width =
+                Math.min(
+                    100,
+                    (p90 / total) * 100
+                ) +
+                "%";
+
+        }
+
+    }
+    catch(error){
+
+        console.error(
+            "Prediction error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   MESSAGE
+============================================================ */
+
+function showMessage(
+    id,
+    text,
+    isSuccess
+){
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    element.textContent =
+        text;
+
+
+    element.className =
+        "message " +
+        (
+            isSuccess
+                ? "success"
+                : "error"
+        );
+
+
+    element.style.display =
+        "block";
+
+    showToast(text, isSuccess ? "success" : "error");
+
+}
+
+
+function showToast(message, type = "success"){
+    const toast = document.getElementById("actionToast");
+    if(!toast) return;
+    toast.textContent = message;
+    toast.className = "action-toast " + type + " show";
+    clearTimeout(showToast.timeoutId);
+    showToast.timeoutId = setTimeout(function(){
+        toast.classList.remove("show");
+    }, 3600);
+}
+
+
+function clearMessage(id){
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    element.style.display =
+        "none";
+
+
+    element.textContent =
+        "";
+
+}
+
+
+function clearActionMessages(){
+    ["bookingMessage", "entryMessage", "exitMessage"].forEach(
+        clearMessage
+    );
+}
+
+
+/* ============================================================
+   CLOSE MODAL
+============================================================ */
+
+function closeModal(id){
+
+    document.getElementById(
+        id
+    ).style.display =
+        "none";
+
+}
+
+
+/* ============================================================
+   PAYMENT
+============================================================ */
+
+async function openPayment(){
+
+    if(!pendingPaymentSessionId){
+        showToast("No payment is currently due.", "error");
+        return;
+    }
+
+    const body = document.getElementById(
+        "paymentModalBody"
+    );
+
+    body.innerHTML = `
+        <div style="
+            background:#eff6ff;
+            border:1px solid #bfdbfe;
+            border-radius:10px;
+            padding:16px;
+            margin-bottom:15px;
+            font-size:12px;
+            color:#1e40af;">
+            💳 Session #${pendingPaymentSessionId}
+        </div>
+        <div style="
+            background:#f8fafc;
+            border-radius:8px;
+            padding:14px;
+            font-size:11px;
+            color:#475569;">
+            Click <strong>Confirm Payment</strong> to mark this session as paid.
+        </div>
+    `;
+
+    document.getElementById(
+        "confirmPayBtn"
+    ).style.display = "block";
+
+    document.getElementById(
+        "paymentModal"
+    ).style.display = "flex";
+
+    showToast("Payment details opened for session #" + pendingPaymentSessionId + ".", "info");
+
+}
+
+
+async function confirmPayment(){
+
+    if(!pendingPaymentSessionId){
+        return;
+    }
+
+    try{
+
+        const response = await fetch(
+            "/api/payments/" +
+            pendingPaymentSessionId +
+            "/pay",
+            { method: "POST" }
+        );
+
+        const data = await response.json();
+
+        if(!response.ok || !data.success){
+            showToast(data.detail || data.message || "Payment could not be completed.", "error");
+            return;
+        }
+
+        const receipt = data.receipt;
+
+        document.getElementById(
+            "paymentModalBody"
+        ).innerHTML = `
+
+            <div style="
+                background:#ecfdf5;
+                border:1px solid #bbf7d0;
+                border-radius:10px;
+                padding:14px;
+                font-size:12px;
+                font-weight:700;
+                color:#166534;
+                margin-bottom:15px;">
+                ✓ Payment Confirmed!
+            </div>
+
+            <div class="detail-grid">
+
+                <div class="detail-box">
+                    <span>NUMBER PLATE</span>
+                    <strong>${receipt.number_plate}</strong>
+                </div>
+
+                <div class="detail-box">
+                    <span>SLOT</span>
+                    <strong>${receipt.slot_id}</strong>
+                </div>
+
+                <div class="detail-box">
+                    <span>DURATION</span>
+                    <strong>${receipt.duration_minutes} min</strong>
+                </div>
+
+                <div class="detail-box">
+                    <span>AMOUNT PAID</span>
+                    <strong style="color:#16a34a;">
+                        ₹${receipt.amount}
+                    </strong>
+                </div>
+
+                <div class="detail-box">
+                    <span>ENTRY</span>
+                    <strong>${receipt.entry_time}</strong>
+                </div>
+
+                <div class="detail-box">
+                    <span>EXIT</span>
+                    <strong>${receipt.exit_time}</strong>
+                </div>
+
+            </div>
+
+        `;
+
+        document.getElementById(
+            "confirmPayBtn"
+        ).style.display = "none";
+
+        document.getElementById(
+            "payNowBtn"
+        ).style.display = "none";
+
+        pendingPaymentSessionId = null;
+
+        showToast(
+            "Payment received: ₹" + receipt.amount + ". Slot " + receipt.slot_id + " is released."
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert("Payment failed. Please try again.");
+
+    }
+
+}
+
+
+/* ============================================================
+   FLOOR CONGESTION PREDICTION
+============================================================ */
+
+async function loadFloorCongestion(){
+
+    try{
+
+        const response = await fetch("/api/prediction/floors?minutes=30");
+        const data = await response.json();
+
+        if(!data.success) return;
+
+        const grid = document.getElementById("floorCongestionGrid");
+
+        grid.innerHTML = data.floors.map(floor => {
+
+            const lvl = floor.congestion_level.toLowerCase();
+            const levelClass = "level-" + lvl;
+
+            const barColor =
+                lvl === "critical" ? "#ef4444" :
+                lvl === "high"     ? "#f59e0b" :
+                lvl === "medium"   ? "#3b82f6" : "#22c55e";
+
+            return `
+                <div class="congestion-card">
+
+                    <div style="font-size:12px;font-weight:700;margin-bottom:6px;">
+                        Floor ${floor.floor} — Section ${floor.section}
+                    </div>
+
+                    <span class="congestion-level ${levelClass}">
+                        ${floor.congestion_level}
+                    </span>
+
+                    <div class="congestion-pct">
+                        ${floor.predicted_occupancy_pct}%
+                    </div>
+
+                    <div style="font-size:9px;color:#64748b;">
+                        Now: ${floor.current_occupancy_pct}% occupied<br>
+                        Predicted: ${floor.predicted_occupied} occupied /
+                        ${floor.predicted_available} free
+                    </div>
+
+                    <div class="floor-bar-wrap" style="margin-top:8px;">
+                        <div class="floor-bar" style="
+                            width:${floor.predicted_occupancy_pct}%;
+                            background:${barColor};
+                        "></div>
+                    </div>
+
+                    ${floor.will_fill_up
+                        ? `<div class="fill-warning">⚠️ Floor may fill up!</div>`
+                        : ""}
+
+                </div>
+            `;
+
+        }).join("");
+
+    }
+    catch(error){
+        console.error("Floor congestion error:", error);
+    }
+
+}
+
+
+/* ============================================================
+   REFRESH
+============================================================ */
+
+function refreshDashboard(showConfirmation = false){
+
+    loadStatistics();
+    loadSlots();
+    loadPrediction();
+    loadFloorCongestion();
+    loadAnomalies();
+    loadAdminSummary();
+    loadAdminCollections();
+
+    if(showConfirmation){
+        showToast("Dashboard refreshed.", "info");
+    }
+
+}
+
+
+async function loadAdminSummary(){
+
+    try{
+
+        const res  = await fetch('/api/admin/summary');
+        const data = await res.json();
+
+        if(!data.success) return;
+
+        document.getElementById('adminTotalVehicles').textContent = data.total_vehicles;
+        document.getElementById('adminActiveNow').textContent     = data.sessions.active_now || 0;
+        document.getElementById('adminTotalRevenue').textContent  = '\u20b9' + (data.payments.total_revenue || 0).toFixed(0);
+        document.getElementById('adminPending').textContent       = '\u20b9' + (data.payments.pending || 0).toFixed(0);
+
+        const statusColor = s =>
+            s === 'Active'    ? '#15803d' :
+            s === 'Completed' ? '#1d4ed8' : '#64748b';
+
+        const payColor = p =>
+            p === 'Paid'    ? '#15803d' :
+            p === 'Pending' ? '#b45309' : '#64748b';
+
+        document.getElementById('adminSessionsBody').innerHTML =
+            data.recent_sessions.length === 0
+            ? '<tr><td colspan="9" style="padding:16px;text-align:center;color:#94a3b8;">No sessions yet.</td></tr>'
+            : data.recent_sessions.map(s => `
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                    <td style="padding:9px 10px;">#${s.session_id}</td>
+                    <td style="padding:9px 10px;font-weight:700;">${s.number_plate}</td>
+                    <td style="padding:9px 10px;">${vehicleIcon(s.vehicle_type)} ${s.vehicle_type}</td>
+                    <td style="padding:9px 10px;">${s.slot_id}</td>
+                    <td style="padding:9px 10px;">${s.entry_time || '--'}</td>
+                    <td style="padding:9px 10px;">${s.duration_minutes != null ? s.duration_minutes + ' min' : '--'}</td>
+                    <td style="padding:9px 10px;font-weight:700;">${s.amount != null ? '\u20b9' + s.amount : '--'}</td>
+                    <td style="padding:9px 10px;">
+                        <span style="color:${payColor(s.payment_status)};font-weight:700;">
+                            ${s.payment_status || '--'}
+                        </span>
+                    </td>
+                    <td style="padding:9px 10px;">
+                        <span style="color:${statusColor(s.status)};font-weight:700;">
+                            ${s.status}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+
+    } catch(e){
+        console.error('Admin summary error:', e);
+    }
+
+}
+
+
+/* ============================================================
+   CLOSE MODAL ON OUTSIDE CLICK
+============================================================ */
+
+document
+    .querySelectorAll(
+        ".modal-overlay"
+    )
+    .forEach(
+        modal => {
+
+            modal.addEventListener(
+                "click",
+                function(event){
+
+                    if(
+                        event.target ===
+                        modal
+                    ){
+
+                        modal.style.display =
+                            "none";
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+/* ============================================================
+   INITIAL LOAD
+============================================================ */
+
+checkStoredToken();
+
+
+/* ============================================================
+   AUTO REFRESH EVERY 10 SECONDS
+============================================================ */
+
+setInterval(
+    refreshDashboard,
+    10000
+);
+
+
+</script>
+
+
+</body>
+
+</html>

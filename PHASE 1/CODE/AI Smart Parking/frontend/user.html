@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Parking — User Portal</title>
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; font-family:"Segoe UI",Arial,sans-serif; }
+html{ scroll-behavior:smooth; }
+body{ background:#f4f7fb; color:#172033; }
+
+#loginPage{
+    position:fixed; inset:0; background:#0f172a;
+    display:flex; align-items:center; justify-content:center; z-index:9999;
+}
+.login-box{
+    background:white; border-radius:16px; padding:36px 32px;
+    width:100%; max-width:380px; box-shadow:0 25px 60px rgba(0,0,0,.4);
+}
+.login-logo{ text-align:center; margin-bottom:24px; }
+.login-logo .icon{
+    width:56px; height:56px; background:#2563eb; border-radius:14px;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:26px; margin-bottom:10px;
+}
+.login-logo h2{ font-size:20px; }
+.login-logo p{ font-size:11px; color:#64748b; margin-top:3px; }
+.login-error{
+    display:none; background:#fef2f2; color:#991b1b;
+    border:1px solid #fecaca; border-radius:8px;
+    padding:10px; font-size:11px; margin-bottom:13px;
+}
+
+.topbar{
+    position:sticky; top:0; height:68px;
+    background:rgba(255,255,255,.96); backdrop-filter:blur(10px);
+    border-bottom:1px solid #e5e7eb;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 28px; z-index:50;
+}
+.topbar-left{ display:flex; align-items:center; gap:12px; }
+.topbar-logo{
+    width:38px; height:38px; background:#2563eb; border-radius:10px;
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.topbar-title{ font-size:17px; font-weight:700; }
+.topbar-sub{ font-size:10px; color:#64748b; margin-top:2px; }
+.topbar-right{ display:flex; align-items:center; gap:10px; }
+.user-nav{ display:flex; align-items:center; gap:13px; overflow-x:auto; }
+.user-nav a{ color:#475569; text-decoration:none; font-size:10px; font-weight:650; white-space:nowrap; }
+.user-nav a:hover{ color:#2563eb; }
+.data-table{ width:100%; border-collapse:collapse; font-size:11px; }
+.data-table th,.data-table td{ padding:9px 10px; border-bottom:1px solid #e5e7eb; text-align:left; }
+.data-table th{ color:#64748b; font-weight:700; }
+.action-toast{
+  position:fixed; top:82px; right:22px; z-index:10001; width:min(380px,calc(100vw - 32px));
+  padding:14px 17px; border-radius:8px; color:#fff; font-size:13px; font-weight:650;
+  box-shadow:0 12px 32px rgba(15,23,42,.22); opacity:0; transform:translateY(-10px);
+  pointer-events:none; transition:opacity .2s ease,transform .2s ease;
+}
+.action-toast.show{ opacity:1; transform:translateY(0); }
+.action-toast.success{ background:#166534; }
+.action-toast.error{ background:#991b1b; }
+.action-toast.info{ background:#1e40af; }
+.user-badge{
+    background:#eff6ff; color:#2563eb; padding:7px 12px;
+    border-radius:20px; font-size:11px; font-weight:600;
+}
+.logout-btn{
+    background:#fef2f2; color:#b91c1c; border:1px solid #fecaca;
+    padding:8px 14px; border-radius:8px; font-size:11px;
+    font-weight:600; cursor:pointer;
+}
+
+.content{ padding:28px; max-width:900px; margin:0 auto; }
+.section{ margin-bottom:24px; }
+.section-title{ font-size:16px; font-weight:700; margin-bottom:14px; }
+
+.card{
+    background:white; border:1px solid #e5e7eb; border-radius:13px;
+    padding:21px; box-shadow:0 4px 15px rgba(15,23,42,.04);
+}
+.card-title{ font-size:14px; font-weight:700; margin-bottom:4px; }
+.card-sub{ font-size:10px; color:#94a3b8; margin-bottom:16px; }
+
+.camera-hero{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-bottom:14px;
+}
+.camera-live-pill{
+    display:inline-flex; align-items:center; gap:7px; padding:8px 12px;
+    border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0;
+    color:#166534; font-size:9px; font-weight:800; letter-spacing:.08em;
+}
+.live-dot{
+    width:8px; height:8px; border-radius:50%; background:#22c55e;
+    box-shadow:0 0 0 6px rgba(34, 197, 94, .12);
+}
+.camera-flow{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0 18px;
+}
+.camera-step{
+    background:linear-gradient(180deg,#f8fbff,#f8fafc); border:1px solid #dbeafe;
+    border-radius:10px; padding:12px 10px; min-height:104px;
+}
+.step-no{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px; border-radius:50%; background:#dbeafe; color:#1d4ed8;
+    font-size:10px; font-weight:800; margin-bottom:10px;
+}
+.step-label{ font-size:11px; font-weight:800; color:#0f172a; }
+.camera-step small{ display:block; margin-top:5px; color:#64748b; line-height:1.5; font-size:9px; }
+.camera-panel{
+    background:linear-gradient(180deg,#eff6ff,#f8fafc); border:1px solid #bfdbfe;
+    border-radius:12px; padding:14px; margin-top:12px;
+}
+.camera-panel .header-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    margin-bottom:12px;
+}
+.camera-panel .header-row strong{ font-size:12px; }
+.camera-chip{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 10px;
+    border-radius:999px; font-size:9px; font-weight:700; background:#dbeafe; color:#1d4ed8;
+}
+
+.form-group{ margin-bottom:13px; }
+.form-label{ display:block; font-size:9px; color:#475569; font-weight:700; margin-bottom:6px; }
+input, select{
+    width:100%; height:41px; border:1px solid #dbe1ea;
+    background:#f8fafc; border-radius:8px; padding:0 11px;
+    outline:none; font-size:12px; color:#172033;
+}
+input:focus, select:focus{ border-color:#2563eb; background:white; }
+
+.btn{
+    width:100%; height:41px; border:none; border-radius:8px;
+    color:white; font-size:11px; font-weight:700; cursor:pointer;
+}
+.btn-blue{ background:#2563eb; }
+.btn-blue:hover{ background:#1d4ed8; }
+.btn-red{ background:#dc2626; }
+.btn-red:hover{ background:#b91c1c; }
+.btn-green{ background:#16a34a; }
+.btn-green:hover{ background:#15803d; }
+
+.msg{ display:none; margin-top:11px; padding:10px; border-radius:8px; font-size:11px; }
+.msg.ok{ display:block; background:#ecfdf5; color:#166534; border:1px solid #bbf7d0; }
+.msg.err{ display:block; background:#fef2f2; color:#991b1b; border:1px solid #fecaca; }
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+.stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:22px; }
+.stat{
+    background:white; border:1px solid #e5e7eb; border-radius:12px;
+    padding:16px; text-align:center;
+}
+.stat-num{ font-size:26px; font-weight:800; margin:4px 0; }
+.stat-lbl{ font-size:9px; color:#64748b; font-weight:600; }
+
+.slot-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+.slot{
+    height:64px; border-radius:9px; border:1px solid;
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; cursor:pointer; transition:.2s; user-select:none;
+}
+.slot:hover{ transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,.1); }
+.slot-id{ font-size:13px; font-weight:750; }
+.slot-st{ font-size:8px; text-transform:uppercase; font-weight:600; margin-top:2px; }
+.av{ background:#ecfdf5; border-color:#86efac; color:#15803d; }
+.oc{ background:#fef2f2; border-color:#fca5a5; color:#b91c1c; }
+.rs{ background:#fffbeb; border-color:#fcd34d; color:#b45309; }
+
+.floor-hdr{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:9px 12px; background:#f8fafc; border:1px solid #e2e8f0;
+    border-radius:8px; margin-bottom:9px;
+    font-size:12px; font-weight:700;
+}
+.floor-av{ font-size:10px; color:#64748b; }
+.floor-blk{ margin-bottom:18px; }
+
+.legend{ display:flex; gap:14px; margin-top:12px; font-size:9px; color:#64748b; }
+.ldot{ width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
+
+.rec-box{
+    background:#f0fdf4; border:1px solid #bbf7d0;
+    border-radius:11px; padding:16px; margin-bottom:14px;
+}
+.rec-lbl{ font-size:9px; color:#64748b; font-weight:600; }
+.rec-slot{ font-size:28px; font-weight:800; color:#15803d; margin:3px 0 5px; }
+.rec-score{
+    display:inline-block; background:#16a34a; color:white;
+    padding:4px 10px; border-radius:20px; font-size:9px; font-weight:700;
+}
+.rec-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:7px; margin-top:12px; }
+.rec-item{ background:white; border-radius:7px; padding:9px; font-size:9px; }
+.rec-item span{ display:block; color:#64748b; margin-bottom:2px; }
+
+.find-result{
+    display:none; margin-top:14px; background:#eff6ff;
+    border:1px solid #bfdbfe; border-radius:10px; padding:14px;
+}
+.loc-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
+.loc-item{ background:white; border:1px solid #dbeafe; border-radius:8px; padding:9px; }
+.loc-item span{ display:block; color:#64748b; font-size:8px; margin-bottom:3px; }
+.loc-item strong{ font-size:11px; }
+
+.input-wrap{ position:relative; }
+.fuzzy-box{
+    display:none; position:absolute; z-index:200; width:100%;
+    background:white; border:1px solid #bfdbfe; border-radius:8px;
+    margin-top:3px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.1);
+}
+.fuzzy-item{
+    padding:9px 12px; font-size:12px; cursor:pointer;
+    border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;
+}
+.fuzzy-item:hover{ background:#eff6ff; }
+
+.modal-overlay{
+    position:fixed; inset:0; background:rgba(15,23,42,.62);
+    display:none; align-items:center; justify-content:center; z-index:500; padding:20px;
+}
+.modal{
+    width:100%; max-width:480px; background:white; border-radius:15px;
+    overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,.25);
+    animation:ms .2s ease;
+}
+@keyframes ms{
+    from{ opacity:0; transform:translateY(10px) scale(.97); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+}
+.modal-hdr{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 20px; border-bottom:1px solid #e5e7eb;
+}
+.modal-hdr h2{ font-size:16px; }
+.modal-close{
+    width:30px; height:30px; border:none; border-radius:7px;
+    background:#f1f5f9; font-size:17px; cursor:pointer;
+}
+.modal-body{ padding:20px; }
+.modal-foot{
+    padding:13px 20px; border-top:1px solid #e5e7eb;
+    display:flex; gap:9px;
+}
+.modal-foot button{ flex:1; }
+
+.sel-slot{
+    background:#eff6ff; border:1px solid #bfdbfe;
+    border-radius:10px; padding:12px; margin-bottom:15px;
+}
+.sel-slot span{ display:block; font-size:8px; color:#64748b; }
+.sel-slot strong{ display:block; color:#2563eb; font-size:20px; margin-top:3px; }
+
+.detail-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.detail-box{ background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; }
+.detail-box span{ display:block; color:#64748b; font-size:8px; margin-bottom:3px; }
+.detail-box strong{ font-size:11px; }
+
+@media(max-width:700px){
+  .user-nav{ max-width:45vw; }
+  .user-nav a{ font-size:9px; }
+    .grid2{ grid-template-columns:1fr; }
+    .stats{ grid-template-columns:1fr 1fr; }
+    .slot-grid{ grid-template-columns:repeat(3,1fr); }
+    .loc-grid{ grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<div id="actionToast" class="action-toast" role="status" aria-live="polite"></div>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="icon">🚗</div>
+      <h2>Smart Parking</h2>
+      <p>User Portal — Sign in to continue</p>
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <div class="form-group">
+      <label class="form-label">USERNAME</label>
+      <input id="loginUsername" type="text" placeholder="user" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">PASSWORD</label>
+      <input id="loginPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-blue" onclick="doLogin()" id="loginBtn">Sign In</button>
+    <div style="text-align:center;margin-top:12px;font-size:10px;color:#94a3b8;">
+      Default: user / user123 &nbsp;|&nbsp; <a href="/dashboard" style="color:#2563eb;">Admin Login</a>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">🚗</div>
+    <div>
+      <div class="topbar-title">Smart Parking</div>
+      <div class="topbar-sub">User Portal</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <nav class="user-nav" aria-label="User portal">
+      <a href="#dashboardSection" onclick="showToast('Dashboard opened.','info')">Dashboard</a>
+      <a href="#bookSlotSection" onclick="showToast('Book Slot opened.','info')">Book Slot</a>
+      <a href="#myBookingsSection" onclick="showToast('My Bookings opened.','info')">My Bookings</a>
+      <a href="#myVehicleSection" onclick="showToast('My Vehicle opened.','info')">My Vehicle</a>
+      <a href="#currentParkingSection" onclick="showToast('Current Parking opened.','info')">Current Parking</a>
+      <a href="#notificationsSection" onclick="showToast('Notifications opened.','info')">Notifications</a>
+      <a href="#paymentsSection" onclick="showToast('Payments opened.','info')">Payments</a>
+      <a href="#historySection" onclick="showToast('Parking History opened.','info')">History</a>
+    </nav>
+    <div class="user-badge" id="userBadge">👤 User</div>
+    <button class="logout-btn" onclick="doLogout()">🔒 Logout</button>
+  </div>
+</header>
+
+<div class="content" id="dashboardSection">
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-lbl">AVAILABLE SLOTS</div>
+    <div class="stat-num" id="uAvailable" style="color:#15803d;">--</div>
+    <div class="stat-lbl">Ready to book</div>
+  </div>
+  <div class="stat">
+    <div class="stat-lbl">OCCUPIED</div>
+    <div class="stat-num" id="uOccupied" style="color:#b91c1c;">--</div>
+    <div class="stat-lbl">Currently parked</div>
+  </div>
+  <div class="stat">
+    <div class="stat-lbl">TOTAL SLOTS</div>
+    <div class="stat-num" id="uTotal" style="color:#2563eb;">--</div>
+    <div class="stat-lbl">Capacity</div>
+  </div>
+</div>
+
+<!-- LIVE SLOTS AND BOOKING -->
+<div class="grid2">
+
+  <!-- LEFT: PARKING MAP -->
+  <div class="section">
+    <div class="section-title">🅿️ Live Parking Map</div>
+    <div class="card">
+      <div id="userParkingArea">Loading slots...</div>
+      <div class="legend">
+        <span><span class="ldot" style="background:#22c55e;"></span>Available</span>
+        <span><span class="ldot" style="background:#ef4444;"></span>Occupied</span>
+        <span><span class="ldot" style="background:#f59e0b;"></span>Reserved</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="bookSlotSection">
+    <div class="section-title">Book Slot</div>
+    <div class="card">
+      <div class="card-title">Dynamic slot assignment</div>
+      <div class="card-sub">Choose an available bay. Walk-ins are balanced across floors automatically.</div>
+      <p style="font-size:12px;color:#475569;line-height:1.6;">Select an available slot on the live map to reserve it. At arrival, your confirmed reservation is verified against the detected number plate.</p>
+      <button class="btn btn-blue" style="margin-top:16px;" onclick="showAvailableSlots()">View available slots</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" id="currentParkingSection">
+      <div class="section-title">🔎 Find My Vehicle</div>
+      <div class="card">
+        <div class="card-title">Locate Your Vehicle</div>
+        <div class="card-sub">Enter your number plate</div>
+        <div style="display:flex;gap:10px;">
+          <div class="input-wrap" style="flex:1;">
+            <input id="findPlate" type="text" placeholder="TN14AB234" autocomplete="off"
+              oninput="fuzzySearch('findPlate','findSug')">
+            <div class="fuzzy-box" id="findSug"></div>
+          </div>
+          <button class="btn btn-blue" style="width:120px;" onclick="findVehicle()">Find</button>
+        </div>
+        <div class="find-result" id="findResult">
+          <div style="font-size:13px;font-weight:700;">📍 Vehicle Location</div>
+          <div class="loc-grid">
+            <div class="loc-item"><span>PLATE</span><strong id="fPlate">--</strong></div>
+            <div class="loc-item"><span>TYPE</span><strong id="fType">--</strong></div>
+            <div class="loc-item"><span>FLOOR</span><strong id="fFloor">--</strong></div>
+            <div class="loc-item"><span>SLOT</span><strong id="fSlot">--</strong></div>
+            <div class="loc-item"><span>SECTION</span><strong id="fSection">--</strong></div>
+            <div class="loc-item"><span>ENTRY TIME</span><strong id="fEntry">--</strong></div>
+            <div class="loc-item"><span>OWNER</span><strong id="fOwner">--</strong></div>
+            <div class="loc-item"><span>STATUS</span><strong id="fStatus">--</strong></div>
+          </div>
+        </div>
+      </div>
+</div>
+
+<!-- AUTOMATIC VEHICLE DETECTION -->
+<div class="section">
+  <div class="section-title">📹 AI Smart Gate</div>
+  <div class="card">
+    <div class="camera-hero">
+      <div>
+        <div class="card-title">Camera Auto Recognition</div>
+        <div class="card-sub">Capture → identify vehicle → read plate → register user</div>
+      </div>
+      <div class="camera-live-pill"><span class="live-dot"></span> LIVE</div>
+    </div>
+
+    <div class="camera-flow">
+      <div class="camera-step">
+        <div class="step-no">01</div>
+        <div class="step-label">Capture</div>
+        <small>Vehicle image is captured from the camera feed.</small>
+      </div>
+      <div class="camera-step">
+        <div class="step-no">02</div>
+        <div class="step-label">Identify</div>
+        <small>Model detects the vehicle type and the plate region.</small>
+      </div>
+      <div class="camera-step">
+        <div class="step-no">03</div>
+        <div class="step-label">Register</div>
+        <small>Plate value is auto-filled and sent to the parking system.</small>
+      </div>
+    </div>
+
+    <div class="camera-panel">
+      <div class="header-row">
+        <strong>Detected Vehicle Data</strong>
+        <div class="camera-chip" id="cameraModeLabel">Entry Mode</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">DETECTED PLATE</label>
+        <div class="input-wrap">
+          <input id="entryPlate" type="text" placeholder="Camera will detect the plate automatically" autocomplete="off"
+            oninput="fuzzySearch('entryPlate','entrySug')">
+          <div class="fuzzy-box" id="entrySug"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">VEHICLE TYPE</label>
+        <select id="entryType">
+          <option value="Car">🚗 Car</option>
+          <option value="Bike">🏍️ Bike</option>
+          <option value="Bus">🚌 Bus</option>
+          <option value="Truck">🚚 Truck</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;">
+      <button class="btn btn-blue" onclick="doEntry()" style="flex:1;min-width:180px;">Process Entry</button>
+      <button class="btn btn-red" onclick="doExit()" style="flex:1;min-width:180px;">Process Exit</button>
+    </div>
+
+    <button class="btn btn-green" id="payBtn" style="display:none;margin-top:12px;width:100%;" onclick="openPayModal()">
+      💳 Pay Now
+    </button>
+
+    <div class="msg" id="entryMsg" style="margin-top:12px;"></div>
+    <div class="msg" id="exitMsg" style="margin-top:8px;"></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<div class="content">
+  <section class="section" id="myVehicleSection">
+    <div class="section-title">My Vehicle</div>
+    <div class="card">
+      <div class="card-title">Vehicle number plate</div>
+      <div class="card-sub">Use the registered plate to load bookings, active parking, alerts, and receipts.</div>
+      <div style="display:flex;gap:10px;max-width:520px;">
+        <input id="profilePlate" type="text" placeholder="TN14AB234" autocomplete="off">
+        <button class="btn btn-blue" style="width:150px;" onclick="loadUserProfile()">Load vehicle</button>
+      </div>
+      <div id="profileVehicle" style="margin-top:12px;font-size:12px;color:#475569;"></div>
+    </div>
+  </section>
+
+  <section class="section" id="myBookingsSection">
+    <div class="section-title">My Bookings</div>
+    <div class="card"><div id="myBookingsList">Load a vehicle plate to view bookings.</div></div>
+  </section>
+
+  <section class="section" id="notificationsSection">
+    <div class="section-title">Notifications</div>
+    <div class="card"><div id="myNotificationsList">Load a vehicle plate to view notifications.</div></div>
+  </section>
+
+  <section class="section" id="paymentsSection">
+    <div class="section-title">Payments</div>
+    <div class="card"><div id="myPaymentsList">Load a vehicle plate to view payments.</div></div>
+  </section>
+
+  <section class="section" id="historySection">
+    <div class="section-title">Parking History</div>
+    <div class="card"><div id="myHistoryList">Load a vehicle plate to view history.</div></div>
+  </section>
+</div>
+
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>🅿️ Book Parking Slot</h2>
+      <button class="modal-close" onclick="closeModal('bookModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="sel-slot">
+        <span>SELECTED SLOT</span>
+        <strong id="bookSlotLabel">--</strong>
+      </div>
+      <div class="form-group">
+        <label class="form-label">YOUR NAME</label>
+        <input id="bName" type="text" placeholder="Enter your name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">NUMBER PLATE</label>
+        <input id="bPlate" type="text" placeholder="TN14AB234">
+      </div>
+      <div class="form-group">
+        <label class="form-label">VEHICLE TYPE</label>
+        <select id="bType">
+          <option value="Car">🚗 Car</option>
+          <option value="Bike">🏍️ Bike</option>
+          <option value="Bus">🚌 Bus</option>
+          <option value="Truck">🚚 Truck</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PHONE</label>
+        <input id="bPhone" type="text" placeholder="9876543210">
+      </div>
+      <div class="msg" id="bookMsg"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" style="background:#64748b;" onclick="closeModal('bookModal');showToast('Booking cancelled.','info')">Cancel</button>
+      <button class="btn btn-blue" onclick="confirmBooking()">Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>💳 Payment</h2>
+      <button class="modal-close" onclick="closeModal('payModal');showToast('Payment window closed.','info')">×</button>
+    </div>
+    <div class="modal-body" id="payModalBody"></div>
+    <div class="modal-foot">
+      <button class="btn" style="background:#64748b;" onclick="closeModal('payModal');showToast('Payment window closed.','info')">Close</button>
+      <button class="btn btn-blue" id="confirmPayBtn" onclick="confirmPayment()">✓ Confirm Payment</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+let authToken = sessionStorage.getItem('parkingToken') || null;
+let selectedSlot = null;
+let pendingSessionId = null;
+let cameraActionInProgress = false;
+let fuzzyTimer = null;
+
+/* ---- AUTH ---- */
+async function doLogin(){
+    const u = document.getElementById('loginUsername').value.trim();
+    const p = document.getElementById('loginPassword').value.trim();
+    const err = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
+    if(!u||!p){ err.textContent='Enter username and password.'; err.style.display='block'; showToast('Enter your username and password.','error'); return; }
+    btn.textContent='Signing in...'; btn.disabled=true;
+    try{
+        const res = await fetch('/api/auth/user/login',{
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({username:u, password:p})
+        });
+        const data = await res.json();
+        if(!res.ok){ err.textContent=data.detail||'Login failed.'; err.style.display='block'; showToast(data.detail||'Sign in failed.','error'); btn.textContent='Sign In'; btn.disabled=false; return; }
+        if(data.role === 'admin'){ window.location.href='/dashboard'; return; }
+        authToken = data.token;
+        sessionStorage.setItem('parkingToken', authToken);
+        sessionStorage.setItem('parkingRole', data.role);
+        document.getElementById('loginPage').style.display='none';
+        document.getElementById('userBadge').textContent = '👤 ' + data.username;
+        loadAll();
+        showToast('Signed in to your parking account.');
+    } catch(e){
+        err.textContent='Unable to connect to server.'; err.style.display='block';
+        showToast('Could not connect. Please try again.','error');
+        btn.textContent='Sign In'; btn.disabled=false;
+    }
+}
+
+async function doLogout(){
+    if(authToken) await fetch('/api/auth/logout',{method:'POST',headers:{'x-token':authToken}}).catch(()=>{});
+    authToken=null; sessionStorage.clear();
+    document.getElementById('loginPage').style.display='flex';
+    document.getElementById('loginUsername').value='';
+    document.getElementById('loginPassword').value='';
+    showToast('You have been signed out.','info');
+}
+
+async function checkToken(){
+    if(!authToken) return;
+    try{
+        const res = await fetch('/api/auth/verify',{headers:{'x-token':authToken}});
+        if(res.ok){
+            const d = await res.json();
+          if(d.role !== 'user'){
+            authToken=null;
+            sessionStorage.removeItem('parkingToken');
+            sessionStorage.removeItem('parkingRole');
+            document.getElementById('loginPage').style.display='flex';
+            return;
+          }
+            document.getElementById('loginPage').style.display='none';
+            document.getElementById('userBadge').textContent='👤 '+d.username;
+            loadAll();
+        } else {
+          authToken=null;
+          sessionStorage.removeItem('parkingToken');
+          sessionStorage.removeItem('parkingRole');
+          document.getElementById('loginPage').style.display='flex';
+        }
+    } catch(e){}
+}
+
+async function loadLatestCameraDetection(){
+    try {
+    const response = await fetch(`/api/camera/latest?ts=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) return;
+        const data = await response.json();
+        if (!data || !data.number_plate) return;
+
+        const plate = data.number_plate.toUpperCase().replaceAll(' ', '');
+        const vehicleType = data.vehicle_type || 'Car';
+
+        const entryPlate = document.getElementById('entryPlate');
+        const profilePlate = document.getElementById('profilePlate');
+        const entryType = document.getElementById('entryType');
+        const modeLabel = document.getElementById('cameraModeLabel');
+
+        if (entryPlate) entryPlate.value = plate;
+        if (profilePlate && !profilePlate.value) profilePlate.value = plate;
+        if (entryType) entryType.value = vehicleType;
+        if (modeLabel) {
+            const rawMode = String(data.mode || data.source || 'Entry').toLowerCase();
+            const modeText = rawMode.includes('exit') ? 'Exit Mode' : 'Entry Mode';
+            modeLabel.textContent = modeText;
+            modeLabel.style.background = modeText.includes('Exit') ? '#fef2f2' : '#dbeafe';
+            modeLabel.style.color = modeText.includes('Exit') ? '#b91c1c' : '#1d4ed8';
+            modeLabel.style.border = modeText.includes('Exit') ? '1px solid #fecaca' : '1px solid #bfdbfe';
+        }
+
+        sessionStorage.setItem('parkingPlate', plate);
+
+    } catch (error) {
+        // camera detection is optional; ignore if unavailable
+    }
+}
+
+/* ---- LOAD ALL ---- */
+function loadAll(){
+  loadStats();
+  loadSlots();
+  loadLatestCameraDetection();
+  const savedPlate=sessionStorage.getItem('parkingPlate');
+  if(savedPlate){
+    document.getElementById('profilePlate').value=savedPlate;
+    loadUserData();
+  }
+}
+
+/* ---- STATS ---- */
+async function loadStats(){
+    try{
+        const r = await fetch('/api/statistics');
+        const d = await r.json();
+        document.getElementById('uAvailable').textContent = d.available;
+        document.getElementById('uOccupied').textContent  = d.occupied;
+        document.getElementById('uTotal').textContent     = d.total;
+    } catch(e){}
+}
+
+/* ---- SLOTS ---- */
+async function loadSlots(){
+    try{
+        const r = await fetch('/api/slots');
+        const d = await r.json();
+        const area = document.getElementById('userParkingArea');
+        area.innerHTML='';
+        const floors={};
+        d.slots.forEach(s=>{ if(!floors[s.floor]) floors[s.floor]=[]; floors[s.floor].push(s); });
+        Object.keys(floors).sort((a,b)=>Number(a)-Number(b)).forEach(fl=>{
+            const avail = floors[fl].filter(s=>s.status==='Available').length;
+            const blk = document.createElement('div'); blk.className='floor-blk';
+            blk.innerHTML=`<div class="floor-hdr"><span>Floor ${fl}</span><span class="floor-av">${avail} available</span></div>`;
+            const grid = document.createElement('div'); grid.className='slot-grid';
+            floors[fl].forEach(s=>{
+                const el = document.createElement('div');
+                el.className='slot '+(s.status==='Available'?'av':s.status==='Occupied'?'oc':'rs');
+                el.innerHTML=`<div class="slot-id">${s.slot_id}</div><div class="slot-st">${s.status}</div>`;
+                if(s.status==='Available') el.onclick=()=>openBookModal(s);
+                grid.appendChild(el);
+            });
+            blk.appendChild(grid);
+            area.appendChild(blk);
+        });
+    } catch(e){ document.getElementById('userParkingArea').textContent='Unable to load slots.'; }
+}
+
+/* ---- BOOKING MODAL ---- */
+function openBookModal(slot){
+    selectedSlot=slot;
+    document.getElementById('bookSlotLabel').textContent=slot.slot_id+' • Floor '+slot.floor+' • Section '+slot.section;
+    document.getElementById('bName').value='';
+    document.getElementById('bPlate').value='';
+    document.getElementById('bPhone').value='';
+    document.getElementById('bType').value='Car';
+    clearMsg('bookMsg');
+    document.getElementById('bookModal').style.display='flex';
+    showToast('Slot '+slot.slot_id+' selected. Complete the booking form.','info');
+}
+
+async function confirmBooking(){
+  clearActionMessages();
+    const name=document.getElementById('bName').value.trim();
+    const plate=document.getElementById('bPlate').value.trim();
+    const type=document.getElementById('bType').value;
+    const phone=document.getElementById('bPhone').value.trim();
+    if(!name){ showMsg('bookMsg','Enter your name.',false); showToast('Enter your name to book this slot.','error'); return; }
+    if(!plate){ showMsg('bookMsg','Enter number plate.',false); showToast('Enter a number plate to book this slot.','error'); return; }
+    try{
+        const r = await fetch('/api/book',{
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({name,number_plate:plate,vehicle_type:type,slot_id:selectedSlot.slot_id,phone,email:''})
+        });
+        const d = await r.json();
+        if(!r.ok){ showMsg('bookMsg',d.detail||'Booking failed.',false); showToast(d.detail||'Booking could not be completed.','error'); return; }
+        document.getElementById('profilePlate').value=plate;
+        sessionStorage.setItem('parkingPlate',plate.toUpperCase().replaceAll(' ',''));
+        showMsg('bookMsg','✓ Slot '+d.slot_id+' booked for '+d.vehicle_number,true);
+        showToast('Booking confirmed: slot '+d.slot_id+' for '+d.vehicle_number+'.');
+        setTimeout(()=>{ closeModal('bookModal'); loadAll(); loadUserData(); },1400);
+      } catch(e){ showMsg('bookMsg','Unable to connect.',false); showToast('Booking failed because the server could not be reached.','error'); }
+}
+
+async function waitForDetectedPlate(mode, scanId, timeoutMs = 45000) {
+    const startedAt = Date.now();
+    while (Date.now() - startedAt < timeoutMs) {
+        try {
+        const response = await fetch(`/api/camera/latest?ts=${Date.now()}`, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Camera detection endpoint is unavailable.');
+            const data = await response.json();
+            const plate = (data && data.number_plate ? data.number_plate : '').trim();
+            if (plate && data.scan_id === scanId) {
+                return {
+                    plate,
+                    vehicle_type: data.vehicle_type || document.getElementById('entryType').value,
+                    source: data.source || mode,
+                  action_result: data.action_result,
+                };
+            }
+        } catch (error) {
+            // ignore polling failures while waiting for detection
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    return null;
+}
+
+async function triggerCameraCapture(mode) {
+    const response = await fetch('/api/camera/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode })
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+        throw new Error(data.detail || data.message || 'Camera could not be started.');
+    }
+    return data;
+}
+
+  async function captureVehicle(mode) {
+    showToast(mode === 'entry'
+      ? 'Opening camera to detect the vehicle and plate...'
+      : 'Opening camera to identify the exiting vehicle...','info');
+    const scan = await triggerCameraCapture(mode);
+    const detected = await waitForDetectedPlate(mode, scan.scan_id);
+    if (!detected) {
+      throw new Error('No fresh number plate was detected. Keep the plate visible and try again.');
+    }
+
+    document.getElementById('entryPlate').value = detected.plate;
+    document.getElementById('entryType').value = detected.vehicle_type || 'Car';
+    return detected;
+  }
+
+/* ---- ENTRY ---- */
+async function doEntry(){
+    if (cameraActionInProgress) return;
+    cameraActionInProgress = true;
+    clearActionMessages();
+    try {
+      const detected = await captureVehicle('entry');
+      const d = detected.action_result;
+      if (!d || !d.success) {
+        const message = d?.message || 'Vehicle entry could not be recorded.';
+        showMsg('entryMsg',message,false);
+        showToast(message,'error');
+        return;
+      }
+      document.getElementById('profilePlate').value=detected.plate;
+      sessionStorage.setItem('parkingPlate',detected.plate.toUpperCase().replaceAll(' ',''));
+        showMsg('entryMsg','✓ '+d.vehicle_type+' '+d.number_plate+' assigned to Slot '+d.slot_id,true);
+      showToast('Camera verified '+d.number_plate+' and assigned slot '+d.slot_id+'.');
+        loadAll(); loadUserData();
+    } catch(e){ showMsg('entryMsg',e.message||'Unable to connect.',false); showToast(e.message||'Vehicle entry failed because the server could not be reached.','error'); }
+    finally { cameraActionInProgress = false; }
+}
+
+/* ---- EXIT ---- */
+async function doExit(){
+    if (cameraActionInProgress) return;
+    cameraActionInProgress = true;
+    clearActionMessages();
+    try{
+      const detected = await captureVehicle('exit');
+      const d = detected.action_result;
+      if (!d || !d.success) {
+        const message = d?.message || 'Vehicle exit could not be recorded.';
+        showMsg('exitMsg',message,false);
+        showToast(message,'error');
+        return;
+      }
+        showMsg('exitMsg','Payment due: ₹'+d.amount+'. Slot '+d.slot_id+' releases after payment.',true);
+      showToast('Camera matched '+detected.plate+'. Exit recorded; ₹'+d.amount+' due.','info');
+        pendingSessionId=d.session_id;
+        document.getElementById('payBtn').style.display='block';
+      document.getElementById('profilePlate').value=detected.plate;
+      sessionStorage.setItem('parkingPlate',detected.plate.toUpperCase().replaceAll(' ',''));
+        loadAll(); loadUserData();
+    } catch(e){ showMsg('exitMsg',e.message||'Unable to connect.',false); showToast(e.message||'Exit could not be processed because the server could not be reached.','error'); }
+    finally { cameraActionInProgress = false; }
+}
+
+/* ---- FIND VEHICLE ---- */
+async function findVehicle(){
+  clearActionMessages();
+    const plate=document.getElementById('findPlate').value.trim();
+    if(!plate){ showToast('Enter a number plate to find your vehicle.','error'); return; }
+  document.getElementById('findResult').style.display='none';
+    try{
+        const r = await fetch('/api/find-car/'+encodeURIComponent(plate));
+        const d = await r.json();
+        const res=document.getElementById('findResult');
+        if(!r.ok){ res.style.display='none'; showToast(d.detail||'No active parking record found for '+plate+'.','error'); return; }
+        document.getElementById('profilePlate').value=plate;
+        sessionStorage.setItem('parkingPlate',plate.toUpperCase().replaceAll(' ',''));
+        loadUserData();
+        res.style.display='block';
+        document.getElementById('fPlate').textContent=d.vehicle_number;
+        document.getElementById('fType').textContent=d.vehicle_type;
+        document.getElementById('fFloor').textContent='Floor '+d.floor;
+        document.getElementById('fSlot').textContent=d.slot_id;
+        document.getElementById('fSection').textContent=d.section;
+        document.getElementById('fEntry').textContent=d.entry_time;
+        document.getElementById('fOwner').textContent=d.owner_name;
+        document.getElementById('fStatus').textContent=d.status;
+        showToast('Vehicle '+d.vehicle_number+' found at slot '+d.slot_id+' on floor '+d.floor+'.');
+      } catch(e){ showToast('Could not find the vehicle because the server could not be reached.','error'); }
+}
+
+  function escapeHtml(value){
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  function renderTable(elementId, columns, rows){
+    const target=document.getElementById(elementId);
+    if(!rows.length){ target.textContent='No records found.'; return; }
+    target.innerHTML=`<div style="overflow-x:auto"><table class="data-table"><thead><tr>${columns.map(column=>`<th>${escapeHtml(column.label)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${columns.map(column=>`<td>${escapeHtml(row[column.key])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+
+  async function loadUserData(){
+    const plate=document.getElementById('profilePlate').value.trim().toUpperCase().replaceAll(' ','');
+    const profile=document.getElementById('profileVehicle');
+    if(!plate){ profile.textContent='Enter your vehicle number plate.'; showToast('Enter a vehicle plate to load its records.','error'); return; }
+    sessionStorage.setItem('parkingPlate',plate);
+    const root=`/api/vehicles/${encodeURIComponent(plate)}`;
+    const results=await Promise.allSettled([
+      fetch(`/api/find-car/${encodeURIComponent(plate)}`).then(response=>response.json()),
+      fetch(`${root}/bookings`).then(response=>response.json()),
+      fetch(`/api/notifications/${encodeURIComponent(plate)}`).then(response=>response.json()),
+      fetch(`${root}/payments`).then(response=>response.json()),
+      fetch(`${root}/history`).then(response=>response.json())
+    ]);
+    const data=index=>results[index].status==='fulfilled' ? results[index].value : {};
+    const vehicle=data(0);
+    profile.textContent=vehicle.success
+      ? `${vehicle.vehicle_number} · ${vehicle.vehicle_type} · ${vehicle.status} · Floor ${vehicle.floor}, slot ${vehicle.slot_id}`
+      : `${plate} · No active parking session`;
+    renderTable('myBookingsList',[
+      {key:'booking_id',label:'BOOKING'}, {key:'slot_id',label:'SLOT'},
+      {key:'start_time',label:'START'}, {key:'end_time',label:'END'}, {key:'status',label:'STATUS'}
+    ],data(1).bookings||[]);
+    renderTable('myNotificationsList',[
+      {key:'created_at',label:'TIME'}, {key:'category',label:'TYPE'}, {key:'message',label:'MESSAGE'}
+    ],data(2).notifications||[]);
+    renderTable('myPaymentsList',[
+      {key:'payment_time',label:'TIME'}, {key:'slot_id',label:'SLOT'},
+      {key:'amount',label:'AMOUNT (₹)'}, {key:'payment_status',label:'STATUS'}
+    ],data(3).payments||[]);
+    const history=data(4);
+    renderTable('myHistoryList',[
+      {key:'entry_time',label:'ENTRY'}, {key:'exit_time',label:'EXIT'},
+      {key:'slot_id',label:'SLOT'}, {key:'duration_minutes',label:'MINUTES'},
+      {key:'amount',label:'AMOUNT (₹)'}, {key:'status',label:'STATUS'}
+    ],history.history||history.sessions||[]);
+  }
+
+  async function loadUserProfile(){
+    const plate=document.getElementById('profilePlate').value.trim().toUpperCase().replaceAll(' ','');
+    if(!plate){ showToast('Enter a vehicle plate to load its records.','error'); return; }
+    await loadUserData();
+    showToast('Vehicle records loaded for '+plate+'.','info');
+  }
+
+/* ---- PAYMENT ---- */
+function openPayModal(){
+  if(!pendingSessionId){ showToast('No payment is currently due.','error'); return; }
+    document.getElementById('payModalBody').innerHTML=`
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;font-size:12px;color:#1e40af;margin-bottom:13px;">
+            💳 Session #${pendingSessionId}
+        </div>
+        <div style="background:#f8fafc;border-radius:8px;padding:12px;font-size:11px;color:#475569;">
+            Click <strong>Confirm Payment</strong> to complete.
+        </div>`;
+    document.getElementById('confirmPayBtn').style.display='block';
+    document.getElementById('payModal').style.display='flex';
+    showToast('Payment details opened for session #'+pendingSessionId+'.','info');
+}
+
+async function confirmPayment(){
+  if(!pendingSessionId){ showToast('No pending payment was found.','error'); return; }
+    try{
+        const r = await fetch('/api/payments/'+pendingSessionId+'/pay',{method:'POST'});
+        const d = await r.json();
+        if(!r.ok||!d.success){ showToast(d.detail||d.message||'Payment could not be completed.','error'); return; }
+        const rec=d.receipt;
+        document.getElementById('payModalBody').innerHTML=`
+            <div style="background:#ecfdf5;border:1px solid #bbf7d0;border-radius:10px;padding:13px;font-size:12px;font-weight:700;color:#166534;margin-bottom:13px;">✓ Payment Confirmed!</div>
+            <div class="detail-grid">
+                <div class="detail-box"><span>PLATE</span><strong>${rec.number_plate}</strong></div>
+                <div class="detail-box"><span>SLOT</span><strong>${rec.slot_id}</strong></div>
+                <div class="detail-box"><span>DURATION</span><strong>${rec.duration_minutes} min</strong></div>
+                <div class="detail-box"><span>AMOUNT</span><strong style="color:#16a34a;">₹${rec.amount}</strong></div>
+                <div class="detail-box"><span>ENTRY</span><strong>${rec.entry_time}</strong></div>
+                <div class="detail-box"><span>EXIT</span><strong>${rec.exit_time}</strong></div>
+            </div>`;
+        document.getElementById('confirmPayBtn').style.display='none';
+        loadAll(); loadUserData();
+        document.getElementById('payBtn').style.display='none';
+        pendingSessionId=null;
+        showToast('Payment received: ₹'+rec.amount+'. Slot '+rec.slot_id+' is released.');
+      } catch(e){ showToast('Payment failed because the server could not be reached.','error'); }
+}
+
+/* ---- FUZZY SEARCH ---- */
+async function fuzzySearch(inputId, sugId){
+    const q=document.getElementById(inputId).value.trim();
+    const box=document.getElementById(sugId);
+    if(q.length<3){ box.style.display='none'; return; }
+    clearTimeout(fuzzyTimer);
+    fuzzyTimer=setTimeout(async()=>{
+        try{
+            const r=await fetch('/api/vehicles/search?q='+encodeURIComponent(q));
+            const d=await r.json();
+            if(!d.matches||!d.matches.length){ box.style.display='none'; return; }
+            box.innerHTML=d.matches.map(m=>`
+                <div class="fuzzy-item" onclick="selectPlate('${inputId}','${sugId}','${m.number_plate}')">
+                    <span>${m.number_plate}</span>
+                    <span style="color:#64748b;font-size:10px;">${m.vehicle_type}</span>
+                </div>`).join('');
+            box.style.display='block';
+        } catch(e){ box.style.display='none'; }
+    },300);
+}
+
+function selectPlate(inputId, sugId, plate){
+    document.getElementById(inputId).value=plate;
+    document.getElementById(sugId).style.display='none';
+}
+
+document.addEventListener('click',()=>{
+    ['entrySug','exitSug','findSug'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.style.display='none';
+    });
+});
+
+/* ---- HELPERS ---- */
+function showMsg(id, text, ok){
+    const el=document.getElementById(id);
+    el.textContent=text; el.className='msg '+(ok?'ok':'err');
+}
+function showToast(message, type='success'){
+  const toast=document.getElementById('actionToast');
+  if(!toast) return;
+  toast.textContent=message;
+  toast.className='action-toast '+type+' show';
+  clearTimeout(showToast.timeoutId);
+  showToast.timeoutId=setTimeout(()=>toast.classList.remove('show'),3600);
+}
+function showAvailableSlots(){
+  document.getElementById('userParkingArea').scrollIntoView({behavior:'smooth'});
+  showToast('Showing the live parking slots.','info');
+}
+function clearActionMessages(){
+  ['bookMsg','entryMsg','exitMsg'].forEach(clearMsg);
+}
+function clearMsg(id){ const el=document.getElementById(id); el.className='msg'; el.textContent=''; }
+function closeModal(id){ document.getElementById(id).style.display='none'; }
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+    m.addEventListener('click',e=>{ if(e.target===m) m.style.display='none'; });
+});
+
+/* ---- INIT ---- */
+checkToken();
+setInterval(loadAll, 15000);
+
+</script>
+</body>
+</html>
