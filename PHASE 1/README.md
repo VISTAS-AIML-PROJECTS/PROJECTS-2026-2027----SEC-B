@@ -1,4 +1,4 @@
-# DermaAI – AI-Based Skin Allergy Detection
+# AI-Based Skin Allergy Detection and Personalized Healthcare Recommendation System Using Deep Learning
 
 ## Project Overview
 DermaAI is an AI-powered application that analyzes uploaded skin images and predicts one of four supported skin conditions.
