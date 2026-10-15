@@ -1,0 +1,149 @@
+{
+    "Eczema": {
+        "condition_name": "Eczema",
+        "source": "NHS",
+        "source_url": "https://www.nhs.uk/conditions/atopic-eczema/",
+        "description": "Eczema is a condition that causes the skin to become itchy, dry, cracked, sore and inflamed. Symptoms can vary from mild to severe and may occur in different areas of the body.",
+        "common_symptoms": [
+            "Itchy skin",
+            "Dry skin",
+            "Red or inflamed skin",
+            "Cracked skin",
+            "Scaly or thickened skin",
+            "Skin irritation",
+            "Occasional bleeding caused by scratching"
+        ],
+        "common_areas": [
+            "Hands",
+            "Face",
+            "Elbows",
+            "Knees",
+            "Inside of the elbows",
+            "Behind the knees"
+        ],
+        "general_care": [
+            "Keep the skin moisturised regularly.",
+            "Avoid products that irritate the skin.",
+            "Use gentle skin-care products.",
+            "Avoid excessive scratching.",
+            "Keep fingernails short."
+        ],
+        "medical_attention": "Seek medical advice if symptoms are persistent, severe, worsening, infected, or interfering with daily activities.",
+        "emergency_note": "Severe skin symptoms, rapidly worsening redness, significant swelling, breathing difficulty, or other serious symptoms require urgent medical attention."
+    },
+
+    "Psoriasis": {
+        "condition_name": "Psoriasis",
+        "source": "NHS",
+        "source_url": "https://www.nhs.uk/conditions/psoriasis/",
+        "description": "Psoriasis is a skin condition that causes areas of skin to become dry, scaly and inflamed. It can affect different parts of the body and may occur in episodes of flare-ups and improvement.",
+        "common_symptoms": [
+            "Dry skin",
+            "Scaly patches",
+            "Inflamed skin",
+            "Itching",
+            "Soreness",
+            "Cracked skin",
+            "Thickened patches of skin"
+        ],
+        "common_areas": [
+            "Elbows",
+            "Knees",
+            "Scalp",
+            "Lower back",
+            "Hands",
+            "Feet"
+        ],
+        "general_care": [
+            "Keep affected skin moisturised.",
+            "Avoid scratching or picking affected areas.",
+            "Use gentle skin-care products.",
+            "Avoid known personal triggers.",
+            "Follow treatment prescribed by a healthcare professional."
+        ],
+        "medical_attention": "Seek medical advice if you think you have psoriasis, if symptoms become severe, or if treatment is not helping.",
+        "emergency_note": "Rapidly spreading redness, widespread pus-filled areas, severe illness, or other serious symptoms require urgent medical assessment."
+    },
+
+    "Contact_dermatitis": {
+        "condition_name": "Contact Dermatitis",
+        "source": "NHS",
+        "source_url": "https://www.nhs.uk/conditions/contact-dermatitis/",
+        "description": "Contact dermatitis is a type of eczema caused by contact with a particular irritant or allergen. It can cause the skin to become itchy, dry, cracked, blistered or inflamed.",
+        "common_symptoms": [
+            "Itching",
+            "Dry skin",
+            "Cracked skin",
+            "Blisters",
+            "Skin irritation",
+            "Inflammation",
+            "Soreness"
+        ],
+        "common_areas": [
+            "Hands",
+            "Face",
+            "Arms",
+            "Areas exposed to an irritant or allergen"
+        ],
+        "common_triggers": [
+            "Soaps",
+            "Detergents",
+            "Cosmetics",
+            "Certain metals",
+            "Solvents",
+            "Frequent contact with water",
+            "Other substances that irritate or trigger the skin"
+        ],
+        "general_care": [
+            "Identify and avoid known irritants or allergens.",
+            "Keep affected skin moisturised with a suitable emollient.",
+            "Use gentle skin-care products.",
+            "Rinse the skin after exposure to a known irritant when appropriate.",
+            "Avoid repeated exposure to substances that trigger symptoms."
+        ],
+        "medical_attention": "See a doctor if symptoms are persistent, recurrent, severe, or do not improve after avoiding suspected triggers.",
+        "emergency_note": "Severe swelling, difficulty breathing, widespread severe symptoms, or other signs of a serious allergic reaction require emergency medical attention."
+    },
+
+    "Urticaria": {
+        "condition_name": "Urticaria",
+        "source": "NHS",
+        "source_url": "https://www.nhs.uk/conditions/hives/",
+        "description": "Urticaria, also called hives, causes itchy raised areas or patches on the skin. It can occur suddenly and may disappear and reappear over time.",
+        "common_symptoms": [
+            "Raised itchy patches",
+            "Red or discoloured skin",
+            "Swelling",
+            "Itching",
+            "Skin irritation"
+        ],
+        "common_areas": [
+            "Arms",
+            "Legs",
+            "Chest",
+            "Back",
+            "Face",
+            "Other areas of the body"
+        ],
+        "common_triggers": [
+            "Certain foods",
+            "Medicines",
+            "Infections",
+            "Heat",
+            "Cold",
+            "Pressure",
+            "Exercise",
+            "Stress",
+            "Other allergens or environmental triggers"
+        ],
+        "general_care": [
+            "Avoid known triggers when possible.",
+            "Keep the skin cool if heat makes symptoms worse.",
+            "Avoid excessive scratching.",
+            "Wear comfortable loose-fitting clothing.",
+            "Seek medical advice when symptoms are persistent or severe."
+        ],
+        "medical_attention": "Seek medical advice if hives keep returning, are severe, or occur with other concerning symptoms.",
+        "emergency_note": "Swelling of the lips, mouth, tongue or throat, difficulty breathing, difficulty swallowing, severe dizziness or fainting can indicate a serious allergic reaction and require emergency medical attention."
+    }
+}
