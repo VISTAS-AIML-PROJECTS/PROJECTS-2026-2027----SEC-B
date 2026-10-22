@@ -2,6 +2,10 @@
 
 > **Advanced Computer Vision, Dual-Engine Deep Learning & Automated Clinical Safety Guardrails for Human Cutaneous Health**
 
+**Team 2 · SEC-B · AIML 2026-27** — Phase 1 submission (branch `TEAM-2`)
+📄 Paper: `../../IEEE/DermaVision_IEEE_Paper.pdf` · 📊 Slides: `../../PPT/PPT.pdf` · 📋 Report: `../../IEEE/DermaVision_Final_Report.docx`
+👥 Team Members: _kishorein25, <add remaining Team 2 member names here>_
+
 ---
 
 ## 🌟 Executive Summary
