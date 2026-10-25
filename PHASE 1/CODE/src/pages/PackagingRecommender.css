@@ -1,0 +1,544 @@
+/* PackagingRecommender.css — scoped styles for the recommender tool */
+
+.pr-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────── */
+.pr-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
+
+.pr-topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.pr-topbar-title h1 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--charcoal-text);
+  letter-spacing: -0.02em;
+}
+
+.pr-topbar-title span {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.pr-back-btn {
+  font-size: 0.8125rem;
+  color: var(--forest-green);
+  background: none;
+  border: 1px solid var(--mint-leaf);
+  border-radius: 6px;
+  padding: 0.375rem 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.pr-back-btn:hover {
+  background: #f0fdf4;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────── */
+.pr-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .pr-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Input card ──────────────────────────────────────────────────────── */
+.pr-input-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.pr-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--charcoal-text);
+  margin-bottom: 1.25rem;
+}
+
+.pr-card-heading svg {
+  color: var(--forest-green);
+}
+
+.pr-form-group {
+  margin-bottom: 1rem;
+}
+
+.pr-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pr-input,
+.pr-select {
+  width: 100%;
+  padding: 0.5625rem 0.75rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 7px;
+  font-size: 0.875rem;
+  color: var(--charcoal-text);
+  background: #fafafa;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: inherit;
+}
+
+.pr-input:focus,
+.pr-select:focus {
+  outline: none;
+  border-color: var(--eco-green);
+  background: #fff;
+}
+
+.pr-dims-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.pr-dims-sep {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  text-align: center;
+  padding-bottom: 2px;
+}
+
+.pr-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.pr-submit-btn {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.6875rem 1rem;
+  background: var(--forest-green);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+
+.pr-submit-btn:hover:not(:disabled) {
+  background: #1b5e20;
+}
+
+.pr-submit-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.pr-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Right panel states ──────────────────────────────────────────────── */
+.pr-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  color: #9ca3af;
+  text-align: center;
+  gap: 0.75rem;
+}
+
+.pr-empty-state svg {
+  opacity: 0.35;
+}
+
+.pr-empty-state p {
+  font-size: 0.875rem;
+}
+
+.pr-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  gap: 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.pr-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e7eb;
+  border-top-color: var(--eco-green);
+  border-radius: 50%;
+  animation: pr-spin 0.7s linear infinite;
+}
+
+@keyframes pr-spin {
+  to { transform: rotate(360deg); }
+}
+
+.pr-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  color: #b91c1c;
+  font-size: 0.875rem;
+}
+
+/* ── Analysis summary ────────────────────────────────────────────────── */
+.pr-summary-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.pr-summary-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--forest-green);
+  margin-bottom: 0.5rem;
+}
+
+.pr-summary-headline {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--charcoal-text);
+  margin-bottom: 0.25rem;
+}
+
+.pr-summary-sub {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin-bottom: 0.875rem;
+}
+
+.pr-summary-dims {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 7px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--forest-green);
+  font-weight: 500;
+  margin-bottom: 0.875rem;
+}
+
+.pr-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 7px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78125rem;
+  color: #92400e;
+}
+
+.pr-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+}
+
+.pr-status-badge.recommended {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.pr-status-badge.warning {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.pr-status-badge.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ── Best match card ─────────────────────────────────────────────────── */
+.pr-best-card {
+  background: #fff;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 1.375rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 8px rgba(46,125,50,0.07);
+}
+
+.pr-best-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--forest-green);
+  margin-bottom: 0.375rem;
+}
+
+.pr-best-sku {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #6b7280;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 0.25rem;
+}
+
+.pr-best-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--charcoal-text);
+  margin-bottom: 0.625rem;
+  line-height: 1.35;
+}
+
+.pr-best-dims {
+  font-size: 0.8125rem;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.pr-best-dims span {
+  font-weight: 600;
+}
+
+/* Metric blocks */
+.pr-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .pr-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.pr-metric {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.625rem 0.75rem;
+  text-align: center;
+}
+
+.pr-metric-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--forest-green);
+  line-height: 1.2;
+}
+
+.pr-metric-label {
+  font-size: 0.6875rem;
+  color: #6b7280;
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+
+.pr-metric-na {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+/* Detail rows */
+.pr-detail-row {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.875rem;
+}
+
+.pr-detail-item {
+  min-width: 120px;
+}
+
+.pr-detail-key {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  margin-bottom: 0.2rem;
+}
+
+.pr-detail-val {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--charcoal-text);
+}
+
+.pr-detail-val.na {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Why box */
+.pr-why-box {
+  background: #f0fdf4;
+  border-left: 3px solid var(--eco-green);
+  border-radius: 0 7px 7px 0;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.8125rem;
+  color: #374151;
+}
+
+.pr-why-box strong {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--forest-green);
+  margin-bottom: 0.25rem;
+}
+
+/* ── Other options ───────────────────────────────────────────────────── */
+.pr-others-heading {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+.pr-other-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pr-other-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 110px 80px 80px;
+  align-items: center;
+  gap: 0.75rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.8125rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.pr-other-row:hover {
+  border-color: #bbf7d0;
+  box-shadow: 0 2px 6px rgba(46,125,50,0.07);
+}
+
+@media (max-width: 700px) {
+  .pr-other-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+}
+
+.pr-other-sku {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pr-other-name {
+  font-weight: 500;
+  color: var(--charcoal-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pr-other-dims {
+  font-size: 0.75rem;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.pr-other-util {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--forest-green);
+  text-align: right;
+}
+
+.pr-other-price {
+  font-size: 0.75rem;
+  color: #374151;
+  text-align: right;
+}
+
+.pr-other-na {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ── No-fit state ────────────────────────────────────────────────────── */
+.pr-nofit {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+}

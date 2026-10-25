@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.egg-info/
+
+# Backend secrets
+backend/.env
+
+# SQLite database (runtime data — not source)
+backend/data/*.db
+
+# YOLO weights (large binary — distribute separately)
+backend/models/yolo/*.pt
+backend/models/yolo/*.onnx
+# Generated Android build
+*.apk
+
+# Large model archive
+wrapture_material_model.zip
+
+# Frontend dependencies and generated builds
+node_modules/
+dist/

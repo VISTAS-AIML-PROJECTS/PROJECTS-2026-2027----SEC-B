@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Wrapture</string>
+    <string name="title_activity_main">Wrapture</string>
+    <string name="package_name">com.wrapture.app</string>
+    <string name="custom_url_scheme">com.wrapture.app</string>
+</resources>
