@@ -1,0 +1,98 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #202124;
+  background: #eef1f5;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; margin: 0; }
+button, input, select { font: inherit; }
+
+.app-shell { position: relative; width: 100%; height: 100%; overflow: hidden; background: #e9edf2; }
+.map { position: absolute; inset: 0; }
+
+.brand-pill {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 5;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.97);
+  box-shadow: 0 2px 12px rgba(0,0,0,.16);
+}
+.brand-mark { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; background: #202124; color: #fff; }
+.brand-title { font-weight: 700; font-size: 15px; }
+.brand-subtitle { margin-top: 2px; color: #6b7075; font-size: 11px; }
+
+.search-card, .vehicle-card, .route-card-stack {
+  position: absolute;
+  z-index: 6;
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 2px 16px rgba(0,0,0,.18);
+  border-radius: 14px;
+}
+
+.search-card { top: 78px; left: 18px; width: 430px; padding: 14px; }
+.location-button {
+  width: 100%; border: 1px solid #dadce0; background: #fff; border-radius: 9px;
+  padding: 9px 12px; text-align: left; cursor: pointer; font-weight: 600;
+}
+.location-button:hover, .result-item:hover, .route-card:hover { background: #f5f7fa; }
+.field-row { display: flex; align-items: center; gap: 11px; min-height: 46px; }
+.dot, .pin-destination { flex: 0 0 auto; width: 14px; height: 14px; border-radius: 50%; }
+.start-dot { border: 4px solid #1a73e8; background: #fff; }
+.pin-destination { border: 2px solid #d93025; color: transparent; }
+.connector { width: 2px; height: 19px; margin-left: 6px; background: #c4c7c9; }
+.field-text, .destination-label { font-size: 13px; color: #42464a; }
+.search-row { border: 1px solid #dadce0; border-radius: 9px; padding: 0 8px 0 10px; }
+.search-row:focus-within { border-color: #1a73e8; box-shadow: 0 0 0 1px #1a73e8; }
+.search-row input { flex: 1; border: none; outline: none; min-width: 0; padding: 12px 6px; }
+.search-go { border: none; background: transparent; cursor: pointer; color: #1a73e8; font-size: 20px; }
+.destination-label { padding: 7px 8px 8px 35px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.results-list { max-height: 250px; overflow: auto; border-top: 1px solid #eee; margin-top: 2px; }
+.result-item { width: 100%; border: none; background: white; text-align: left; display: flex; gap: 10px; padding: 11px 8px; cursor: pointer; font-size: 12px; }
+.result-icon { color: #5f6368; }
+.plan-button {
+  width: 100%; margin-top: 9px; border: 0; background: #1a73e8; color: white; border-radius: 9px;
+  padding: 11px 14px; cursor: pointer; font-weight: 700;
+}
+.plan-button:disabled { opacity: .55; cursor: wait; }
+
+.vehicle-card { top: 78px; right: 18px; width: 260px; padding: 15px; }
+.panel-heading { font-weight: 750; margin-bottom: 13px; font-size: 16px; }
+.vehicle-card label { display: block; font-size: 12px; color: #5f6368; margin: 10px 0 6px; }
+.vehicle-card select { width: 100%; border: 1px solid #dadce0; border-radius: 8px; padding: 10px; background: #fff; }
+.vehicle-card input[type=range] { width: 100%; }
+.soc-line { display: flex; justify-content: space-between; color: #8a8f94; font-size: 10px; }
+.project-note { margin-top: 9px; font-size: 10px; line-height: 1.35; color: #7b8085; }
+
+.route-card-stack { left: 18px; bottom: 20px; width: 430px; padding: 10px; }
+.route-heading { font-weight: 700; padding: 4px 6px 8px; }
+.route-card { width: 100%; border: 1px solid transparent; background: white; border-radius: 10px; padding: 11px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-align: left; margin-top: 4px; }
+.route-card.selected { border-color: #1a73e8; background: #f4f8ff; }
+.route-title { font-weight: 650; font-size: 13px; }
+.route-meta { color: #5f6368; margin-top: 2px; font-size: 12px; }
+.selected-chip { color: #1a73e8; font-size: 11px; font-weight: 700; }
+.route-status { padding: 9px 6px 2px; font-size: 10px; color: #777; }
+
+.hint-toast, .error-toast {
+  position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 7;
+  max-width: 600px; background: rgba(255,255,255,.96); box-shadow: 0 2px 12px rgba(0,0,0,.18);
+  border-radius: 10px; padding: 9px 13px; font-size: 12px;
+}
+.error-toast { color: #b3261e; border: 1px solid #f2b8b5; }
+
+.ev-start-marker, .ev-destination-marker { border-radius: 50%; box-shadow: 0 1px 6px rgba(0,0,0,.35); }
+.ev-start-marker { width: 18px; height: 18px; background: #1a73e8; border: 4px solid white; }
+.ev-destination-marker { width: 18px; height: 18px; background: #d93025; border: 4px solid white; }
+
+@media (max-width: 850px) {
+  .search-card { width: calc(100% - 36px); }
+  .vehicle-card { left: 18px; right: auto; top: auto; bottom: 185px; width: 240px; }
+  .route-card-stack { width: calc(100% - 36px); }
+  .brand-subtitle { display: none; }
+}

@@ -1,0 +1,166 @@
+name,normalized_name,type,pincode,taluk,latitude,longitude,source,source_url,verified_level
+Chennai,chennai,district_reference,600001,Chennai,13.060429,80.249576,IndiaMapia,https://indiamapia.com/Chennai/Chennai.html,locality_reference
+Kosapet,kosapet,locality,600012,Perambur Purasawalkam,13.0922487,80.2551249,IndiaMapia,https://indiamapia.com/Chennai/Kosapet.html,locality_reference
+Anna Nagar,anna nagar,locality,600040,Egmore Nungambakkam,13.06938,80.21713,IndiaMapia,https://indiamapia.com/Chennai/Anna_Nagar.html,locality_reference
+Indira Nagar,indira nagar,locality,600020,Chennai,13.01595,80.26044,IndiaMapia,https://indiamapia.com/Chennai/Indira_Nagar.html,locality_reference
+Edapalayam,edapalayam,locality,600003,Tondiarpet Fort St George,13.0859736,80.2774194,IndiaMapia,https://indiamapia.com/Chennai/Edapalayam.html,locality_reference
+Chennai Race Course,chennai race course,landmark,600032,Chennai,13.0524329,80.2508056,IndiaMapia,https://indiamapia.com/Chennai/Chennai_Race_Course.html,locality_reference
+Neelankarai,neelankarai,locality,600041,Chennai,12.949293,80.255001,IndiaMapia,https://indiamapia.com/Chennai/Neelankarai.html,locality_reference
+Choolaimedu,choolaimedu,locality,600094,Chennai,13.0604447,80.223755,IndiaMapia,https://indiamapia.com/Chennai/Choolaimedu.html,locality_reference
+Adyar,adyar,locality,600020,Chennai,13.0011824,80.2564907,IndiaMapia,https://indiamapia.com/Chennai/Adyar.html,locality_reference
+Choolai,choolai,locality,600112,Chennai,13.0918796,80.264184,IndiaMapia,https://indiamapia.com/Chennai/Choolai.html,locality_reference
+Velacheri,velacheri,locality,600042,Chennai,12.97598,80.2212002,IndiaMapia,https://indiamapia.com/Chennai/Velacheri.html,locality_reference
+Government Estate,government estate,locality,600002,Chennai,13.05375,80.2525,IndiaMapia,https://indiamapia.com/Chennai/Government_Estate.html,locality_reference
+Tiruvallikkeni,tiruvallikkeni,locality,600005,Chennai,13.0568601,80.2795055,IndiaMapia,https://indiamapia.com/Chennai/Tiruvallikkeni.html,locality_reference
+Kodungaiyur (West),kodungaiyur west,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kodungaiyur (East),kodungaiyur east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Dr.Radhakrishnan Nagar (North),dr radhakrishnan nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Cherian Nagar (North),cherian nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Jeeva Nagar (North),jeeva nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Cherian Nagar (South),cherian nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Jeeva Nagar (South),jeeva nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Korukupet,korukupet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Mottai Thottam,mottai thottam,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kumaraswamy Nagar (South),kumaraswamy nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Dr.Radhakrishnan Nagar (South),dr radhakrishnan nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kumaraswamy Nagar (North),kumaraswamy nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Dr. Vijayaraghavalu Nagar,dr vijayaraghavalu nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Tondiarpet,tondiarpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Sanjeevarayanpet,sanjeevarayanpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Grace Garden,grace garden,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Ma. Po Si. Nagar,ma po si nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Royapuram,royapuram,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Singara Garden,singara garden,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Narayanappa Garden,narayanappa garden,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Old Washermenpet,old washermenpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Meenakshiammanpet,meenakshiammanpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kondithope,kondithope,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Seven Wells (North),seven wells north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Amman Koil,amman koil,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Muthialpet,muthialpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Vallal Seethakadhi Nagar,vallal seethakadhi nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Katchaleeswarar Nagar,katchaleeswarar nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Seven Wells (South),seven wells south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Sowcarpet,sowcarpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Basin Bridge,basin bridge,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Vysarpadi (South),vysarpadi south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Vysarpadi (North),vysarpadi north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Perambur (North),perambur north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Perambur (East),perambur east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Elango Nagar,elango nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Perambur (South),perambur south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Thiru-Vi-Ka Nagar,thiru vi ka nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Wadia Nagar,wadia nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Dr.Sathiyavanimuthu Nagar,dr sathiyavanimuthu nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Pulianthope,pulianthope,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Dr.Besant Nagar,dr besant nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Peddunaickenpet,peddunaickenpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Perumal Koil Garden,perumal koil garden,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Thattankulam,thattankulam,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Park Town,park town,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Elephant Gate,elephant gate,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Agaram (North),agaram north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Chembium,chembium,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Siruvallur,siruvallur,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Nagamaniammaiyar Nagar (North),nagamaniammaiyar nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Agaram (South),agaram south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Viduthalai Gurusamy Nagar (South),viduthalai gurusamy nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Ayanavaram,ayanavaram,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Naganmaniammayar Nagar (South),naganmaniammayar nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Panneerselvam Nagar,panneerselvam nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Maraimalai Adigal Nagar (North),maraimalai adigal nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Maraimalai Adigal Nagar (South),maraimalai adigal nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Purasawalkam,purasawalkam,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kolathur,kolathur,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Villivakkam (North),villivakkam north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Villivakkam (South),villivakkam south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Virugambakkam (North),virugambakkam north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Anna Nagar (West),anna nagar west,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Anna Nagar (Central),anna nagar central,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Anna Nagar (East),anna nagar east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Shenoy Nagar,shenoy nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kilpauk (North),kilpauk north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Gangadeeswarar Koil,gangadeeswarar koil,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kilpauk (South),kilpauk south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Aminjikarai (East),aminjikarai east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Aminjikarai (Central),aminjikarai central,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Aminjikarai (West),aminjikarai west,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Periyar Nagar (North),periyar nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Periyar Nagar (South),periyar nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Nungambakkam,nungambakkam,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Adikesavapuram,adikesavapuram,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Nehru Nagar,nehru nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Chintadripet,chintadripet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Komaleeswaranpet,komaleeswaranpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Balasubramaniam Nagar,balasubramaniam nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Thiruvotteeswaranpet,thiruvotteeswaranpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Dr.Natesan Nagar,dr natesan nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Chepauk,chepauk,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Zam Bazaar,zam bazaar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Umarupulavar Nagar,umarupulavar nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Thiruvallikeni,thiruvallikeni,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Marina,marina,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Krishnampet,krishnampet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Bharathi Nagar,bharathi nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Azad Nagar (North),azad nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Bharathidasan Nagar,bharathidasan nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Azad Nagar (South),azad nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Vivekanandapuram,vivekanandapuram,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Anjukam Ammaiyar Nagar,anjukam ammaiyar nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Pattalam,pattalam,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Anbhazhagan Nagar,anbhazhagan nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Perumalpet,perumalpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kannappar Nagar,kannappar nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Dr.Ambedkar Nagar,dr ambedkar nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Chetpet,chetpet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Egmore,egmore,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Pudupet,pudupet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Ko-Si-Mani Nagar,ko si mani nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Nakkeerar Nagar,nakkeerar nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Thousand Lights,thousand lights,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Azhagiri Nagar,azhagiri nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Amir Mahal,amir mahal,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Royapettah,royapettah,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Teynampet,teynampet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Sathiyamoorthi Nagar,sathiyamoorthi nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Alwarpet (North),alwarpet north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Alwarpet (South),alwarpet south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Vadapalani (West),vadapalani west,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Vadapalani (East),vadapalani east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kalaivanar Nagar,kalaivanar nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Navalar Nedunchezian Nagar (East),navalar nedunchezian nagar east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Navalar Nedunchezian Nagar (West),navalar nedunchezian nagar west,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Ashok Nagar,ashok nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+M.G.R.Nagar,m g r nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kamaraj Nagar (North),kamaraj nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kamaraj Nagar (South),kamaraj nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Thiyagaraya Nagar,thiyagaraya nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Rajaji Nagar,rajaji nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Virugambakkam (South),virugambakkam south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Saligramam,saligramam,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kodambakkam (North),kodambakkam north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kodambakkam (South),kodambakkam south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Saidapet (West),saidapet west,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kumaran Nagar (North),kumaran nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Kumaran Nagar (South),kumaran nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Saidapet (East),saidapet east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+K. K. Nagar,k k nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+V.O.C.Nagar,v o c nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+G.D. Naidu Nagar (East),g d naidu nagar east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+G.D. Naidu Nagar (South),g d naidu nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Guindy (West),guindy west,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Guindy (East),guindy east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Bhemmannapet,bhemmannapet,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Thiruvalluvar Nagar,thiruvalluvar nagar,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Madhavaperumal Puram,madhavaperumal puram,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Karaneeswarapuram,karaneeswarapuram,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Santhome,santhome,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Mylapore,mylapore,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Avvai Nagar (North),avvai nagar north,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Raja Annamalaipuram,raja annamalaipuram,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Avvai Nagar (South),avvai nagar south,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Adyar (West),adyar west,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Adyar (East),adyar east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Velacherry,velacherry,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Thriuvanmiyur (West),thriuvanmiyur west,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
+Thiruvanmiyur (East),thiruvanmiyur east,census_ward_alias,,,,,Census of India 2011 - Chennai DCHB,https://chennai.nic.in/document-category/census/,administrative_name_only
