@@ -1,0 +1,71 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+backend/venv/
+backend/.venv/
+venv/
+.venv/
+ENV/
+env/
+
+# Node dependencies & build outputs
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+node_modules/
+dist/
+
+# Uploaded Video Files (preserve directory structure via .gitkeep)
+backend/app/uploads/*
+!backend/app/uploads/.gitkeep
+
+# Environment variables & local configuration
+.env
+.env.local
+*.log
+
+# Storage & Model Weights
+backend/storage/
+*.pt
+*.onnx
+*.pdparams
+*.pdmodel
+*.pdiparams*
+
+# Temporary & Diagnostic Files
+scratch/
+backend/scratch/
+*.zip
+*.bak
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
