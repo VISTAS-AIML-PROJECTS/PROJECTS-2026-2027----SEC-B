@@ -142,7 +142,7 @@ if "chat_history" not in st.session_state:
 # SIDEBAR CONTROLS
 # ==============================================================================
 with st.sidebar:
-    st.image("https://img.icons8.com/fluency/96/dermatology.png", width=72)
+    st.image("assets/logo.png", width=120)
     st.markdown("### **DermaVision Control Panel**")
     st.markdown("Select target anatomical region for diagnostic screening:")
 
