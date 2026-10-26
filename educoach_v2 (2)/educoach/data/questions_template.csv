@@ -1,2 +1,0 @@
-category,subject,topic,difficulty,question,option_a,option_b,option_c,option_d,answer,explanation
-Technical,Python,Lists,Easy,Which method adds an item to the end of a list?,append,insert,add,push,A,append() adds one item at the end.

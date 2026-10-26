@@ -1,9 +1,0 @@
-{% extends 'base.html' %}{% block content %}
-<section class="auth card"><div class="logo">✨</div><h1>Create your account</h1>
-<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-<input name="name" placeholder="Full name" required>
-<input name="email" type="email" placeholder="Email" required>
-<input name="password" type="password" placeholder="Password (8+ chars, letters and a digit)" minlength="8" required>
-<button>Register</button></form>
-<p>Already registered? <a href="{{ url_for('login') }}">Login</a></p></section>
-{% endblock %}
