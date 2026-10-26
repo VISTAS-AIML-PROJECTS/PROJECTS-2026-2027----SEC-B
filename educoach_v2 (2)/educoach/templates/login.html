@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block content %}
+<section class="auth card"><div class="logo">🎓</div><h1>Welcome to EduCoach AI</h1><p class="muted">Adaptive placement preparation platform</p>
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input name="email" type="email" placeholder="Email" required autofocus>
+<input name="password" type="password" placeholder="Password" required>
+<button>Login</button></form>
+<p>New student? <a href="{{ url_for('register') }}">Create account</a></p></section>
+{% endblock %}

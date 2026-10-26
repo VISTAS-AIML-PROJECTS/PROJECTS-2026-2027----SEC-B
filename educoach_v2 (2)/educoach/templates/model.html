@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block content %}
+<header><h1>Readiness model</h1><p class="muted">Random Forest classifier (Low / Medium / High).</p></header>
+<div class="alert info">{{ r.data }}. Replace it with real labelled placement outcomes before making real decisions.</div>
+<div class="grid"><div class="card"><small>Hold-out accuracy</small><h2>{{ (r.holdout_accuracy*100)|round(1) }}%</h2></div>
+<div class="card"><small>5-fold CV</small><h2>{{ (r.cv_mean*100)|round(1) }}%</h2><p class="muted">&plusmn; {{ (r.cv_std*100)|round(1) }}</p></div>
+<div class="card"><small>Macro F1</small><h2>{{ r.macro_f1 }}</h2></div>
+<div class="card"><small>Train / test size</small><h2>{{ r.train_size }} / {{ r.test_size }}</h2></div></div>
+<div class="grid2"><div class="card"><h3>Confusion matrix</h3><table><tr><th>actual \ predicted</th>{% for l in r.labels %}<th>{{ l }}</th>{% endfor %}</tr>
+{% for row in r.confusion %}<tr><th>{{ r.labels[loop.index0] }}</th>{% for v in row %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</table></div>
+<div class="card"><h3>Feature importance</h3>{% for f, v in r.importances %}<p>{{ f }} <span class="bar"><i style="width:{{ v*100*2.5 }}%"></i></span> {{ v }}</p>{% endfor %}</div></div>
+{% endblock %}

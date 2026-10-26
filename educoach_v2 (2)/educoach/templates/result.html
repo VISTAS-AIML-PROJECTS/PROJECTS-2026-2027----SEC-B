@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block content %}
+<section class="card result"><h1>{{ "Excellent! 🎉" if a.score >= 80 else "Good effort 👍" if a.score >= 50 else "Keep going 💪" }}</h1><div class="ring" style="--p:{{ a.score }};--c:{{ '#16a34a' if a.score >= 80 else '#f59e0b' if a.score >= 50 else '#e11d48' }}"><span>{{ a.score|round(0)|int }}%</span></div>
+<p>{{ a.correct }} / {{ a.total }} correct &middot; {{ a.time_taken }}s &middot; {{ a.difficulty }}</p>
+<div class="chips">{% for t, s in by_topic.items() %}<span class="chip">{{ t }}: {{ s[0] }}/{{ s[1] }}</span>{% endfor %}</div>
+<a class="btn" href="{{ url_for('dashboard') }}">Dashboard</a> <a class="btn alt" href="{{ url_for('mistakes') }}">Mistake notebook</a></section>
+<h2>Review</h2>
+{% for r in rows %}<div class="card question {{ 'right' if r.is_correct else 'wrong' }}">
+<h3>{{ loop.index }}. {{ r.question }}</h3>
+<p>Your answer: <b class="{{ 'good' if r.is_correct else 'bad' }}">{{ r.chosen or 'Not answered' }}</b>{% if not r.is_correct %} &middot; Correct: <b class="good">{{ r.answer }}</b>{% endif %}</p>
+<p class="muted">{{ r.explanation }} <span class="badge">{{ r.topic }}</span> <span class="badge d-{{ r.difficulty }}">{{ r.difficulty }}</span></p></div>{% endfor %}
+{% if a.score >= 80 %}<script>for(let i=0;i<28;i++){const s=document.createElement('span');s.className='confetti';s.textContent=['🎉','✨','🎊','⭐'][i%4];s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2+Math.random()*2.5)+'s';s.style.animationDelay=Math.random()+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),6000)}</script>{% endif %}{% endblock %}

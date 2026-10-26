@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}
+<header><h1>AI Mentor</h1><p class="muted">Rule-based coaching built from your per-topic accuracy, Elo ability ratings, trend and the readiness model.</p></header>
+<div class="card"><h3>Insights 🧠</h3>{% for t in tips %}<div class="tip {{ 't-weak' if 'accuracy over' in t else 't-strong' if 'strength' in t else '' }}">{{ t }}</div>{% endfor %}</div>
+<h2>Your 7-day plan</h2><div class="card plan">{% for d, t in plan %}<p><b>{{ d }}</b> &mdash; {{ t }}</p>{% endfor %}</div>
+{% endblock %}

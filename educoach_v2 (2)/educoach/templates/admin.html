@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block content %}
+<header><h1>Admin</h1><p class="muted">Manage the question bank.</p></header>
+<div class="grid"><div class="card"><small>Users</small><h2>{{ stats.users }}</h2></div><div class="card"><small>Tests taken</small><h2>{{ stats.attempts }}</h2></div><div class="card"><small>Code submissions</small><h2>{{ stats.subs }}</h2></div></div>
+<h2>Questions</h2><div class="card"><table><tr><th>Category</th><th>Questions</th><th>Topics</th></tr>{% for r in per_cat %}<tr><td>{{ r.category }}</td><td>{{ r.n }}</td><td>{{ r.topics }}</td></tr>{% endfor %}</table></div>
+<h2>Import questions (CSV)</h2><div class="card"><p class="muted">Columns: {{ columns|join(', ') }}. The answer may be the option text or A-D. Duplicates are skipped.</p>
+<p><a href="{{ url_for('admin_template') }}">Download CSV template</a></p>
+<form method="post" action="{{ url_for('admin_import') }}" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="file" name="file" accept=".csv" required><button>Import</button></form></div>
+{% endblock %}

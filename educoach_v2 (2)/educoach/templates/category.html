@@ -1,0 +1,14 @@
+{% extends 'base.html' %}{% block content %}
+<header class="banner mod-{{ category }}"><h1>{{ {"Technical":"💻","Verbal":"📖","Aptitude":"🧮","Coding":"⌨️"}[category] }} {{ category }}</h1>
+<p class="muted">{% if category == 'Coding' %}Choose a language and topic. Python submissions are judged automatically against test cases.{% else %}Adaptive mode picks questions near your current ability for each topic. Every test has 30 questions and is timed (about 30 min; 45 min for Aptitude).{% endif %}</p></header><div class="acc-{{ category }}">
+{% for subject, topics in data.items() %}<h2 class="subj">{{ subject }}</h2>
+<div class="grid">{% for topic in topics %}<div class="card topic"><h3>{{ topic }}</h3>
+{% if category == 'Coding' %}<a class="btn" href="{{ url_for('coding', language=subject, topic=topic) }}">Open problems</a>
+{% else %}
+  <p class="muted">{{ counts.get((subject, topic), 0) }} question(s){% if topic in rt %} &middot; <span class="badge lvl-{{ level_name(rt[topic]) }}">{{ level_name(rt[topic]) }}</span>{% endif %}</p>
+  <form method="post" action="{{ url_for('start_test') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="category" value="{{ category }}"><input type="hidden" name="subject" value="{{ subject }}"><input type="hidden" name="topic" value="{{ topic }}">
+    <div class="row"><select name="difficulty"><option>Adaptive</option><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
+    <button>Start test</button></form>
+{% endif %}</div>{% endfor %}</div>{% endfor %}
+</div>{% endblock %}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}EduCoach AI{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head><body>
+<nav>
+  <a class="brand" href="{{ url_for('dashboard') if session.get('user_id') else url_for('login') }}">EduCoach AI</a>
+  {% if session.get('user_id') %}
+  <div class="links">
+    <a href="{{ url_for('dashboard') }}">Home</a>
+    <a href="{{ url_for('performance') }}">Performance</a>
+    <a href="{{ url_for('mistakes') }}">Mistakes</a>
+    <a href="{{ url_for('mentor') }}">AI Mentor</a>
+    <a href="{{ url_for('model_info') }}">Model</a>
+    {% if session.get('is_admin') %}<a href="{{ url_for('admin') }}">Admin</a>{% endif %}
+    <form method="post" action="{{ url_for('logout') }}" class="inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="linkbtn">Logout</button></form>
+  </div>
+  {% endif %}
+</nav>
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}{% for cat, msg in messages %}<div class="alert {{ cat }}">{{ msg }}</div>{% endfor %}{% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body></html>

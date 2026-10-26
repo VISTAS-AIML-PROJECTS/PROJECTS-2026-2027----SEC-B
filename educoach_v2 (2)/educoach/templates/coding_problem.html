@@ -1,0 +1,12 @@
+{% extends 'base.html' %}{% block content %}
+<header><h1>{{ p.title }}</h1><p class="muted">{{ language }} &middot; {{ topic }}</p></header>
+<div class="card"><p>{{ p.statement }}</p><div class="grid2"><div><small>Sample input</small><pre>{{ p.sample_in }}</pre></div><div><small>Sample output</small><pre>{{ p.sample_out }}</pre></div></div>
+<p class="muted">Read from standard input and print to standard output.</p></div>
+<form method="post" class="card"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<textarea name="code" class="code" rows="14" spellcheck="false" placeholder="Write your {{ language }} solution here..." required>{{ code }}</textarea><button>Run &amp; submit</button></form>
+{% if result %}<div class="card"><h3>Verdict: <span class="{{ 'good' if result.status == 'Accepted' else 'bad' }}">{{ result.status }}</span></h3>
+{% if result.results %}<table><tr><th>#</th><th>Result</th><th>Details</th></tr>{% for r in result.results %}<tr><td>{{ r.n }}</td><td class="{{ 'good' if r.passed else 'bad' }}">{{ r.verdict }}</td>
+<td>{% if r.hidden %}<span class="muted">hidden test</span>{% elif not r.passed %}input <code>{{ r.input }}</code> expected <code>{{ r.expected }}</code> got <code>{{ r.got }}</code>{% else %}&check;{% endif %}</td></tr>{% endfor %}</table>{% endif %}</div>{% endif %}
+{% if hist %}<h2>Recent submissions</h2><div class="card"><table><tr><th>Status</th><th>Passed</th><th>When</th></tr>{% for h in hist %}<tr><td>{{ h.status }}</td><td>{{ h.passed }}/{{ h.total }}</td><td>{{ h.created_at[:16]|replace('T',' ') }}</td></tr>{% endfor %}</table></div>{% endif %}
+<p><a href="{{ url_for('coding', language=language, topic=topic) }}">&larr; Back to problems</a></p>
+{% endblock %}
