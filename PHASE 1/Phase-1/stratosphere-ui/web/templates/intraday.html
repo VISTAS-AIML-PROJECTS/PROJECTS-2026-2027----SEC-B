@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+{% block title %}Intraday Backtest — Stratosphere{% endblock %}
+{% block content %}
+<style>
+.iw { max-width:1100px; margin:0 auto; padding:0 1rem 4rem; }
+.ih { text-align:center; padding:2rem 0 1.4rem; }
+.ih h1 { font-size:2.2rem; font-weight:900;
+  background:linear-gradient(135deg,#00e5ff,#7c4dff,#ff4081);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.ih p  { color:#778899; font-size:.9rem; margin-top:.3rem; }
+
+.card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:16px; padding:1.5rem 1.8rem; margin-bottom:1.2rem;
+  backdrop-filter:blur(12px); }
+.card h3 { margin:0 0 1rem; font-size:1rem; color:#c8d0e8; font-weight:700; letter-spacing:.3px; }
+
+/* Data source cards */
+.ds-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:.9rem; }
+.ds-card { background:rgba(255,255,255,.05); border-radius:12px; padding:1.1rem 1.3rem;
+  border:1px solid rgba(255,255,255,.08); position:relative; transition:.2s; }
+.ds-card:hover { border-color:rgba(100,200,255,.25); }
+.ds-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:.5rem; }
+.ds-dot.ok  { background:#00c853; box-shadow:0 0 8px #00c853; }
+.ds-dot.err { background:#ff5252; box-shadow:0 0 8px #ff5252; }
+.ds-dot.loading { background:#ffd740; animation:pulse 1s infinite; }
+.ds-name { font-weight:700; font-size:.95rem; display:flex; align-items:center; }
+.ds-meta { font-size:.78rem; color:#778899; margin-top:.5rem; line-height:1.6; }
+.ds-badge { display:inline-block; font-size:.68rem; padding:.2rem .55rem;
+  border-radius:20px; font-weight:700; margin-top:.4rem; }
+.badge-free { background:rgba(0,200,83,.15); color:#00c853; border:1px solid rgba(0,200,83,.3); }
+.badge-live { background:rgba(0,229,255,.15); color:#00e5ff; border:1px solid rgba(0,229,255,.3); }
+.badge-daily{ background:rgba(255,215,64,.15); color:#ffd740; border:1px solid rgba(255,215,64,.3); }
+
+/* Controls */
+.ctrl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:.8rem; }
+.ctrl-item label { display:block; font-size:.76rem; color:#8899bb; margin-bottom:.3rem; }
+.ctrl-item input, .ctrl-item select {
+  width:100%; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+  color:#fff; border-radius:10px; padding:.5rem .85rem; font-size:.86rem; box-sizing:border-box; }
+.btn { border:none; border-radius:10px; padding:.6rem 1.8rem;
+  font-size:.9rem; font-weight:700; cursor:pointer; color:#fff; }
+.btn:disabled { opacity:.35; cursor:not-allowed; }
+.btn-run  { background:linear-gradient(135deg,#7c4dff,#00e5ff); }
+.btn-run:hover:not(:disabled) { filter:brightness(1.15); }
+
+/* Result panel */
+#result-panel { display:none; }
+.metrics-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:.8rem; margin-bottom:1rem; }
+.metric-box   { background:rgba(255,255,255,.05); border-radius:12px; padding:1rem 1.2rem; }
+.metric-box .mv { font-size:1.7rem; font-weight:900; }
+.metric-box .ml { font-size:.72rem; color:#778899; margin-top:.25rem; }
+.green { color:#00c853; } .red { color:#ff5252; } .gold { color:#ffd740; }
+.cyan  { color:#00e5ff; } .purple { color:#b388ff; }
+
+/* Exit badge */
+.exit-badge { display:inline-block; padding:.35rem 1rem; border-radius:20px;
+  font-weight:700; font-size:.85rem; margin-left:.6rem; }
+.exit-target { background:rgba(0,200,83,.2);  color:#00c853; border:1px solid rgba(0,200,83,.4); }
+.exit-sl     { background:rgba(255,82,82,.2);  color:#ff5252; border:1px solid rgba(255,82,82,.4); }
+.exit-close  { background:rgba(255,215,64,.15);color:#ffd740; border:1px solid rgba(255,215,64,.3); }
+
+/* Chart */
+#chart-wrap { width:100%; height:260px; position:relative; }
+canvas#equity-chart { width:100%!important; height:100%!important; }
+
+/* Trade log */
+.tlog { font-size:.78rem; font-family:monospace; background:rgba(0,0,0,.3);
+  border-radius:10px; padding:1rem; max-height:180px; overflow-y:auto; line-height:1.7; }
+.tlog .ev-entry { color:#00e5ff; }
+.tlog .ev-exit-t { color:#00c853; }
+.tlog .ev-exit-s { color:#ff5252; }
+.tlog .ev-exit-c { color:#ffd740; }
+.tlog .ev-candle { color:#778899; }
+
+/* Expiry pills */
+.exp-pills { display:flex; flex-wrap:wrap; gap:.4rem; max-height:120px; overflow-y:auto; margin-top:.4rem; }
+.exp-pill { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+  border-radius:20px; padding:.25rem .8rem; font-size:.75rem; cursor:pointer; transition:.15s; }
+.exp-pill:hover, .exp-pill.active { background:rgba(124,77,255,.3); border-color:#7c4dff; color:#b388ff; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.spin { animation:spin 1s linear infinite; display:inline-block; }
+@keyframes spin { to{transform:rotate(360deg)} }
+</style>
+
+<div class="iw">
+  <div class="ih">
+    <h1>📊 Intraday Options Backtest</h1>
+    <p>Real 1-minute NIFTY options data · Oct 2024 → Mar 2026 · Actual traded prices (LTP)</p>
+  </div>
+
+  <!-- Data Source Status -->
+  <div class="card">
+    <h3>🔌 Data Sources</h3>
+    <div class="ds-grid" id="ds-grid">
+      <div class="ds-card"><span class="ds-dot loading"></span><span class="ds-name">Loading…</span></div>
+    </div>
+  </div>
+
+  <!-- Backtest Controls -->
+  <div class="card">
+    <h3>⚙️ Trade Setup</h3>
+
+    <!-- Expiry picker -->
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:.78rem;color:#8899bb;display:block;margin-bottom:.4rem;">Select Expiry Date</label>
+      <div class="exp-pills" id="exp-pills"><span style="color:#556;font-size:.8rem;">Loading expiries…</span></div>
+    </div>
+
+    <div class="ctrl-grid">
+      <div class="ctrl-item">
+        <label>Strike Price</label>
+        <input id="inp-strike" type="number" value="25000" step="50" min="20000" max="30000">
+      </div>
+      <div class="ctrl-item">
+        <label>Option Type</label>
+        <select id="inp-type">
+          <option value="CE">CE (Call)</option>
+          <option value="PE">PE (Put)</option>
+        </select>
+      </div>
+      <div class="ctrl-item">
+        <label>Entry Time (HH:MM)</label>
+        <input id="inp-entry" type="time" value="09:30">
+      </div>
+      <div class="ctrl-item">
+        <label>Target %</label>
+        <input id="inp-target" type="number" value="30" min="5" max="200" step="5">
+      </div>
+      <div class="ctrl-item">
+        <label>Stop Loss %</label>
+        <input id="inp-sl" type="number" value="20" min="5" max="100" step="5">
+      </div>
+      <div class="ctrl-item">
+        <label>Lots</label>
+        <input id="inp-lots" type="number" value="1" min="1" max="50">
+      </div>
+    </div>
+
+    <div style="margin-top:1.2rem;display:flex;gap:.8rem;align-items:center;">
+      <button class="btn btn-run" id="btn-run" onclick="runBacktest()">▶ Run Intraday Backtest</button>
+      <span id="run-status" style="font-size:.82rem;color:#778899;"></span>
+    </div>
+  </div>
+
+  <!-- Result Panel -->
+  <div id="result-panel">
+
+    <!-- Metrics -->
+    <div class="card">
+      <h3>
+        📈 Trade Result
+        <span id="exit-badge" class="exit-badge" style="font-size:.78rem;"></span>
+      </h3>
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <div class="mv" id="m-pnl">—</div>
+          <div class="ml">P&amp;L (₹)</div>
+        </div>
+        <div class="metric-box">
+          <div class="mv" id="m-pct">—</div>
+          <div class="ml">Return %</div>
+        </div>
+        <div class="metric-box">
+          <div class="mv cyan" id="m-entry">—</div>
+          <div class="ml">Entry ₹ (LTP)</div>
+        </div>
+        <div class="metric-box">
+          <div class="mv" id="m-exit">—</div>
+          <div class="ml">Exit ₹ (LTP)</div>
+        </div>
+        <div class="metric-box">
+          <div class="mv gold" id="m-target">—</div>
+          <div class="ml">Target ₹</div>
+        </div>
+        <div class="metric-box">
+          <div class="mv red" id="m-sl">—</div>
+          <div class="ml">Stop Loss ₹</div>
+        </div>
+        <div class="metric-box">
+          <div class="mv purple" id="m-candles">—</div>
+          <div class="ml">Minutes Held</div>
+        </div>
+        <div class="metric-box">
+          <div class="mv" id="m-symbol" style="font-size:1rem;word-break:break-all;">—</div>
+          <div class="ml">Symbol</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equity curve chart -->
+    <div class="card">
+      <h3>📉 Option Price (LTP) Over Time</h3>
+      <div id="chart-wrap">
+        <canvas id="equity-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Trade log -->
+    <div class="card">
+      <h3>🗒️ Trade Log</h3>
+      <div class="tlog" id="trade-log"></div>
+    </div>
+
+  </div><!-- /result-panel -->
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+let selectedExpiry = '';
+let chartInstance  = null;
+
+// ── Load data source status ───────────────────────────────────────────────────
+async function loadStatus() {
+  try {
+    const r = await fetch('/api/data/status');
+    const d = await r.json();
+    const grid = document.getElementById('ds-grid');
+    grid.innerHTML = '';
+
+    const sources = [
+      { key:'nifty_intraday', label:'NIFTY Intraday (Kaggle)', icon:'📊' },
+      { key:'nse_bhavcopy',   label:'NSE Bhavcopy',             icon:'📋' },
+      { key:'yfinance',       label:'yfinance (Equity)',         icon:'📈' },
+      { key:'angel_one',      label:'Angel One (Live)',          icon:'⚡' },
+    ];
+
+    for (const s of sources) {
+      const info = d[s.key] || {};
+      const ok   = info.available;
+      let meta   = '';
+      if (s.key === 'nifty_intraday') {
+        meta = `${info.coverage || ''}<br>${info.granularity || '1 min'} candles · ${info.size_gb || '?'} GB<br>Cached expiries: <b style="color:#00e5ff">${info.cached_expiries || 0}</b>`;
+      } else if (s.key === 'nse_bhavcopy') {
+        meta = `Daily OHLCV · Expired contracts<br>Latest: <b style="color:#ffd740">${info.latest_date || '?'}</b>`;
+      } else if (s.key === 'yfinance') {
+        meta = info.covers || '';
+      } else if (s.key === 'angel_one') {
+        meta = `Live WebSocket · Active contracts`;
+      }
+      if (info.error) meta = `<span style="color:#ff5252">${info.error.slice(0,60)}</span>`;
+
+      const badgeClass = s.key === 'nifty_intraday' ? 'badge-live' :
+                         s.key === 'angel_one'       ? 'badge-live' : 'badge-free';
+      const badgeLabel = s.key === 'angel_one' ? 'Free (needs account)' : 'Free';
+
+      grid.innerHTML += `
+        <div class="ds-card">
+          <div class="ds-name">
+            <span class="ds-dot ${ok ? 'ok' : 'err'}"></span>
+            ${s.icon} ${s.label}
+          </div>
+          <div class="ds-meta">${meta}</div>
+          <span class="ds-badge ${badgeClass}">${badgeLabel}</span>
+        </div>`;
+    }
+  } catch(e) {
+    document.getElementById('ds-grid').innerHTML = `<span style="color:#ff5252">Failed to load status: ${e}</span>`;
+  }
+}
+
+// ── Load expiry list ──────────────────────────────────────────────────────────
+async function loadExpiries() {
+  const pills = document.getElementById('exp-pills');
+  try {
+    const r = await fetch('/api/data/expiries');
+    const d = await r.json();
+    const expiries = (d.expiries || []).reverse(); // newest first
+    pills.innerHTML = '';
+    for (const exp of expiries) {
+      const el = document.createElement('span');
+      el.className = 'exp-pill';
+      el.textContent = exp;
+      el.onclick = () => {
+        document.querySelectorAll('.exp-pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        selectedExpiry = exp;
+      };
+      pills.appendChild(el);
+    }
+    // Auto-select first
+    if (expiries.length) {
+      pills.firstChild.click();
+    }
+  } catch(e) {
+    pills.innerHTML = `<span style="color:#ff5252">Could not load expiries (dataset may still be extracting)</span>`;
+  }
+}
+
+// ── Run Backtest ──────────────────────────────────────────────────────────────
+async function runBacktest() {
+  if (!selectedExpiry) { alert('Please select an expiry date first'); return; }
+
+  const btn    = document.getElementById('btn-run');
+  const status = document.getElementById('run-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">⏳</span> Running…';
+  status.textContent = 'Loading option data from cache…';
+  document.getElementById('result-panel').style.display = 'none';
+
+  const body = {
+    expiry:     selectedExpiry,
+    strike:     parseFloat(document.getElementById('inp-strike').value),
+    opt_type:   document.getElementById('inp-type').value,
+    entry_time: document.getElementById('inp-entry').value,
+    target_pct: parseFloat(document.getElementById('inp-target').value),
+    sl_pct:     parseFloat(document.getElementById('inp-sl').value),
+    lots:       parseInt(document.getElementById('inp-lots').value),
+    lot_size:   75,
+  };
+
+  try {
+    const r = await fetch('/api/backtest/intraday', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (d.error) { alert('Error: ' + d.error); return; }
+
+    renderResult(d);
+    status.textContent = `Done · ${d.candles_held} candles · ${d.exit_reason}`;
+  } catch(e) {
+    alert('Request failed: ' + e);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '▶ Run Intraday Backtest';
+  }
+}
+
+function renderResult(d) {
+  const win = d.pnl >= 0;
+  const col = win ? 'green' : 'red';
+
+  // Metrics
+  document.getElementById('m-pnl').textContent     = `₹${d.pnl >= 0 ? '+' : ''}${d.pnl.toLocaleString()}`;
+  document.getElementById('m-pnl').className       = `mv ${col}`;
+  document.getElementById('m-pct').textContent     = `${d.pnl_pct >= 0 ? '+' : ''}${d.pnl_pct.toFixed(1)}%`;
+  document.getElementById('m-pct').className       = `mv ${col}`;
+  document.getElementById('m-entry').textContent   = `₹${d.entry_price}`;
+  document.getElementById('m-exit').textContent    = `₹${d.exit_price}`;
+  document.getElementById('m-exit').className      = `mv ${col}`;
+  document.getElementById('m-target').textContent  = `₹${d.target_price}`;
+  document.getElementById('m-sl').textContent      = `₹${d.sl_price}`;
+  document.getElementById('m-candles').textContent = d.candles_held;
+  document.getElementById('m-symbol').textContent  = d.symbol;
+
+  const badge = document.getElementById('exit-badge');
+  if (d.exit_reason === 'TARGET')      { badge.textContent = '✅ Target Hit';   badge.className = 'exit-badge exit-target'; }
+  else if (d.exit_reason === 'STOP_LOSS') { badge.textContent = '🛑 Stop Loss'; badge.className = 'exit-badge exit-sl'; }
+  else                                  { badge.textContent = '🕐 Expiry Close'; badge.className = 'exit-badge exit-close'; }
+
+  // Chart
+  const curve = d.equity_curve;
+  const labels = curve.map(p => p.time.slice(11,16));  // HH:MM
+  const ltpVals = curve.map(p => p.ltp);
+
+  if (chartInstance) chartInstance.destroy();
+  const ctx = document.getElementById('equity-chart').getContext('2d');
+  chartInstance = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label:'LTP (₹)',
+        data: ltpVals,
+        borderColor: win ? '#00c853' : '#ff5252',
+        backgroundColor: win ? 'rgba(0,200,83,.08)' : 'rgba(255,82,82,.08)',
+        borderWidth:2, pointRadius:0, fill:true, tension:.3,
+      },{
+        label:'Entry',
+        data: Array(labels.length).fill(d.entry_price),
+        borderColor:'rgba(0,229,255,.5)', borderDash:[4,4], borderWidth:1.5, pointRadius:0,
+      },{
+        label:'Target',
+        data: Array(labels.length).fill(d.target_price),
+        borderColor:'rgba(0,200,83,.5)', borderDash:[4,4], borderWidth:1.5, pointRadius:0,
+      },{
+        label:'Stop Loss',
+        data: Array(labels.length).fill(d.sl_price),
+        borderColor:'rgba(255,82,82,.5)', borderDash:[4,4], borderWidth:1.5, pointRadius:0,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      animation:{duration:500},
+      plugins:{ legend:{labels:{color:'#9aaccc',font:{size:11}}}, tooltip:{mode:'index'} },
+      scales:{
+        x:{ ticks:{color:'#556',font:{size:10}, maxTicksLimit:15}, grid:{color:'rgba(255,255,255,.04)'} },
+        y:{ ticks:{color:'#778899',font:{size:11}}, grid:{color:'rgba(255,255,255,.06)'},
+            title:{display:true, text:'LTP (₹)', color:'#556', font:{size:11}} }
+      }
+    }
+  });
+
+  // Trade log
+  const log = document.getElementById('trade-log');
+  const entryRow = curve[0];
+  const exitRow  = curve[curve.length - 1];
+  log.innerHTML = `
+<span class="ev-entry">▶ ENTRY   ${entryRow.time.slice(11,16)}  LTP=₹${d.entry_price}  Target=₹${d.target_price}  SL=₹${d.sl_price}</span>\n`;
+  for (let i = 1; i < Math.min(curve.length - 1, 8); i++) {
+    const p = curve[i];
+    log.innerHTML += `<span class="ev-candle">  ${p.time.slice(11,16)}  LTP=₹${p.ltp.toFixed(2)}  PnL=₹${p.pnl >= 0 ? '+' : ''}${p.pnl.toFixed(0)}</span>\n`;
+  }
+  if (curve.length > 9) log.innerHTML += `<span class="ev-candle">  … ${curve.length - 2} more candles …</span>\n`;
+  const exitClass = d.exit_reason === 'TARGET' ? 'ev-exit-t' : d.exit_reason === 'STOP_LOSS' ? 'ev-exit-s' : 'ev-exit-c';
+  log.innerHTML += `<span class="${exitClass}">■ EXIT    ${exitRow.time.slice(11,16)}  LTP=₹${d.exit_price}  [${d.exit_reason}]  P&L=₹${d.pnl >= 0 ? '+' : ''}${d.pnl.toFixed(0)} (${d.pnl_pct >= 0 ? '+' : ''}${d.pnl_pct.toFixed(1)}%)</span>`;
+
+  document.getElementById('result-panel').style.display = 'block';
+  document.getElementById('result-panel').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+loadStatus();
+loadExpiries();
+</script>
+{% endblock %}

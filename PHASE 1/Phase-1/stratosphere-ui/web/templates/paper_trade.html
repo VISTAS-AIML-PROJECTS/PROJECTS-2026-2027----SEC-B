@@ -1,0 +1,939 @@
+{% extends "base.html" %}
+{% block title %}Paper Trade — Stratosphere{% endblock %}
+{% block content %}
+
+<style>
+/* ── Paper Trade Dashboard Styles ─────────────────────────────────────────── */
+.pt-grid        { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.4rem; }
+.pt-card        { background:#0f172a; border:1px solid #1e293b; border-radius:14px; padding:1.2rem 1.4rem; }
+.pt-card.full   { grid-column:1/-1; }
+.pt-title       { font-size:1rem; font-weight:700; color:#f1f5f9; margin-bottom:.9rem; display:flex; align-items:center; gap:.5rem; }
+
+/* Status pill */
+.pill           { display:inline-flex; align-items:center; gap:.3rem; padding:.2rem .7rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+.pill.green     { background:#14532d; color:#86efac; border:1px solid #16a34a; }
+.pill.red       { background:#450a0a; color:#fca5a5; border:1px solid #b91c1c; }
+.pill.amber     { background:#451a03; color:#fde68a; border:1px solid #b45309; }
+.pill.blue      { background:#0c1a40; color:#93c5fd; border:1px solid #1d4ed8; }
+.pill.purple    { background:#2e1065; color:#d8b4fe; border:1px solid #7e22ce; }
+.pill.cyan      { background:#083344; color:#67e8f9; border:1px solid #0891b2; }
+
+/* NIFTY spot hero */
+.spot-hero      { font-size:2.4rem; font-weight:800; color:#38bdf8; letter-spacing:-1px; }
+.spot-label     { font-size:.72rem; color:#64748b; margin-top:.1rem; }
+
+/* Position card */
+.pos-card       { background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.07));
+                  border:1px solid rgba(99,102,241,.35); border-radius:12px; padding:1rem 1.2rem; }
+.pos-row        { display:flex; justify-content:space-between; align-items:center; gap:.8rem; flex-wrap:wrap; }
+.pos-stat       { text-align:center; }
+.pos-val        { font-size:1.1rem; font-weight:700; color:#e2e8f0; }
+.pos-lbl        { font-size:.68rem; color:#64748b; margin-top:1px; }
+.pnl-pos        { color:#22c55e; }
+.pnl-neg        { color:#f87171; }
+
+/* Trades table */
+.pt-table       { width:100%; border-collapse:collapse; font-size:.8rem; }
+.pt-table th    { background:#1e293b; color:#94a3b8; padding:.5rem .7rem; text-align:left; font-weight:600; font-size:.72rem; }
+.pt-table td    { padding:.45rem .7rem; border-bottom:1px solid #1e293b; color:#cbd5e1; }
+.pt-table tr:hover td { background:#1e293b44; }
+.reason-sl      { color:#f87171; font-weight:700; }
+.reason-target  { color:#22c55e; font-weight:700; }
+.reason-time    { color:#f59e0b; }
+.reason-manual  { color:#94a3b8; }
+.reason-ai      { color:#c084fc; font-weight:700; background:#2e1065; padding:2px 6px; border-radius:4px; border:1px solid #7e22ce; font-size:.72rem; }
+.reason-trail   { color:#67e8f9; font-weight:700; background:#083344; padding:2px 6px; border-radius:4px; border:1px solid #0891b2; font-size:.72rem; }
+
+/* Log box */
+.pt-log         { background:#020817; border:1px solid #1e293b; border-radius:8px; padding:.7rem 1rem;
+                  font-family:monospace; font-size:.75rem; color:#64748b;
+                  max-height:180px; overflow-y:auto; white-space:pre-wrap; }
+
+/* Controls */
+.pt-ctrl        { display:flex; gap:.7rem; align-items:center; flex-wrap:wrap; }
+.btn-start      { background:linear-gradient(135deg,#16a34a,#15803d); color:#fff; border:none; border-radius:8px; padding:.55rem 1.3rem; font-weight:700; cursor:pointer; font-size:.88rem; }
+.btn-stop       { background:linear-gradient(135deg,#b91c1c,#991b1b); color:#fff; border:none; border-radius:8px; padding:.55rem 1.3rem; font-weight:700; cursor:pointer; font-size:.88rem; }
+.btn-close      { background:#1e293b; color:#f59e0b; border:1px solid #f59e0b44; border-radius:8px; padding:.45rem 1rem; font-weight:600; cursor:pointer; font-size:.82rem; }
+.btn-start:disabled,.btn-stop:disabled,.btn-close:disabled { opacity:.4; cursor:not-allowed; }
+.cap-input      { background:#1e293b; border:1px solid #334155; border-radius:7px; color:#e2e8f0; padding:.45rem .8rem; font-size:.88rem; width:100px; }
+
+/* Creds warning */
+.creds-warn     { background:#451a03; border:1px solid #b45309; border-radius:10px; padding:1rem 1.2rem; margin-bottom:1.2rem; }
+
+/* ── Live Options Chain & AI Signals ─────────────────────────────────────── */
+.oc-header-bar   { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.8rem; margin-bottom:.9rem; }
+.oc-controls     { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+.oc-select       { background:#1e293b; border:1px solid #334155; border-radius:6px; color:#e2e8f0; padding:.35rem .6rem; font-size:.78rem; font-weight:600; outline:none; }
+.oc-btn-toggle   { background:#1e293b; border:1px solid #334155; border-radius:6px; color:#94a3b8; padding:.35rem .7rem; font-size:.78rem; font-weight:600; cursor:pointer; }
+.oc-btn-toggle.active { background:#3b82f6; color:#fff; border-color:#2563eb; }
+
+/* Metrics ribbon */
+.oc-ribbon       { display:flex; gap:.8rem; flex-wrap:wrap; background:#0b1329; border:1px solid #1e293b; border-radius:10px; padding:.7rem 1rem; margin-bottom:1rem; align-items:center; }
+.oc-stat-item    { display:flex; flex-direction:column; gap:.1rem; min-width:85px; }
+.oc-stat-lbl     { font-size:.62rem; color:#64748b; text-transform:uppercase; letter-spacing:.5px; font-weight:700; }
+.oc-stat-val     { font-size:.92rem; font-weight:800; color:#e2e8f0; }
+
+/* Top Pick Banner */
+.oc-top-banner   { background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(59,130,246,.08)); border:1px solid rgba(16,185,129,.4); border-radius:10px; padding:.7rem 1rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.8rem; }
+.oc-top-left     { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+.oc-top-tag      { background:#065f46; color:#6ee7b7; padding:.2rem .5rem; border-radius:4px; font-size:.7rem; font-weight:800; }
+.oc-top-symbol   { font-weight:800; font-size:.88rem; color:#f8fafc; }
+.oc-top-pnl      { font-size:.78rem; color:#94a3b8; }
+
+/* Matrix table */
+.oc-matrix-wrap  { overflow-x:auto; max-height:480px; }
+.oc-matrix-table { width:100%; border-collapse:collapse; font-size:.74rem; text-align:center; }
+.oc-matrix-table th { background:#1e293b; color:#94a3b8; padding:.45rem .3rem; font-size:.67rem; font-weight:700; text-transform:uppercase; border-bottom:1px solid #334155; position:sticky; top:0; z-index:2; }
+.oc-matrix-table td { padding:.35rem .25rem; border-bottom:1px solid #1e293b; vertical-align:middle; }
+.oc-matrix-table tr:hover td { background:rgba(255,255,255,.03); }
+
+/* Highlighting */
+.oc-strike-col   { font-weight:800; color:#38bdf8; font-size:.82rem; background:#0f172a; min-width:80px; }
+.oc-atm-row td   { background:rgba(56,189,248,.08) !important; border-top:1px solid #0284c7; border-bottom:1px solid #0284c7; }
+.oc-atm-badge    { background:#0284c7; color:#fff; font-size:.58rem; padding:1px 4px; border-radius:3px; margin-left:3px; vertical-align:middle; }
+.oc-call-itm     { background:rgba(16,185,129,.05); }
+.oc-put-itm      { background:rgba(239,68,68,.05); }
+
+/* Signal pills */
+.sig-badge       { display:inline-block; padding:.15rem .45rem; border-radius:4px; font-size:.65rem; font-weight:800; text-transform:uppercase; }
+.sig-buy         { background:#065f46; color:#34d399; border:1px solid #059669; }
+.sig-watch       { background:#78350f; color:#fcd34d; border:1px solid #d97706; }
+.sig-wait        { background:#1e293b; color:#64748b; }
+
+/* Progress bar for P(win) */
+.prob-container  { display:flex; align-items:center; gap:.3rem; justify-content:center; }
+.prob-bar-wrap   { width:34px; height:6px; background:#1e293b; border-radius:3px; overflow:hidden; display:inline-block; }
+.prob-bar-fill   { height:100%; border-radius:3px; }
+
+/* Trade action button */
+.btn-trade-now   { background:#2563eb; color:#fff; border:none; border-radius:4px; padding:.22rem .5rem; font-size:.68rem; font-weight:700; cursor:pointer; transition:all .15s; }
+.btn-trade-now:hover { background:#1d4ed8; transform:scale(1.05); }
+.btn-trade-now.buy-active { background:#16a34a; }
+.tag-itm         { color:#34d399; font-weight:700; font-size:.62rem; }
+.tag-otm         { color:#94a3b8; font-size:.62rem; }
+.tag-atm         { color:#38bdf8; font-weight:800; font-size:.62rem; }
+</style>
+
+<!-- Credentials warning — shown if env vars not set -->
+<div id="creds-warn" class="creds-warn" style="display:none">
+  <strong style="color:#fde68a">⚠ Angel One credentials not set</strong>
+  <div style="font-size:.8rem;color:#fcd34d;margin-top:.4rem">
+    Set these in your terminal before starting the server:<br>
+    <code style="color:#38bdf8">
+      export ANGEL_API_KEY="..."<br>
+      export ANGEL_CLIENT_ID="..."<br>
+      export ANGEL_PIN="..."<br>
+      export ANGEL_TOTP_SECRET="..."
+    </code>
+    <br>Then restart the server and refresh this page.
+  </div>
+</div>
+
+<!-- Strategy Selection Card -->
+<div class="pt-card" style="margin-bottom:1.2rem; background:linear-gradient(135deg,rgba(15,23,42,0.95),rgba(30,41,59,0.7)); border:1px solid #334155">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.8rem; margin-bottom:.8rem">
+    <div style="display:flex; align-items:center; gap:.6rem; flex-wrap:wrap">
+      <span style="font-size:1.15rem">🧠</span>
+      <span style="font-size:1rem; font-weight:800; color:#f1f5f9">AI Trading Strategy Selection</span>
+      <span id="strat-tag-badge" class="pill blue" style="font-size:.68rem">Original Baseline</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:.6rem; flex-wrap:wrap">
+      <label for="strat-select" style="font-size:.78rem; color:#94a3b8; font-weight:600">Active Model:</label>
+      <select id="strat-select" class="oc-select" style="font-size:.82rem; padding:.45rem .8rem; min-width:270px" onchange="onStrategyChange()">
+        <option value="kaggle_twin_tower">Kaggle Twin Tower (1-Min Original)</option>
+        <option value="angel_twin_tower">Angel One Twin Tower (5-Min Live Broker)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Strategy Metadata Grid -->
+  <div id="strat-details-box" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:.8rem; background:#080e1e; border:1px solid #1e293b; border-radius:10px; padding:.8rem 1rem">
+    <div>
+      <div style="font-size:.64rem; color:#64748b; font-weight:700; text-transform:uppercase">Timeframe &amp; Granularity</div>
+      <div id="strat-detail-timeframe" style="font-size:.86rem; font-weight:700; color:#e2e8f0; margin-top:.2rem">1-minute candles</div>
+    </div>
+    <div>
+      <div style="font-size:.64rem; color:#64748b; font-weight:700; text-transform:uppercase">Entry P(Win) Threshold</div>
+      <div id="strat-detail-threshold" style="font-size:.86rem; font-weight:700; color:#34d399; margin-top:.2rem">0.670 (67.0%)</div>
+    </div>
+    <div>
+      <div style="font-size:.64rem; color:#64748b; font-weight:700; text-transform:uppercase">Data Source</div>
+      <div id="strat-detail-source" style="font-size:.86rem; font-weight:700; color:#38bdf8; margin-top:.2rem">Kaggle Historical</div>
+    </div>
+    <div>
+      <div style="font-size:.64rem; color:#64748b; font-weight:700; text-transform:uppercase">Training Samples</div>
+      <div id="strat-detail-samples" style="font-size:.86rem; font-weight:700; color:#a78bfa; margin-top:.2rem">62,377 contracts</div>
+    </div>
+  </div>
+  <div id="strat-detail-desc" style="font-size:.74rem; color:#94a3b8; margin-top:.6rem; line-height:1.4">
+    Original Twin Tower AI trained on 62,377 historical 1-minute NIFTY option contracts from Kaggle. Optimized for high-frequency precision with conservative entry gating.
+  </div>
+</div>
+
+<!-- Top controls bar -->
+<div class="pt-card" style="margin-bottom:1.2rem">
+  <div class="pt-ctrl">
+    <label style="font-size:.78rem;color:#94a3b8">💰 Capital
+      <input id="cap-input" class="cap-input" type="number" value="50000" min="6000" step="1000">
+    </label>
+    <button class="btn-start" id="btn-start" onclick="ptStart()">▶ Start Paper Trading</button>
+    <button class="btn-stop"  id="btn-stop"  onclick="ptStop()" disabled>⏹ Stop</button>
+    <button class="btn-close" id="btn-close" onclick="ptClose()" disabled>✕ Close Position</button>
+    <button id="btn-auto-trade" class="pill green" style="cursor:pointer;border:none;padding:.45rem .9rem;font-size:.78rem" onclick="toggleAutoTrade()">🤖 Auto-Trade: ACTIVE</button>
+    <span id="feed-pill" class="pill red">🔴 Feed offline</span>
+    <span id="run-pill"  class="pill red">⏸ Stopped</span>
+  </div>
+  <div style="font-size:.72rem;color:#475569;margin-top:.6rem">
+    Paper trading uses <strong style="color:#38bdf8">real Angel One live prices</strong> but places
+    <strong style="color:#f59e0b">no real orders</strong>. P&amp;L includes actual NSE charges.
+    1-trade-at-a-time mode enforced.
+  </div>
+</div>
+
+<div class="pt-grid">
+
+  <!-- NIFTY Spot -->
+  <div class="pt-card">
+    <div class="pt-title">📈 NIFTY Spot</div>
+    <div id="spot-price" class="spot-hero">—</div>
+    <div class="spot-label" id="spot-age">Waiting for live data…</div>
+  </div>
+
+  <!-- Today's P&L -->
+  <div class="pt-card">
+    <div class="pt-title">💰 Today's Paper P&L</div>
+    <div id="total-pnl" style="font-size:2rem;font-weight:800;color:#94a3b8">₹ 0</div>
+    <div style="font-size:.75rem;color:#64748b;margin-top:.3rem">
+      <span id="trade-count">0 trades closed</span>
+    </div>
+  </div>
+
+  <!-- Active Position -->
+  <div class="pt-card full" id="pos-section" style="display:none">
+    <div class="pt-title">📌 Active Position</div>
+    <div class="pos-card">
+      <div class="pos-row">
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-symbol">—</div>
+          <div class="pos-lbl">Symbol</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-strat"><span class="pill blue" style="font-size:.68rem">Kaggle 1M</span></div>
+          <div class="pos-lbl">Strategy</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-underlying" style="color:#38bdf8">—</div>
+          <div class="pos-lbl">NIFTY at Entry</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-entry">—</div>
+          <div class="pos-lbl">Entry LTP</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-ltp">—</div>
+          <div class="pos-lbl">Live LTP</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-sl">—</div>
+          <div class="pos-lbl" style="color:#f87171">Hard SL (-30%)</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-trail" style="color:#67e8f9">₹—</div>
+          <div class="pos-lbl" style="color:#67e8f9">Dynamic Trail Stop</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-tgt">—</div>
+          <div class="pos-lbl" style="color:#22c55e">Target (+50%)</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-exit-p" style="color:#d8b4fe">—</div>
+          <div class="pos-lbl" style="color:#d8b4fe">Tower 2 P(Exit)</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-lots">—</div>
+          <div class="pos-lbl">Lots</div>
+        </div>
+        <div class="pos-stat">
+          <div id="pos-pnl" class="pos-val" style="font-size:1.5rem">₹0</div>
+          <div class="pos-lbl">Unrealised P&L</div>
+        </div>
+        <div class="pos-stat">
+          <div class="pos-val" id="pos-dur">—</div>
+          <div class="pos-lbl">Duration</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No position placeholder -->
+  <div class="pt-card full" id="no-pos-section">
+    <div style="text-align:center;padding:1.5rem;color:#475569">
+      <div style="font-size:2rem;margin-bottom:.4rem">⏳</div>
+      <div>No open position. Waiting for AI signal…</div>
+      <div style="font-size:.72rem;margin-top:.3rem;color:#334155">
+        The engine will open a position when the AI tower emits a signal and market is open.
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Options Chain & AI Signals -->
+  <div class="pt-card full" id="option-chain-section">
+    <div class="oc-header-bar">
+      <div class="pt-title" style="margin-bottom:0">
+        <span>⚡ Live Options Chain &amp; AI Signals</span>
+        <span class="pill green" id="oc-live-pill" style="font-size:.65rem">🟢 Real-Time Engine</span>
+      </div>
+      <div class="oc-controls">
+        <label style="font-size:.74rem;color:#94a3b8">Expiry:
+          <select id="oc-expiry" class="oc-select" onchange="loadOptionChain()"></select>
+        </label>
+        <label style="font-size:.74rem;color:#94a3b8">Range:
+          <select id="oc-range" class="oc-select" onchange="loadOptionChain()">
+            <option value="6">±6 Strikes (Tight ATM)</option>
+            <option value="10" selected>±10 Strikes (Recommended)</option>
+            <option value="16">±16 Strikes (Wide Chain)</option>
+          </select>
+        </label>
+        <button id="btn-view-matrix" class="oc-btn-toggle active" onclick="setChainView('matrix')">Calls / Puts Matrix</button>
+        <button id="btn-view-list" class="oc-btn-toggle" onclick="setChainView('list')">Scanner List</button>
+        <button class="oc-btn-toggle" onclick="loadOptionChain()" title="Refresh now">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- Live Metrics Ribbon -->
+    <div class="oc-ribbon">
+      <div class="oc-stat-item">
+        <span class="oc-stat-lbl">NIFTY Spot</span>
+        <span class="oc-stat-val" id="oc-spot-val" style="color:#38bdf8">—</span>
+      </div>
+      <div class="oc-stat-item">
+        <span class="oc-stat-lbl">ATM Strike</span>
+        <span class="oc-stat-val" id="oc-atm-val">—</span>
+      </div>
+      <div class="oc-stat-item">
+        <span class="oc-stat-lbl">DTE Days</span>
+        <span class="oc-stat-val" id="oc-dte-val">—</span>
+      </div>
+      <div class="oc-stat-item">
+        <span class="oc-stat-lbl">Put / Call (PCR)</span>
+        <span class="oc-stat-val" id="oc-pcr-val">—</span>
+      </div>
+      <div class="oc-stat-item">
+        <span class="oc-stat-lbl">Collected Options</span>
+        <span class="oc-stat-val" id="oc-count-val" style="color:#a78bfa">—</span>
+      </div>
+      <div class="oc-stat-item">
+        <span class="oc-stat-lbl">AI Entry Threshold</span>
+        <span class="oc-stat-val" id="oc-thr-val" style="color:#34d399">—</span>
+      </div>
+    </div>
+
+    <!-- Top Signal Recommendation Banner -->
+    <div class="oc-top-banner" id="oc-top-banner" style="display:none">
+      <div class="oc-top-left">
+        <span class="oc-top-tag" id="top-sig-badge">AI TOP SIGNAL</span>
+        <span class="oc-top-symbol" id="top-sig-symbol">—</span>
+        <span class="oc-top-pnl" id="top-sig-details">—</span>
+      </div>
+      <button class="btn-trade-now buy-active" id="btn-top-trade" onclick="tradeTopSignal()" style="padding:.4rem .9rem;font-size:.78rem">
+        ⚡ Paper Trade This Signal
+      </button>
+    </div>
+
+    <!-- Dual Column Split Table (Calls on Left | Strike | Puts on Right) -->
+    <div id="oc-matrix-view" class="oc-matrix-wrap">
+      <table class="oc-matrix-table">
+        <thead>
+          <tr>
+            <th colspan="7" style="background:rgba(16,185,129,.12);color:#34d399;border-right:1px solid #334155">CALLS (CE)</th>
+            <th style="background:#0284c7;color:#fff">STRIKE</th>
+            <th colspan="7" style="background:rgba(239,68,68,.12);color:#f87171;border-left:1px solid #334155">PUTS (PE)</th>
+          </tr>
+          <tr>
+            <th style="width:65px">Trade</th>
+            <th style="width:75px">AI P(Win)</th>
+            <th style="width:55px">Signal</th>
+            <th style="width:55px">Delta</th>
+            <th style="width:55px">Theta</th>
+            <th style="width:50px">IV</th>
+            <th style="width:70px;border-right:1px solid #334155">Live LTP</th>
+            <th style="width:90px;background:#0f172a">Strike</th>
+            <th style="width:70px;border-left:1px solid #334155">Live LTP</th>
+            <th style="width:50px">IV</th>
+            <th style="width:55px">Theta</th>
+            <th style="width:55px">Delta</th>
+            <th style="width:55px">Signal</th>
+            <th style="width:75px">AI P(Win)</th>
+            <th style="width:65px">Trade</th>
+          </tr>
+        </thead>
+        <tbody id="oc-matrix-body">
+          <tr><td colspan="15" style="text-align:center;padding:1.5rem;color:#475569">Loading live options chain…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Detailed Scanner List View -->
+    <div id="oc-list-view" class="oc-matrix-wrap" style="display:none">
+      <table class="oc-matrix-table" style="text-align:left">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Type</th>
+            <th>Strike</th>
+            <th>Moneyness</th>
+            <th>Live LTP</th>
+            <th>IV%</th>
+            <th>Delta (Δ)</th>
+            <th>Theta (Θ)</th>
+            <th>Gamma (Γ)</th>
+            <th style="text-align:center">AI P(Win)</th>
+            <th style="text-align:center">Signal Status</th>
+            <th>Target &amp; Stop</th>
+            <th style="text-align:center">Action</th>
+          </tr>
+        </thead>
+        <tbody id="oc-list-body">
+          <tr><td colspan="13" style="text-align:center;padding:1.5rem;color:#475569">Loading options list…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Trade log -->
+  <div class="pt-card full">
+    <div class="pt-title">📋 Closed Trades — Today</div>
+    <div style="overflow-x:auto">
+      <table class="pt-table">
+        <thead><tr>
+          <th>Symbol</th><th>Strategy</th><th>Type</th><th>Underlying (Entry)</th><th>Entry</th><th>Exit</th>
+          <th>Lots</th><th>Gross P&L</th><th>Charges</th><th>Net P&L ✅</th><th>Net %</th><th>Reason</th><th>Duration</th>
+        </tr></thead>
+        <tbody id="trades-body">
+          <tr><td colspan="13" style="text-align:center;color:#475569;padding:1.5rem">No trades yet today</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <div class="pt-card full">
+    <div class="pt-title">🖥 Engine Log</div>
+    <div class="pt-log" id="pt-log">Waiting…</div>
+  </div>
+
+</div>
+
+<script>
+let ptPollTimer = null;
+let currentStrategy = 'kaggle_twin_tower';
+let strategiesMap = {};
+
+function fmtRs(v) {
+  const s = v >= 0 ? '+' : '-';
+  return s + '₹' + Math.abs(v).toLocaleString('en-IN', {maximumFractionDigits:0});
+}
+function fmtDur(entry_time) {
+  if (!entry_time) return '—';
+  const secs = Math.floor((Date.now() - new Date(entry_time).getTime()) / 1000);
+  const h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60), s = secs%60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+function reasonClass(r) {
+  return {
+    SL: 'reason-sl',
+    TARGET: 'reason-target',
+    TIME: 'reason-time',
+    MANUAL: 'reason-manual',
+    AI_EXIT: 'reason-ai',
+    TRAIL_STOP: 'reason-trail'
+  }[r] || '';
+}
+
+let isAutoTradeOn = true;
+
+function updateAutoTradeButton(active) {
+  isAutoTradeOn = !!active;
+  const btn = document.getElementById('btn-auto-trade');
+  if (btn) {
+    btn.className = 'pill ' + (isAutoTradeOn ? 'green' : 'amber');
+    btn.textContent = isAutoTradeOn ? '🤖 Auto-Trade: ACTIVE' : '⏸ Auto-Trade: PAUSED';
+  }
+}
+
+async function toggleAutoTrade() {
+  const next = !isAutoTradeOn;
+  try {
+    const res = await fetch('/api/paper/auto-trade', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ enabled: next })
+    });
+    const d = await res.json();
+    if (d.status === 'updated') {
+      updateAutoTradeButton(d.auto_trade);
+    }
+  } catch(e) {
+    console.error('Error toggling auto trade:', e);
+  }
+}
+
+// ── Strategy Management ───────────────────────────────────────────────────
+async function loadStrategies() {
+  try {
+    const res = await fetch('/api/paper/strategies');
+    if (!res.ok) return;
+    const d = await res.json();
+    const strats = d.strategies || [];
+    const select = document.getElementById('strat-select');
+    if (!select || !strats.length) return;
+
+    strategiesMap = {};
+    select.innerHTML = '';
+    strats.forEach(s => {
+      strategiesMap[s.id] = s;
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = `${s.name} [${s.tag}]`;
+      select.appendChild(opt);
+    });
+
+    const activeId = d.active_strategy || 'kaggle_twin_tower';
+    select.value = activeId;
+    currentStrategy = activeId;
+    updateStrategyUI(activeId);
+  } catch(e) {
+    console.error('Failed to load strategies:', e);
+  }
+}
+
+async function onStrategyChange() {
+  const select = document.getElementById('strat-select');
+  const newStrat = select.value;
+  try {
+    const res = await fetch('/api/paper/strategy', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ strategy_id: newStrat })
+    });
+    const d = await res.json();
+    if (d.status === 'updated') {
+      currentStrategy = newStrat;
+      if (d.strategy) {
+        strategiesMap[newStrat] = d.strategy;
+      }
+      updateStrategyUI(newStrat);
+      // Immediately reload options chain with the new strategy
+      loadOptionChain();
+    } else {
+      alert('Could not update strategy: ' + (d.error || JSON.stringify(d)));
+    }
+  } catch(e) {
+    console.error('Error switching strategy:', e);
+  }
+}
+
+function updateStrategyUI(stratId) {
+  const s = strategiesMap[stratId];
+  if (!s) return;
+
+  const tagBadge = document.getElementById('strat-tag-badge');
+  if (tagBadge) {
+    tagBadge.textContent = s.tag || s.name;
+    tagBadge.className = 'pill ' + (s.badge_color || 'blue');
+  }
+
+  const tf = document.getElementById('strat-detail-timeframe');
+  if (tf) tf.textContent = s.timeframe || '—';
+
+  const thr = document.getElementById('strat-detail-threshold');
+  if (thr) {
+    const tVal = (s.metrics && s.metrics.threshold !== undefined) ? s.metrics.threshold : s.default_threshold;
+    thr.textContent = `${Number(tVal).toFixed(3)} (${(Number(tVal)*100).toFixed(1)}%)`;
+  }
+
+  const src = document.getElementById('strat-detail-source');
+  if (src) src.textContent = s.data_source || '—';
+
+  const samples = document.getElementById('strat-detail-samples');
+  if (samples) {
+    const n = (s.metrics && s.metrics.trained_samples) ? s.metrics.trained_samples.toLocaleString('en-IN') : (stratId === 'kaggle_twin_tower' ? '62,377' : '357,656');
+    samples.textContent = `${n} rows`;
+  }
+
+  const desc = document.getElementById('strat-detail-desc');
+  if (desc) desc.textContent = s.description || '—';
+}
+
+async function ptStart() {
+  const cap = parseFloat(document.getElementById('cap-input').value || 50000);
+  document.getElementById('btn-start').disabled = true;
+  try {
+    const r = await (await fetch('/api/paper/start', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({capital: cap, strategy: currentStrategy})
+    })).json();
+    if (r.error) { alert('Error: ' + r.error); document.getElementById('btn-start').disabled=false; return; }
+    document.getElementById('btn-stop').disabled = false;
+    startPolling();
+  } catch(e) {
+    alert('Cannot reach server: ' + e.message);
+    document.getElementById('btn-start').disabled = false;
+  }
+}
+
+async function ptStop() {
+  await fetch('/api/paper/stop', {method:'POST'});
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-stop').disabled  = true;
+}
+
+async function ptClose() {
+  const r = await (await fetch('/api/paper/close', {method:'POST'})).json();
+  if (r.error) alert(r.error);
+}
+
+function startPolling() {
+  if (ptPollTimer) clearInterval(ptPollTimer);
+  ptPollTimer = setInterval(pollStatus, 2000);
+  pollStatus();
+}
+
+async function pollStatus() {
+  try {
+    const d = await (await fetch('/api/paper/status')).json();
+
+    // Credentials warning
+    document.getElementById('creds-warn').style.display = d.credentials_set ? 'none' : 'block';
+
+    // Auto-trade button state
+    if (d.auto_trade !== undefined) {
+      updateAutoTradeButton(d.auto_trade);
+    }
+
+    // Pills
+    document.getElementById('feed-pill').className = 'pill ' + (d.feed_connected ? 'green' : 'red');
+    document.getElementById('feed-pill').textContent = d.feed_connected ? '🟢 Feed live' : '🔴 Feed offline';
+    document.getElementById('run-pill').className = 'pill ' + (d.running ? 'green' : 'amber');
+    document.getElementById('run-pill').textContent = d.running ? '▶ Running' : '⏸ Stopped';
+
+    document.getElementById('btn-close').disabled = !d.active_position;
+
+    // NIFTY spot
+    if (d.nifty_spot) {
+      document.getElementById('spot-price').textContent = '₹' + d.nifty_spot.toLocaleString('en-IN');
+      document.getElementById('spot-age').textContent = 'Live — ' + new Date().toLocaleTimeString('en-IN');
+    }
+
+    // Total P&L
+    const pnl = d.total_net_pnl_rs || 0;
+    const pnlEl = document.getElementById('total-pnl');
+    pnlEl.textContent = fmtRs(pnl);
+    pnlEl.style.color = pnl >= 0 ? '#22c55e' : '#f87171';
+    document.getElementById('trade-count').textContent = (d.total_trades || 0) + ' trades closed';
+
+    // Active position
+    const pos = d.active_position;
+    if (pos) {
+      document.getElementById('pos-section').style.display = 'block';
+      document.getElementById('no-pos-section').style.display = 'none';
+      document.getElementById('pos-symbol').textContent = pos.symbol;
+      if (document.getElementById('pos-strat')) {
+        const stratKey = pos.strategy || d.active_strategy || currentStrategy;
+        const isAngel = stratKey.includes('angel');
+        document.getElementById('pos-strat').innerHTML = `<span class="pill ${isAngel ? 'purple' : 'blue'}" style="font-size:.68rem">${isAngel ? 'Angel 5M' : 'Kaggle 1M'}</span>`;
+      }
+      if (document.getElementById('pos-underlying')) {
+        const spotAtEntry = pos.underlying_entry ? pos.underlying_entry.toFixed(1) : '—';
+        const mTag = pos.moneyness_tag ? ` (${pos.moneyness_tag})` : '';
+        document.getElementById('pos-underlying').innerHTML = `₹${spotAtEntry} <span style="font-size:.68rem;color:#94a3b8">${mTag}</span>`;
+      }
+      document.getElementById('pos-entry').textContent  = '₹' + (pos.entry_ltp || 0).toFixed(2);
+      document.getElementById('pos-ltp').textContent    = '₹' + (pos.live_ltp  || pos.entry_ltp || 0).toFixed(2);
+      document.getElementById('pos-sl').textContent     = '₹' + (pos.sl_price  || 0).toFixed(2);
+      if (document.getElementById('pos-trail')) {
+        const trailP = pos.trail_stop ? '₹' + pos.trail_stop.toFixed(2) : '—';
+        const trailPct = pos.trail_pct ? ` (${(pos.trail_pct * 100).toFixed(0)}%)` : '';
+        document.getElementById('pos-trail').textContent = trailP + trailPct;
+      }
+      document.getElementById('pos-tgt').textContent    = '₹' + (pos.target_price || 0).toFixed(2);
+      if (document.getElementById('pos-exit-p')) {
+        const stopP = pos.stop_p !== undefined ? (pos.stop_p * 100).toFixed(1) + '%' : '0.0%';
+        const stopColor = (pos.stop_p >= 0.62) ? '#f87171' : ((pos.stop_p >= 0.40) ? '#f59e0b' : '#34d399');
+        document.getElementById('pos-exit-p').innerHTML = `<span style="color:${stopColor}">${stopP}</span>`;
+      }
+      document.getElementById('pos-lots').textContent   = pos.num_lots + ' × ' + pos.lot_size;
+      document.getElementById('pos-dur').textContent    = fmtDur(pos.entry_time);
+      const unrl = pos.unrealised_rs || 0;
+      const pnlEl2 = document.getElementById('pos-pnl');
+      pnlEl2.textContent  = fmtRs(unrl);
+      pnlEl2.className = 'pos-val ' + (unrl >= 0 ? 'pnl-pos' : 'pnl-neg');
+    } else {
+      document.getElementById('pos-section').style.display = 'none';
+      document.getElementById('no-pos-section').style.display = 'block';
+    }
+
+    // Trades table
+    const trades = d.closed_trades || [];
+    const tbody = document.getElementById('trades-body');
+    if (!trades.length) {
+      tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#475569;padding:1.5rem">No trades yet today</td></tr>';
+    } else {
+      tbody.innerHTML = [...trades].reverse().map(t => {
+        const nc = t.net_pnl_rs >= 0 ? 'pnl-pos' : 'pnl-neg';
+        const isAngel = (t.strategy || '').includes('angel');
+        const stratBadge = `<span class="pill ${isAngel ? 'purple' : 'blue'}" style="font-size:.65rem;padding:.15rem .45rem">${isAngel ? 'Angel 5M' : 'Kaggle 1M'}</span>`;
+        const spotEntry = t.underlying_entry ? `₹${t.underlying_entry.toFixed(1)}` : '—';
+        const mTag = t.moneyness_tag ? `<br><span style="font-size:.66rem;color:#94a3b8">${t.moneyness_tag}</span>` : '';
+        return `<tr>
+          <td>${t.symbol}</td>
+          <td>${stratBadge}</td>
+          <td><span>₹${t.strike} ${t.opt_type}</span></td>
+          <td><strong style="color:#38bdf8">${spotEntry}</strong>${mTag}</td>
+          <td>₹${t.entry_ltp.toFixed(2)}</td>
+          <td>₹${t.exit_ltp.toFixed(2)}</td>
+          <td>${t.num_lots}</td>
+          <td>${fmtRs(t.gross_pnl_rs)}</td>
+          <td style="color:#f87171">-₹${t.charges_rs.toFixed(0)}</td>
+          <td class="${nc}"><strong>${fmtRs(t.net_pnl_rs)}</strong></td>
+          <td class="${nc}">${t.net_pnl_pct >= 0 ? '+' : ''}${t.net_pnl_pct.toFixed(2)}%</td>
+          <td><span class="${reasonClass(t.exit_reason)}">${t.exit_reason}</span></td>
+          <td style="color:#64748b;font-size:.72rem">${t.entry_time.slice(11,16)} → ${t.exit_time.slice(11,16)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Log
+    const logEl = document.getElementById('pt-log');
+    logEl.textContent = (d.log || []).join('\n') || 'No log yet';
+    logEl.scrollTop   = logEl.scrollHeight;
+
+    // Load option chain concurrently
+    loadOptionChain();
+
+  } catch(e) {
+    document.getElementById('feed-pill').className   = 'pill red';
+    document.getElementById('feed-pill').textContent = '🔴 Server offline';
+  }
+}
+
+// ── Options Chain & AI Signals JS ──────────────────────────────────────────
+let currentChainData = null;
+let chainViewMode = 'matrix';
+let selectedTopToken = null;
+let selectedTopConf = 0.5;
+let selectedTopLtp = null;
+
+function setChainView(mode) {
+  chainViewMode = mode;
+  document.getElementById('btn-view-matrix').className = 'oc-btn-toggle ' + (mode === 'matrix' ? 'active' : '');
+  document.getElementById('btn-view-list').className = 'oc-btn-toggle ' + (mode === 'list' ? 'active' : '');
+  document.getElementById('oc-matrix-view').style.display = mode === 'matrix' ? 'block' : 'none';
+  document.getElementById('oc-list-view').style.display = mode === 'list' ? 'block' : 'none';
+  if (currentChainData) renderOptionChain(currentChainData);
+}
+
+async function loadOptionChain() {
+  try {
+    const expSelect = document.getElementById('oc-expiry');
+    const selectedExp = expSelect ? expSelect.value : '';
+    const rangeSelect = document.getElementById('oc-range');
+    const selectedRange = rangeSelect ? rangeSelect.value : 10;
+
+    let url = `/api/paper/option-chain?strike_range=${selectedRange}&strategy=${encodeURIComponent(currentStrategy)}`;
+    if (selectedExp) url += `&expiry=${encodeURIComponent(selectedExp)}`;
+
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    currentChainData = data;
+    renderOptionChain(data);
+  } catch(e) {
+    console.error('Failed to load option chain:', e);
+  }
+}
+
+function renderOptionChain(d) {
+  if (!d || d.error) return;
+
+  // Update expiry dropdown if needed
+  const expSelect = document.getElementById('oc-expiry');
+  if (expSelect && d.expiries && d.expiries.length) {
+    if (expSelect.options.length !== d.expiries.length) {
+      expSelect.innerHTML = d.expiries.map(exp => `<option value="${exp}" ${exp===d.selected_expiry?'selected':''}>${exp}</option>`).join('');
+    }
+  }
+
+  // Update metrics ribbon
+  if (document.getElementById('oc-spot-val')) {
+    document.getElementById('oc-spot-val').textContent = '₹' + (d.spot_price || 0).toLocaleString('en-IN');
+    document.getElementById('oc-atm-val').textContent  = (d.atm_strike || 0).toLocaleString('en-IN');
+    document.getElementById('oc-dte-val').textContent  = (d.dte_days !== undefined ? d.dte_days + 'd' : '—');
+    document.getElementById('oc-pcr-val').textContent  = (d.pcr !== undefined ? d.pcr.toFixed(2) : '—');
+    document.getElementById('oc-count-val').textContent= (d.total_collected || 0) + ' active';
+    document.getElementById('oc-thr-val').textContent  = ((d.threshold || 0.45) * 100).toFixed(1) + '%';
+  }
+
+  // Top signal banner
+  const top = d.top_signal;
+  const banner = document.getElementById('oc-top-banner');
+  if (banner && top) {
+    banner.style.display = 'flex';
+    selectedTopToken = top.token;
+    selectedTopConf = top.p_win || 0.5;
+    selectedTopLtp = top.ltp;
+    const isBuy = top.signal === 'BUY';
+    document.getElementById('top-sig-badge').className = 'oc-top-tag ' + (isBuy ? 'sig-buy' : 'sig-watch');
+    document.getElementById('top-sig-badge').textContent = isBuy ? '🎯 AI BUY SIGNAL' : '👀 WATCHLIST CANDIDATE';
+    document.getElementById('top-sig-symbol').textContent = `${top.symbol} (₹${top.strike} ${top.opt_type})`;
+    document.getElementById('top-sig-details').innerHTML = `LTP: <b style="color:#e2e8f0">₹${top.ltp.toFixed(2)}</b> · P(Win): <b style="color:#34d399">${(top.p_win*100).toFixed(1)}%</b> · Δ: <b>${top.delta}</b> · Θ: <b>₹${top.theta}/day</b> · Target: <b>₹${top.target_price}</b>`;
+  } else if (banner) {
+    banner.style.display = 'none';
+  }
+
+  // Helper renderers
+  function renderSigBadge(sig) {
+    if (sig === 'BUY') return '<span class="sig-badge sig-buy">BUY</span>';
+    if (sig === 'WATCH') return '<span class="sig-badge sig-watch">WATCH</span>';
+    return '<span class="sig-badge sig-wait">WAIT</span>';
+  }
+
+  function renderProbBar(p, thr) {
+    const pct = Math.round((p || 0) * 100);
+    const color = p >= thr ? '#22c55e' : (p >= thr - 0.08 ? '#f59e0b' : '#64748b');
+    return `<div class="prob-container">
+      <span style="font-weight:700;color:${color};font-size:.7rem">${pct}%</span>
+      <span class="prob-bar-wrap"><span class="prob-bar-fill" style="width:${pct}%;background:${color};display:block"></span></span>
+    </div>`;
+  }
+
+  // 1. Dual Matrix View
+  const mbody = document.getElementById('oc-matrix-body');
+  if (mbody && d.chain) {
+    const thr = d.threshold || 0.45;
+    mbody.innerHTML = d.chain.map(row => {
+      const c = row.call;
+      const p = row.put;
+      const isAtm = row.is_atm;
+      const rowCls = isAtm ? 'oc-atm-row' : '';
+
+      // Call side
+      let callHtml = `<td colspan="7" style="color:#475569;border-right:1px solid #334155">—</td>`;
+      if (c) {
+        const cItmCls = c.moneyness_tag === 'ITM' ? 'oc-call-itm' : '';
+        const cBtnCls = c.signal === 'BUY' ? 'buy-active' : '';
+        callHtml = `
+          <td class="${cItmCls}"><button class="btn-trade-now ${cBtnCls}" onclick="quickTrade('${c.token}','${c.symbol}',${c.p_win},${c.ltp})">⚡ Trade</button></td>
+          <td class="${cItmCls}">${renderProbBar(c.p_win, thr)}</td>
+          <td class="${cItmCls}">${renderSigBadge(c.signal)}</td>
+          <td class="${cItmCls}" style="color:#a78bfa">${c.delta}</td>
+          <td class="${cItmCls}" style="color:#f87171">₹${c.theta}</td>
+          <td class="${cItmCls}" style="color:#94a3b8">${c.iv_pct}%</td>
+          <td class="${cItmCls}" style="font-weight:800;color:#e2e8f0;border-right:1px solid #334155">₹${c.ltp.toFixed(2)}</td>
+        `;
+      }
+
+      // Strike center
+      const strikeHtml = `<td class="oc-strike-col ${rowCls}">
+        ${row.strike} ${isAtm ? '<span class="oc-atm-badge">ATM</span>' : ''}
+      </td>`;
+
+      // Put side
+      let putHtml = `<td colspan="7" style="color:#475569;border-left:1px solid #334155">—</td>`;
+      if (p) {
+        const pItmCls = p.moneyness_tag === 'ITM' ? 'oc-put-itm' : '';
+        const pBtnCls = p.signal === 'BUY' ? 'buy-active' : '';
+        putHtml = `
+          <td class="${pItmCls}" style="font-weight:800;color:#e2e8f0;border-left:1px solid #334155">₹${p.ltp.toFixed(2)}</td>
+          <td class="${pItmCls}" style="color:#94a3b8">${p.iv_pct}%</td>
+          <td class="${pItmCls}" style="color:#f87171">₹${p.theta}</td>
+          <td class="${pItmCls}" style="color:#a78bfa">${p.delta}</td>
+          <td class="${pItmCls}">${renderSigBadge(p.signal)}</td>
+          <td class="${pItmCls}">${renderProbBar(p.p_win, thr)}</td>
+          <td class="${pItmCls}"><button class="btn-trade-now ${pBtnCls}" onclick="quickTrade('${p.token}','${p.symbol}',${p.p_win},${p.ltp})">⚡ Trade</button></td>
+        `;
+      }
+
+      return `<tr class="${rowCls}">${callHtml}${strikeHtml}${putHtml}</tr>`;
+    }).join('');
+  }
+
+  // 2. Scanner List View
+  const lbody = document.getElementById('oc-list-body');
+  if (lbody && d.contracts) {
+    const thr = d.threshold || 0.45;
+    const sorted = [...d.contracts].sort((a,b) => (b.p_win||0) - (a.p_win||0));
+    lbody.innerHTML = sorted.map(c => {
+      const isCE = c.opt_type === 'CE';
+      const typeBadge = isCE
+        ? '<span style="background:#065f46;color:#34d399;padding:1px 6px;border-radius:4px;font-weight:800;font-size:.65rem">CE</span>'
+        : '<span style="background:#7f1d1d;color:#fca5a5;padding:1px 6px;border-radius:4px;font-weight:800;font-size:.65rem">PE</span>';
+      const mClass = c.moneyness_tag === 'ITM' ? 'tag-itm' : (c.moneyness_tag === 'ATM' ? 'tag-atm' : 'tag-otm');
+      const btnCls = c.signal === 'BUY' ? 'buy-active' : '';
+
+      return `<tr>
+        <td style="font-weight:700;color:#f8fafc">${c.symbol}</td>
+        <td>${typeBadge}</td>
+        <td style="font-weight:700;color:#38bdf8">${c.strike}</td>
+        <td><span class="${mClass}">${c.moneyness_tag} (${c.moneyness_pct>0?'+':''}${c.moneyness_pct}%)</span></td>
+        <td style="font-weight:800;color:#e2e8f0">₹${c.ltp.toFixed(2)}</td>
+        <td style="color:#94a3b8">${c.iv_pct}%</td>
+        <td style="color:#a78bfa">${c.delta}</td>
+        <td style="color:#f87171">₹${c.theta}</td>
+        <td style="color:#64748b">${c.gamma}</td>
+        <td style="text-align:center">${renderProbBar(c.p_win, thr)}</td>
+        <td style="text-align:center">${renderSigBadge(c.signal)}</td>
+        <td style="font-size:.7rem;color:#94a3b8">Tgt: <b style="color:#22c55e">₹${c.target_price}</b> | SL: <b style="color:#f87171">₹${c.sl_price}</b></td>
+        <td style="text-align:center"><button class="btn-trade-now ${btnCls}" onclick="quickTrade('${c.token}','${c.symbol}',${c.p_win},${c.ltp})">⚡ Trade</button></td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+async function quickTrade(token, symbol, conf, ltp) {
+  if (!confirm(`Execute paper trade on ${symbol}?\nAI Win Confidence: ${(conf*100).toFixed(1)}%`)) return;
+  try {
+    const res = await fetch('/api/paper/signal', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        token: token,
+        direction: 'BUY',
+        confidence: conf,
+        strategy: currentStrategy,
+        entry_ltp: ltp
+      })
+    });
+    const d = await res.json();
+    if (d.status === 'signal_injected') {
+      alert(`Trade opened for ${symbol}! Monitor active position above.`);
+      pollStatus();
+    } else {
+      alert('Trade response: ' + (d.error || JSON.stringify(d)));
+    }
+  } catch(e) {
+    alert('Error injecting trade: ' + e.message);
+  }
+}
+
+function tradeTopSignal() {
+  if (selectedTopToken) {
+    const sym = document.getElementById('top-sig-symbol').textContent || 'Top Signal';
+    quickTrade(selectedTopToken, sym, selectedTopConf, selectedTopLtp);
+  }
+}
+
+// Start polling on load (to show existing status)
+document.addEventListener('DOMContentLoaded', () => {
+  loadStrategies();
+  startPolling();
+  // Check initial creds state
+  pollStatus();
+  loadOptionChain();
+});
+</script>
+
+{% endblock %}

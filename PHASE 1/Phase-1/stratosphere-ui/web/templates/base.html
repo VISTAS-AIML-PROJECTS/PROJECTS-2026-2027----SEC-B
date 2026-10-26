@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stratosphere Explorer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-brand">Stratosphere</a>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/schema">Schema</a>
+            <a href="/indicators">Indicators</a>
+            <a href="/analyzer">Analyzer</a>
+            <a href="/convergence">Convergence</a>
+             <a href="/ai">⚡ AI Scorer</a>
+             <a href="/results">📈 Results</a>
+             <a href="/intraday" style="color:#00e5ff">⚡ Intraday</a>
+             <a href="/ai-tower" style="color:#a78bfa">🧠 AI Tower</a>
+             <a href="/paper-trade" style="color:#22c55e;font-weight:700">📋 Paper Trade</a>
+            <a href="/builder">Builder</a>
+            <a href="/validate">Validator</a>
+            <a href="/kite/auth" id="nav-kite" style="color:#ffd740">🔑 Kite</a>
+            <a href="/trading" style="color:#69f0ae">🚀 Trading</a>
+        </div>
+    </nav>
+
+    <div style="background:#b45309;color:#fff;text-align:center;font-size:12px;font-weight:600;padding:5px 10px;letter-spacing:.2px">DEMO MODE: UI showcase with sample data. The core engine (AI models, backtester, indicator logic, broker integration) is not included in this repository.</div>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="/static/js/main.js?v=2"></script>
+</body>
+</html>

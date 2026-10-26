@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Strategy Validator</h1>
+    <p>Paste a JSON strategy configuration to validate it against the schema and run semantic checks.</p>
+</div>
+
+<div class="validator-layout">
+    <div class="code-editor-container">
+        <textarea id="validate-input" class="code-editor" spellcheck="false">{{ example_json }}</textarea>
+        <button id="validate-btn" class="btn">Validate Configuration</button>
+    </div>
+    
+    <div class="results-panel glass-panel" id="results-panel">
+        <div class="result-item" style="color: var(--text-muted); text-align: center; padding: 3rem 1rem;">
+            Click validate to see results.
+        </div>
+    </div>
+</div>
+{% endblock %}

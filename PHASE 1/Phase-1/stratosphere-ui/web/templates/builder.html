@@ -1,0 +1,488 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<script src="/static/js/builder.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Strategy Builder</h1>
+  <p class="subtitle">Configure every aspect of your trading strategy visually. No JSON required.</p>
+</div>
+
+<div class="builder-layout">
+  <!-- Left Column -->
+  <div class="builder-form">
+    
+    <!-- Section 1: Strategy Basics -->
+    <div class="builder-section" id="section-basics">
+      <div class="section-header" onclick="toggleSection('basics')">
+        <span class="section-number">①</span>
+        <h3>Strategy Basics</h3>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-body" id="body-basics">
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" id="field-name" placeholder="My RSI Reversal Strategy" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="field-description" maxlength="2000" placeholder="Optional description..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tags</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" class="chip-input form-input" id="field-tags-input" placeholder="Add tag">
+            <button class="btn btn-secondary" id="btn-add-tag">Add</button>
+          </div>
+          <div id="tags-container" style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Primary Timeframe</label>
+          <select class="form-select" id="field-timeframe">
+            <option value="M1">M1</option>
+            <option value="M3">M3</option>
+            <option value="M5">M5</option>
+            <option value="M10">M10</option>
+            <option value="M15">M15</option>
+            <option value="M30">M30</option>
+            <option value="M75">M75</option>
+            <option value="H1">H1</option>
+            <option value="H4">H4</option>
+            <option value="DAILY">DAILY</option>
+            <option value="WEEKLY">WEEKLY</option>
+            <option value="MONTHLY">MONTHLY</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Direction</label>
+          <div class="radio-cards" id="field-direction">
+            <div class="radio-card active" data-value="LONG">LONG (📈)</div>
+            <div class="radio-card" data-value="SHORT">SHORT (📉)</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Order Type</label>
+          <select class="form-select" id="field-order-type">
+            <option value="MARKET" selected>MARKET</option>
+            <option value="LIMIT">LIMIT</option>
+            <option value="STOP_LIMIT">STOP_LIMIT</option>
+          </select>
+        </div>
+        <div class="form-group" id="container-limit-offset" style="display: none;">
+          <label class="form-label">Limit Offset (%)</label>
+          <input type="number" class="form-input" id="field-limit-offset" step="0.01">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Universe Filters -->
+    <div class="builder-section" id="section-universe">
+      <div class="section-header" onclick="toggleSection('universe')">
+        <span class="section-number">②</span>
+        <h3>Universe Filters</h3>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-body" id="body-universe" style="display: none;">
+        <div class="form-group">
+          <label class="form-label">Minimum Confidence Score</label>
+          <input type="number" class="form-input" id="field-min-confidence" value="0" min="-100" max="100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Watchlist</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" class="chip-input form-input" id="field-watchlist-input" placeholder="Symbol">
+            <button class="btn btn-secondary" id="btn-add-watchlist">Add</button>
+          </div>
+          <div id="watchlist-container" style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sector Filter</label>
+          <div id="field-sector-filter" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <label><input type="checkbox" value="NIFTY BANK"> NIFTY BANK</label>
+            <label><input type="checkbox" value="NIFTY IT"> NIFTY IT</label>
+            <label><input type="checkbox" value="NIFTY PHARMA"> NIFTY PHARMA</label>
+            <label><input type="checkbox" value="NIFTY AUTO"> NIFTY AUTO</label>
+            <label><input type="checkbox" value="NIFTY FMCG"> NIFTY FMCG</label>
+            <label><input type="checkbox" value="NIFTY METAL"> NIFTY METAL</label>
+            <label><input type="checkbox" value="NIFTY REALTY"> NIFTY REALTY</label>
+            <label><input type="checkbox" value="NIFTY ENERGY"> NIFTY ENERGY</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Market Cap Filter</label>
+          <div id="field-market-cap-filter" style="display: flex; gap: 15px;">
+            <label><input type="checkbox" value="LargeCap"> LargeCap</label>
+            <label><input type="checkbox" value="MidCap"> MidCap</label>
+            <label><input type="checkbox" value="SmallCap"> SmallCap</label>
+            <label><input type="checkbox" value="MicroCap"> MicroCap</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Minimum Average Volume</label>
+          <input type="number" class="form-input" id="field-min-avg-volume" placeholder="500000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Minimum Average Turnover</label>
+          <input type="number" class="form-input" id="field-min-avg-turnover" placeholder="10000000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Volume Lookback (Days)</label>
+          <input type="number" class="form-input" id="field-volume-lookback" value="20" min="5" max="252">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Entry Conditions -->
+    <div class="builder-section" id="section-conditions">
+      <div class="section-header" onclick="toggleSection('conditions')">
+        <span class="section-number">③</span>
+        <h3>Entry Conditions</h3>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-body" id="body-conditions">
+        <div id="condition-tree"></div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button id="btn-add-condition" class="btn btn-secondary">Add Condition</button>
+          <button id="btn-add-group" class="btn btn-secondary">Add Group (AND/OR)</button>
+        </div>
+        
+        <div class="condition-row-template" id="condition-template" style="display:none">
+          <div class="condition-row glass-panel" style="margin-top: 10px; padding: 10px;">
+            <div class="condition-fields" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <select class="cond-indicator form-select" title="Indicator">
+                <option value="">Select indicator...</option>
+              </select>
+              <div class="cond-params"></div>
+              <select class="cond-output form-select" title="Output">
+                <option value="value">value</option>
+              </select>
+              <select class="cond-comparison form-select" title="Comparison">
+                <option value="GT">&gt;</option>
+                <option value="GTE">≥</option>
+                <option value="LT">&lt;</option>
+                <option value="LTE">≤</option>
+                <option value="CROSSES_ABOVE">Crosses Above</option>
+                <option value="CROSSES_BELOW">Crosses Below</option>
+                <option value="BETWEEN">Between</option>
+                <option value="EQUALS">Equals</option>
+              </select>
+              <div class="cond-threshold" style="display: flex; gap: 5px;">
+                <select class="cond-threshold-type form-select">
+                  <option value="static">Value</option>
+                  <option value="indicator_ref">Indicator</option>
+                  <option value="range">Range</option>
+                </select>
+                <input type="number" class="cond-threshold-value form-input" placeholder="30">
+              </div>
+              <select class="cond-timeframe form-select" title="Timeframe override">
+                <option value="">Primary TF</option>
+              </select>
+            </div>
+            <button class="btn-icon btn-remove-condition" title="Remove" style="margin-top: 10px;">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Exit & Stop-Loss -->
+    <div class="builder-section" id="section-exit">
+      <div class="section-header" onclick="toggleSection('exit')">
+        <span class="section-number">④</span>
+        <h3>Exit & Stop-Loss</h3>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-body" id="body-exit">
+        <div class="form-group">
+          <label class="form-label">Stop-Loss Type</label>
+          <div class="radio-cards" id="field-sl-type" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div class="radio-card active" data-value="fixed_pct">Fixed %</div>
+            <div class="radio-card" data-value="atr_based">ATR</div>
+            <div class="radio-card" data-value="swing_low">Swing Low</div>
+            <div class="radio-card" data-value="parabolic_sar">SAR</div>
+            <div class="radio-card" data-value="time_based">Time</div>
+          </div>
+        </div>
+        
+        <div class="sl-params active" id="sl-params-fixed_pct">
+          <div class="form-group">
+            <label class="form-label">Percentage</label>
+            <input type="number" class="form-input" id="field-sl-fixed-pct" min="0.1" max="50" step="0.1">
+          </div>
+        </div>
+        <div class="sl-params" id="sl-params-atr_based" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Multiplier (k)</label>
+            <input type="number" class="form-input" id="field-sl-atr-k" min="0.1" max="10" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ATR Period</label>
+            <input type="number" class="form-input" id="field-sl-atr-period" min="2" max="200" value="14">
+          </div>
+          <div class="form-group">
+            <label class="form-label"><input type="checkbox" id="field-sl-atr-trailing"> Trailing</label>
+          </div>
+        </div>
+        <div class="sl-params" id="sl-params-swing_low" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Lookback Bars</label>
+            <input type="number" class="form-input" id="field-sl-swing-lookback" min="5" max="200">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Buffer %</label>
+            <input type="number" class="form-input" id="field-sl-swing-buffer" min="0" max="10" value="0.5" step="0.1">
+          </div>
+        </div>
+        <div class="sl-params" id="sl-params-parabolic_sar" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">AF Start</label>
+            <input type="number" class="form-input" id="field-sl-sar-start" value="0.02" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">AF Step</label>
+            <input type="number" class="form-input" id="field-sl-sar-step" value="0.02" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">AF Max</label>
+            <input type="number" class="form-input" id="field-sl-sar-max" value="0.2" step="0.01">
+          </div>
+        </div>
+        <div class="sl-params" id="sl-params-time_based" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Max Bars</label>
+            <input type="number" class="form-input" id="field-sl-time-bars" min="1" max="1000">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+          <label class="form-label">
+            Take Profit 
+            <input type="checkbox" class="toggle-switch" id="toggle-take-profit">
+          </label>
+          <div id="container-take-profit" style="display: none; margin-top: 10px;">
+            <div class="form-group">
+              <label class="form-label">Target %</label>
+              <input type="number" class="form-input" id="field-tp-pct" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Partial Exit %</label>
+              <input type="number" class="form-input" id="field-tp-partial" value="100" min="1" max="100">
+            </div>
+            <div class="form-group">
+              <label class="form-label"><input type="checkbox" id="field-tp-trailing"> Trailing After TP</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Time Exit
+            <input type="checkbox" class="toggle-switch" id="toggle-time-exit">
+          </label>
+          <div id="container-time-exit" style="display: none; margin-top: 10px;">
+            <div class="form-group">
+              <label class="form-label">Max Bars</label>
+              <input type="number" class="form-input" id="field-time-exit-bars" min="1">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Position Sizing -->
+    <div class="builder-section" id="section-sizing">
+      <div class="section-header" onclick="toggleSection('sizing')">
+        <span class="section-number">⑤</span>
+        <h3>Position Sizing</h3>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-body" id="body-sizing">
+        <div class="form-group">
+          <label class="form-label">Sizing Method</label>
+          <div class="radio-cards" id="field-sizing-type" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div class="radio-card active" data-value="fixed_qty">Fixed Qty</div>
+            <div class="radio-card" data-value="fixed_value">Fixed ₹</div>
+            <div class="radio-card" data-value="risk_pct">Risk %</div>
+            <div class="radio-card" data-value="volatility_adjusted">Vol-Adjusted</div>
+            <div class="radio-card" data-value="kelly">Kelly</div>
+          </div>
+        </div>
+        
+        <div class="sizing-params active" id="sizing-params-fixed_qty">
+          <div class="form-group">
+            <label class="form-label">Quantity</label>
+            <input type="number" class="form-input" id="field-sizing-qty" min="1">
+          </div>
+        </div>
+        <div class="sizing-params" id="sizing-params-fixed_value" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Value (₹)</label>
+            <input type="number" class="form-input" id="field-sizing-value" min="1">
+          </div>
+        </div>
+        <div class="sizing-params" id="sizing-params-risk_pct" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Risk %</label>
+            <input type="number" class="form-input" id="field-sizing-risk" min="0.1" max="10" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Max Position %</label>
+            <input type="number" class="form-input" id="field-sizing-max-pos" value="25">
+          </div>
+        </div>
+        <div class="sizing-params" id="sizing-params-volatility_adjusted" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Risk %</label>
+            <input type="number" class="form-input" id="field-sizing-vol-risk" min="0.1" max="10" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ATR Period</label>
+            <input type="number" class="form-input" id="field-sizing-vol-atr" value="14">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Multiplier (k)</label>
+            <input type="number" class="form-input" id="field-sizing-vol-k" value="2.0" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Max Position %</label>
+            <input type="number" class="form-input" id="field-sizing-vol-max-pos" value="25">
+          </div>
+        </div>
+        <div class="sizing-params" id="sizing-params-kelly" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Win Rate</label>
+            <input type="number" class="form-input" id="field-sizing-kelly-win" min="0.01" max="0.99" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Avg Win</label>
+            <input type="number" class="form-input" id="field-sizing-kelly-avg-win">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Avg Loss</label>
+            <input type="number" class="form-input" id="field-sizing-kelly-avg-loss">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fraction</label>
+            <input type="number" class="form-input" id="field-sizing-kelly-fraction" value="0.5" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Max Position %</label>
+            <input type="number" class="form-input" id="field-sizing-kelly-max-pos" value="25">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Backtest Defaults -->
+    <div class="builder-section" id="section-backtest">
+      <div class="section-header" onclick="toggleSection('backtest')">
+        <span class="section-number">⑥</span>
+        <h3>Backtest Defaults</h3>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-body" id="body-backtest" style="display: none;">
+        <div class="form-group">
+          <label class="form-label">Initial Capital (₹)</label>
+          <input type="number" class="form-input" id="field-bt-capital" value="1000000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Open Positions</label>
+          <input type="number" class="form-input" id="field-bt-max-pos" value="10" min="1" max="100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Slippage %</label>
+          <input type="number" class="form-input" id="field-bt-slippage" value="0.05" step="0.01">
+        </div>
+        
+        <div class="form-group" style="margin-top: 20px;">
+          <label class="form-label">
+            Advanced Costs
+            <input type="checkbox" class="toggle-switch" id="toggle-advanced-costs">
+          </label>
+          <div id="container-advanced-costs" style="display: none; margin-top: 10px;">
+            <div class="form-group">
+              <label class="form-label">Commission %</label>
+              <input type="number" class="form-input" id="field-bt-commission" value="0.03" step="0.001">
+            </div>
+            <div class="form-group">
+              <label class="form-label">STT %</label>
+              <input type="number" class="form-input" id="field-bt-stt" value="0.025" step="0.001">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Exchange Txn %</label>
+              <input type="number" class="form-input" id="field-bt-exchange" value="0.00345" step="0.00001">
+            </div>
+            <div class="form-group">
+              <label class="form-label">GST %</label>
+              <input type="number" class="form-input" id="field-bt-gst" value="18.0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">SEBI Turnover %</label>
+              <input type="number" class="form-input" id="field-bt-sebi" value="0.0001" step="0.0001">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stamp Duty %</label>
+              <input type="number" class="form-input" id="field-bt-stamp" value="0.015" step="0.001">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Walk-Forward
+            <input type="checkbox" class="toggle-switch" id="toggle-walk-forward">
+          </label>
+          <div id="container-walk-forward" style="display: none; margin-top: 10px;">
+            <div class="form-group">
+              <label class="form-label">Train Bars</label>
+              <input type="number" class="form-input" id="field-wf-train" value="252">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Test Bars</label>
+              <input type="number" class="form-input" id="field-wf-test" value="63">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Step Bars</label>
+              <input type="number" class="form-input" id="field-wf-step" value="63">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 7: Review & Export -->
+    <div class="builder-section" id="section-review">
+      <div class="section-header" onclick="toggleSection('review')">
+        <span class="section-number">⑦</span>
+        <h3>Review & Export</h3>
+        <span class="section-toggle">▼</span>
+      </div>
+      <div class="section-body" id="body-review">
+        <div id="builder-results" style="margin-bottom: 20px;">
+          <!-- Status indicator -->
+          <p>Status: <span id="status-indicator">⊘ Not validated</span></p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button id="btn-validate" class="btn">Validate</button>
+          <button id="btn-download" class="btn btn-secondary">Download JSON</button>
+          <button id="btn-copy" class="btn btn-secondary">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div>
+    <div class="glass-panel json-preview-panel">
+      <h3>📝 Generated JSON</h3>
+      <pre><code id="json-preview" class="json-preview">{}</code></pre>
+      <div class="preview-actions">
+        <button id="btn-validate-preview" class="btn" onclick="document.getElementById('btn-validate').click()">Validate</button>
+        <button id="btn-download-preview" class="btn btn-secondary" onclick="document.getElementById('btn-download').click()">Download</button>
+        <button id="btn-copy-preview" class="btn btn-secondary" onclick="document.getElementById('btn-copy').click()">Copy</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

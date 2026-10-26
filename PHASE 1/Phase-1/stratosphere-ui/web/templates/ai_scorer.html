@@ -1,0 +1,661 @@
+{% extends "base.html" %}
+{% block title %}AI Signal Scorer — Stratosphere{% endblock %}
+
+{% block content %}
+<style>
+/* ── Core layout ─────────────────────────────────────── */
+.ai-wrap { max-width:900px; margin:0 auto; padding:0 1rem 3rem; }
+.ai-header { text-align:center; padding:2rem 0 1.2rem; }
+.ai-header h1 { font-size:2.3rem; font-weight:900; letter-spacing:-.5px;
+  background:linear-gradient(135deg,#00e5ff,#7c4dff,#ff4081);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.ai-header p { color:#778899; margin-top:.4rem; font-size:.92rem; }
+
+/* ── Cards ───────────────────────────────────────────── */
+.card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:16px; padding:1.6rem 1.8rem; margin-bottom:1.2rem;
+  backdrop-filter:blur(12px); }
+.card h3 { margin:0 0 1rem; font-size:1.05rem; color:#c8d0e8; font-weight:700; }
+
+/* ── Train controls ──────────────────────────────────── */
+.train-row { display:flex; gap:.7rem; flex-wrap:wrap; align-items:flex-end; }
+.train-row select, .train-row input {
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+  color:#fff; border-radius:10px; padding:.5rem .85rem; font-size:.88rem;
+  flex:1; min-width:130px; }
+.btn { border:none; border-radius:10px; padding:.55rem 1.4rem;
+  font-size:.92rem; font-weight:700; cursor:pointer; transition:opacity .2s; color:#fff; white-space:nowrap; }
+.btn:disabled { opacity:.35; cursor:not-allowed; }
+.btn-train { background:linear-gradient(135deg,#7c4dff,#00e5ff); }
+.btn-score { background:linear-gradient(135deg,#ff4081,#7c4dff); }
+.btn-scan  { background:linear-gradient(135deg,#00e5ff,#7c4dff); }
+#train-log { margin-top:.8rem; font-size:.82rem; color:#99b; min-height:1.1rem; font-family:monospace; }
+
+/* ── Lookup ──────────────────────────────────────────── */
+.lookup-row { display:flex; gap:.7rem; }
+.lookup-row input { flex:1; background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.13); color:#fff;
+  border-radius:10px; padding:.58rem 1rem; font-size:.98rem; }
+.lookup-row input::placeholder { color:#445; }
+
+/* ── Score gauge ─────────────────────────────────────── */
+#score-result { display:none; }
+.gauge-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.8rem; margin-bottom:1.2rem; }
+.gauge-symbol { font-size:2rem; font-weight:900; color:#fff; }
+.dir-badge { font-size:.85rem; font-weight:800; padding:.32rem .85rem;
+  border-radius:20px; letter-spacing:.4px; }
+.dir-STRONG-BUY  { background:#00c853; color:#000; }
+.dir-BUY         { background:#69f0ae; color:#000; }
+.dir-NEUTRAL     { background:#546e7a; color:#fff; }
+.dir-SELL        { background:#ff5252; color:#fff; }
+.dir-STRONG-SELL { background:#b71c1c; color:#fff; }
+
+/* Gradient bar */
+.bar-wrap { position:relative; margin:.6rem 0 .3rem; }
+.bar-track { height:20px; border-radius:10px;
+  background:linear-gradient(90deg,#b71c1c 0%,#ff5252 25%,#546e7a 50%,#69f0ae 75%,#00c853 100%); }
+.bar-needle { position:absolute; top:-5px; width:4px; height:30px;
+  background:#fff; border-radius:2px; transform:translateX(-50%);
+  box-shadow:0 0 10px rgba(255,255,255,.9);
+  transition:left .7s cubic-bezier(.34,1.56,.64,1); }
+.bar-labels { display:flex; justify-content:space-between;
+  font-size:.7rem; color:#556; margin-top:.3rem; }
+.score-big { text-align:center; font-size:3.4rem; font-weight:900; margin:.4rem 0; }
+
+/* Confidence ring */
+.conf-row { display:flex; gap:1.5rem; flex-wrap:wrap; align-items:center; margin:.8rem 0; }
+.conf-ring { position:relative; width:72px; height:72px; flex-shrink:0; }
+.conf-ring svg { transform:rotate(-90deg); }
+.conf-ring .ring-bg  { fill:none; stroke:rgba(255,255,255,.08); stroke-width:7; }
+.conf-ring .ring-val { fill:none; stroke-width:7; stroke-linecap:round;
+  transition:stroke-dasharray .8s ease; }
+.conf-label { position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; font-size:.72rem; }
+.conf-label b { font-size:1rem; font-weight:900; }
+.conf-meta { flex:1; font-size:.83rem; color:#99aacc; line-height:1.8; }
+.conf-meta b { color:#ccd; }
+
+/* WFV panel */
+.wfv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:.7rem; margin-top:.8rem; }
+.wfv-stat { background:rgba(255,255,255,.05); border-radius:10px; padding:.7rem 1rem; }
+.wfv-stat .wval { font-size:1.5rem; font-weight:800; }
+.wfv-stat .wlbl { font-size:.72rem; color:#778899; margin-top:.15rem; }
+
+/* Fold table */
+.fold-table { width:100%; border-collapse:collapse; font-size:.82rem; margin-top:.8rem; }
+.fold-table th { color:#778899; font-weight:600; padding:.4rem .6rem; border-bottom:1px solid rgba(255,255,255,.07); text-align:right; }
+.fold-table th:first-child { text-align:left; }
+.fold-table td { padding:.38rem .6rem; border-bottom:1px solid rgba(255,255,255,.04); text-align:right; color:#c8d0e8; }
+.fold-table td:first-child { text-align:left; color:#aab; }
+.fold-good { color:#69f0ae !important; }
+.fold-ok   { color:#ffd740 !important; }
+.fold-bad  { color:#ff5252 !important; }
+
+/* Model weights */
+.weight-row { display:flex; align-items:center; gap:.8rem; margin:.35rem 0; font-size:.84rem; }
+.w-name { width:55px; color:#88aacc; font-family:monospace; }
+.w-track { flex:1; height:10px; background:rgba(255,255,255,.07); border-radius:5px; }
+.w-fill  { height:100%; border-radius:5px; background:linear-gradient(90deg,#7c4dff,#00e5ff); }
+.w-pct   { width:42px; text-align:right; color:#ccd; }
+
+/* Feature importance */
+.fi-row { display:flex; align-items:center; gap:.7rem; margin:.28rem 0; font-size:.79rem; }
+.fi-name  { width:160px; color:#88aacc; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fi-track { flex:1; height:9px; background:rgba(255,255,255,.06); border-radius:5px; }
+.fi-fill  { height:100%; border-radius:5px; background:linear-gradient(90deg,#ff4081,#7c4dff); }
+.fi-pct   { width:38px; text-align:right; color:#aac; }
+
+/* Scan grid */
+.scan-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:.85rem; margin-top:1rem; }
+.scan-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
+  border-radius:13px; padding:1.1rem 1.2rem; cursor:pointer;
+  transition:transform .18s, box-shadow .18s; }
+.scan-card:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,0,0,.45); }
+.sc-sym  { font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:.4rem; }
+.sc-score{ font-size:2rem; font-weight:900; margin:.1rem 0; }
+.sc-mini { height:7px; border-radius:4px; margin:.35rem 0;
+  background:linear-gradient(90deg,#b71c1c,#ff5252,#546e7a,#69f0ae,#00c853); position:relative; }
+.sc-needle { position:absolute; top:-2px; width:3px; height:11px;
+  background:#fff; border-radius:2px; transform:translateX(-50%); }
+.sc-dir  { font-size:.72rem; font-weight:700; letter-spacing:.3px; }
+.sc-conf { font-size:.7rem; color:#778899; }
+
+/* Misc */
+.err { color:#ff5252; background:rgba(255,82,82,.1); border-radius:8px;
+  padding:.5rem .9rem; font-size:.83rem; margin:.5rem 0; }
+.spinner { display:inline-block; width:16px; height:16px;
+  border:3px solid rgba(255,255,255,.15); border-top-color:#7c4dff;
+  border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.feat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:.45rem; margin-top:.6rem; }
+.feat-item { background:rgba(255,255,255,.04); border-radius:7px; padding:.38rem .7rem;
+  display:flex; justify-content:space-between; font-size:.78rem; }
+.fn { color:#778899; } .fv { color:#e0e0ff; font-weight:600; }
+</style>
+
+<div class="ai-wrap">
+<div class="ai-header">
+  <h1>⚡ AI Signal Scorer v2</h1>
+  <p>4-model ensemble · 22 features · Walk-Forward Validated · −100 → +100</p>
+</div>
+
+<!-- ── Train ───────────────────────────────────────────────────────── -->
+<div class="card">
+  <h3>🧠 Train Ensemble Model</h3>
+  <div class="train-row">
+    <select id="t-period">
+      <option value="1y">1 Year</option>
+      <option value="2y" selected>2 Years</option>
+      <option value="3y">3 Years</option>
+    </select>
+    <select id="t-fwd">
+      <option value="3">3-day forward</option>
+      <option value="5" selected>5-day forward</option>
+      <option value="10">10-day forward</option>
+    </select>
+    <select id="t-splits">
+      <option value="3">3 WFV folds</option>
+      <option value="5" selected>5 WFV folds</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:#aab;white-space:nowrap">
+      <input type="checkbox" id="t-vol"> Vol-adjusted labels
+    </label>
+    <button class="btn btn-train" id="btn-train" onclick="trainModel()">Train + Validate</button>
+  </div>
+  <div id="train-log"></div>
+</div>
+
+<!-- ── Single score ───────────────────────────────────────────────── -->
+<div class="card">
+  <h3>🎯 Score a Symbol</h3>
+  <div class="lookup-row">
+    <input type="text" id="sym-in" placeholder="e.g. RELIANCE, TATASTEEL, NIFTY…"
+           onkeydown="if(event.key==='Enter')scoreSymbol()">
+    <button class="btn btn-score" onclick="scoreSymbol()">Score ▶</button>
+  </div>
+</div>
+
+<!-- ── Score result ───────────────────────────────────────────────── -->
+<div id="score-result">
+  <!-- Gauge -->
+  <div class="card">
+    <div class="gauge-top">
+      <div class="gauge-symbol" id="r-sym">—</div>
+      <div class="dir-badge dir-NEUTRAL" id="r-dir">NEUTRAL</div>
+    </div>
+    <div class="bar-wrap">
+      <div class="bar-track"><div class="bar-needle" id="r-needle" style="left:50%"></div></div>
+      <div class="bar-labels"><span>−100 Strong Sell</span><span>0 Neutral</span><span>+100 Strong Buy</span></div>
+    </div>
+    <div class="score-big" id="r-score">0</div>
+
+    <!-- Confidence ring + WFV summary -->
+    <div class="conf-row">
+      <div class="conf-ring" id="conf-ring-wrap">
+        <svg viewBox="0 0 72 72" width="72" height="72">
+          <circle class="ring-bg"  cx="36" cy="36" r="28"/>
+          <circle class="ring-val" id="ring-arc" cx="36" cy="36" r="28"
+                  stroke="#7c4dff" stroke-dasharray="0 176"/>
+        </svg>
+        <div class="conf-label">
+          <b id="r-conf">0</b>
+          <span style="color:#667">conf</span>
+        </div>
+      </div>
+      <div class="conf-meta">
+        Predicted return: <b id="r-ret">—</b><br>
+        WFV Direction Accuracy: <b id="r-da">—</b> ± <b id="r-da-std">—</b><br>
+        WFV Paper Sharpe: <b id="r-sharpe">—</b>
+      </div>
+    </div>
+    <div id="r-err" class="err" style="display:none"></div>
+  </div>
+
+  <!-- WFV report panel (loaded from /api/ai/meta) -->
+  <div class="card" id="wfv-panel" style="display:none">
+    <h3>📊 Walk-Forward Validation Report</h3>
+    <div class="wfv-grid" id="wfv-stats"></div>
+    <h4 style="font-size:.85rem;color:#778899;margin:1.2rem 0 .3rem">Fold Breakdown</h4>
+    <table class="fold-table">
+      <thead><tr>
+        <th>Fold</th><th>Train bars</th><th>Test bars</th>
+        <th>Dir Acc</th><th>Sharpe</th><th>RMSE</th>
+      </tr></thead>
+      <tbody id="fold-tbody"></tbody>
+    </table>
+    <h4 style="font-size:.85rem;color:#778899;margin:1.2rem 0 .3rem">Model Weights (from WFV accuracy)</h4>
+    <div id="model-weights"></div>
+  </div>
+
+  <!-- Features + importances -->
+  <div class="card">
+    <h3>📐 Feature Values</h3>
+    <div class="feat-grid" id="feat-grid"></div>
+    <h3 style="margin-top:1.2rem">🔬 Feature Importances (ensemble-averaged)</h3>
+    <div id="fi-bars" style="margin-top:.6rem"></div>
+  </div>
+</div>
+
+<!-- ── Market scan ────────────────────────────────────────────────── -->
+<div class="card">
+  <h3>📡 Market Scan — Nifty 50</h3>
+  <button class="btn btn-scan" id="btn-scan" onclick="runScan()">Run AI Scan</button>
+  <div id="scan-err" class="err" style="display:none"></div>
+  <div class="scan-grid" id="scan-grid"></div>
+</div>
+</div><!-- /ai-wrap -->
+
+<script>
+const FEAT_LABELS = {
+  rsi_14:"RSI(14)", rsi_7:"RSI(7)", macd_hist:"MACD Hist",
+  roc_10:"ROC(10)", momentum_5d:"Mom 5d%", momentum_10d:"Mom 10d%",
+  momentum_20d:"Mom 20d%", bb_pct_b:"BB %B", bb_width:"BB Width",
+  atr_pct:"ATR %", volume_ratio_5d:"Vol/5d MA", volume_ratio_20d:"Vol/20d MA",
+  obv_trend:"OBV Trend", stoch_k:"Stoch %K", stoch_d:"Stoch %D",
+  cci_14:"CCI(14)", adx_14:"ADX(14)", ema_ratio_9_21:"EMA 9/21",
+  ema_ratio_21_50:"EMA 21/50", dist_52w_high:"52W High Dist",
+  dist_52w_low:"52W Low Dist", candle_body:"Candle Body", gap:"Gap %"
+};
+
+function scoreColor(v){
+  if(v>=60)return"#00c853"; if(v>=20)return"#69f0ae";
+  if(v>=-20)return"#90a4ae"; if(v>=-60)return"#ff5252"; return"#b71c1c";
+}
+function dirClass(v){
+  if(v>=60)return"STRONG-BUY"; if(v>=20)return"BUY";
+  if(v>=-20)return"NEUTRAL"; if(v>=-60)return"SELL"; return"STRONG-SELL";
+}
+function dirLabel(v){return dirClass(v).replace("-"," ");}
+function needlePct(s){return((s+100)/200*100).toFixed(1)+"%";}
+function fmtPct(v){return(v>=0?"+":"")+v.toFixed(2)+"%";}
+function fmtDa(v){return(v*100).toFixed(1)+"%";}
+
+// ── Train ──────────────────────────────────────────────────────────
+async function trainModel(){
+  const btn=document.getElementById("btn-train");
+  const log=document.getElementById("train-log");
+  btn.disabled=true;
+  log.innerHTML='<span class="spinner"></span> Downloading data + running walk-forward validation… (~2–4 min)';
+  const t0=Date.now();
+  try{
+    const r=await fetch("/api/ai/train",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        period:document.getElementById("t-period").value,
+        forward_days:parseInt(document.getElementById("t-fwd").value),
+        n_splits:parseInt(document.getElementById("t-splits").value),
+        vol_adjusted:document.getElementById("t-vol").checked,
+      })
+    });
+    const d=await r.json();
+    const elapsed=((Date.now()-t0)/1000).toFixed(0);
+    if(d.error){ log.innerHTML=`<span style="color:#ff5252">❌ ${d.error}</span>`; return; }
+    const m=d.metrics;
+    const daColor = m.direction_accuracy>=0.58?"#69f0ae":m.direction_accuracy>=0.54?"#ffd740":"#ff5252";
+    log.innerHTML=
+      `✅ Trained in ${elapsed}s · <b>${m.samples.toLocaleString()}</b> samples · `+
+      `<b>${m.symbols_trained}</b> symbols · `+
+      `Dir Acc: <b style="color:${daColor}">${(m.direction_accuracy*100).toFixed(1)}%</b> `+
+      `±${(m.direction_accuracy_std*100).toFixed(1)}% · `+
+      `Sharpe: <b>${m.paper_sharpe?.toFixed(2)||"—"}</b>`+
+      (m.symbols_failed?.length?` · <span style="color:#ffd740">Failed: ${m.symbols_failed.slice(0,4).join(", ")}${m.symbols_failed.length>4?"…":""}</span>`:"");
+  }catch(e){ log.innerHTML=`<span style="color:#ff5252">❌ ${e}</span>`; }
+  btn.disabled=false;
+}
+
+// ── Score ──────────────────────────────────────────────────────────
+async function scoreSymbol(){
+  const sym=document.getElementById("sym-in").value.trim().toUpperCase();
+  if(!sym)return;
+  const wrap=document.getElementById("score-result");
+  wrap.style.display="block";
+  document.getElementById("r-sym").textContent=sym+" …";
+  document.getElementById("r-score").textContent="…";
+  document.getElementById("r-err").style.display="none";
+  document.getElementById("wfv-panel").style.display="none";
+  document.getElementById("feat-grid").innerHTML="";
+  document.getElementById("fi-bars").innerHTML="";
+
+  try{
+    const [rs, rm]=await Promise.all([
+      fetch(`/api/ai/score/${sym}`).then(r=>r.json()),
+      fetch("/api/ai/meta").then(r=>r.json()),
+    ]);
+
+    if(rs.error&&!rs.score){
+      document.getElementById("r-err").textContent=rs.error;
+      document.getElementById("r-err").style.display="block";
+      document.getElementById("r-sym").textContent=sym;
+      return;
+    }
+    renderGauge(rs);
+    if(!rm.error) renderWFV(rm);
+    if(rs.features&&Object.keys(rs.features).length) renderFeatures(rs);
+  }catch(e){
+    document.getElementById("r-err").textContent=e.toString();
+    document.getElementById("r-err").style.display="block";
+  }
+}
+
+function renderGauge(d){
+  const score=d.score||0;
+  const col=scoreColor(score);
+  const dc=dirClass(score);
+
+  document.getElementById("r-sym").textContent=d.symbol;
+  const db=document.getElementById("r-dir");
+  db.textContent=d.direction||dirLabel(score);
+  db.className="dir-badge dir-"+dc;
+
+  document.getElementById("r-needle").style.left=needlePct(score);
+  const sv=document.getElementById("r-score");
+  sv.textContent=(score>=0?"+":"")+score;
+  sv.style.color=col;
+
+  document.getElementById("r-ret").textContent=
+    d.predicted_return_pct!=null?fmtPct(d.predicted_return_pct):"—";
+
+  // Confidence ring
+  const conf=Math.round(d.confidence||0);
+  document.getElementById("r-conf").textContent=conf;
+  const circ=2*Math.PI*28; // r=28
+  const arc=document.getElementById("ring-arc");
+  arc.style.strokeDasharray=`${(conf/100*circ).toFixed(1)} ${circ}`;
+  const cCol=conf>=60?"#69f0ae":conf>=35?"#ffd740":"#ff5252";
+  arc.style.stroke=cCol;
+
+  document.getElementById("r-da").textContent=
+    d.wfv_da_mean!=null?fmtDa(d.wfv_da_mean):"—";
+  document.getElementById("r-da-std").textContent=
+    d.wfv_da_std!=null?fmtDa(d.wfv_da_std):"—";
+  document.getElementById("r-sharpe").textContent=
+    d.wfv_sharpe!=null?d.wfv_sharpe.toFixed(2):"—";
+}
+
+function renderWFV(m){
+  const panel=document.getElementById("wfv-panel");
+  panel.style.display="block";
+  const da=m.direction_accuracy_mean;
+  const daCol=da>=0.58?"#69f0ae":da>=0.54?"#ffd740":"#ff5252";
+
+  document.getElementById("wfv-stats").innerHTML=`
+    <div class="wfv-stat">
+      <div class="wval" style="color:${daCol}">${(da*100).toFixed(1)}%</div>
+      <div class="wlbl">Direction Accuracy</div>
+    </div>
+    <div class="wfv-stat">
+      <div class="wval">${(m.direction_accuracy_std*100).toFixed(1)}%</div>
+      <div class="wlbl">DA Std (consistency)</div>
+    </div>
+    <div class="wfv-stat">
+      <div class="wval">${m.paper_sharpe_mean?.toFixed(2)||"—"}</div>
+      <div class="wlbl">Paper Sharpe</div>
+    </div>
+    <div class="wfv-stat">
+      <div class="wval">${m.rmse_mean?.toFixed(3)||"—"}</div>
+      <div class="wlbl">RMSE</div>
+    </div>
+    <div class="wfv-stat">
+      <div class="wval">${m.n_samples?.toLocaleString()||"—"}</div>
+      <div class="wlbl">Training samples</div>
+    </div>
+    <div class="wfv-stat">
+      <div class="wval">${m.n_folds||"—"}</div>
+      <div class="wlbl">WFV folds</div>
+    </div>`;
+
+  // Folds table
+  const tbody=document.getElementById("fold-tbody");
+  tbody.innerHTML="";
+  (m.folds||[]).forEach(f=>{
+    const daC=f.direction_accuracy>=0.58?"fold-good":f.direction_accuracy>=0.52?"fold-ok":"fold-bad";
+    const shC=f.paper_sharpe>0.5?"fold-good":f.paper_sharpe>0?"fold-ok":"fold-bad";
+    tbody.insertAdjacentHTML("beforeend",`
+      <tr>
+        <td>Fold ${f.fold}</td>
+        <td>${f.train_size.toLocaleString()}</td>
+        <td>${f.test_size.toLocaleString()}</td>
+        <td class="${daC}">${(f.direction_accuracy*100).toFixed(1)}%</td>
+        <td class="${shC}">${f.paper_sharpe.toFixed(2)}</td>
+        <td>${f.rmse.toFixed(3)}</td>
+      </tr>`);
+  });
+
+  // Model weights
+  const mw=document.getElementById("model-weights");
+  mw.innerHTML="";
+  const weights=m.model_weights||{};
+  const maxW=Math.max(...Object.values(weights))||1;
+  Object.entries(weights).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    mw.insertAdjacentHTML("beforeend",`
+      <div class="weight-row">
+        <div class="w-name">${k}</div>
+        <div class="w-track"><div class="w-fill" style="width:${(v/maxW*100).toFixed(1)}%"></div></div>
+        <div class="w-pct">${(v*100).toFixed(1)}%</div>
+      </div>`);
+  });
+}
+
+function renderFeatures(d){
+  // Feature values
+  const fg=document.getElementById("feat-grid");
+  fg.innerHTML="";
+  Object.entries(d.features).forEach(([k,v])=>{
+    fg.insertAdjacentHTML("beforeend",
+      `<div class="feat-item"><span class="fn">${FEAT_LABELS[k]||k}</span>
+       <span class="fv">${typeof v==="number"?v.toFixed(2):v}</span></div>`);
+  });
+
+  // Importances
+  const ib=document.getElementById("fi-bars");
+  ib.innerHTML="";
+  const sorted=Object.entries(d.feature_importances).sort((a,b)=>b[1]-a[1]);
+  const maxV=sorted[0]?.[1]||1;
+  sorted.forEach(([k,v])=>{
+    ib.insertAdjacentHTML("beforeend",`
+      <div class="fi-row">
+        <div class="fi-name" title="${k}">${FEAT_LABELS[k]||k}</div>
+        <div class="fi-track"><div class="fi-fill" style="width:${(v/maxV*100).toFixed(1)}%"></div></div>
+        <div class="fi-pct">${(v*100).toFixed(1)}%</div>
+      </div>`);
+  });
+}
+
+// ── Scan ───────────────────────────────────────────────────────────
+async function runScan(){
+  const btn=document.getElementById("btn-scan");
+  const grid=document.getElementById("scan-grid");
+  const errEl=document.getElementById("scan-err");
+  btn.disabled=true; errEl.style.display="none";
+  grid.innerHTML='<span class="spinner"></span> Scoring 20 symbols…';
+  try{
+    const r=await fetch("/api/ai/scan",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({symbols:[
+        "RELIANCE","TCS","HDFCBANK","INFY","ICICIBANK",
+        "SBIN","BHARTIARTL","ITC","KOTAKBANK","LT",
+        "TATASTEEL","BAJFINANCE","AXISBANK","SUNPHARMA","TITAN",
+        "WIPRO","HCLTECH","ASIANPAINT","MARUTI","ADANIPORTS",
+      ]})
+    });
+    const d=await r.json();
+    if(d.error){ errEl.textContent=d.error; errEl.style.display="block"; grid.innerHTML=""; return; }
+    grid.innerHTML="";
+    d.results.forEach(row=>{
+      const score=row.score||0;
+      const col=scoreColor(score);
+      const dc=dirClass(score);
+      grid.insertAdjacentHTML("beforeend",`
+        <div class="scan-card" onclick="document.getElementById('sym-in').value='${row.symbol}';scoreSymbol()">
+          <div class="sc-sym">${row.symbol}</div>
+          <div class="sc-score" style="color:${col}">${score>=0?"+":""}${score}</div>
+          <div class="sc-mini"><div class="sc-needle" style="left:${needlePct(score)}"></div></div>
+          <div class="sc-dir" style="color:${col}">${dc.replace("-"," ")}</div>
+          <div class="sc-conf">Conf ${row.confidence||0}%${row.error?` ⚠`:""}
+          ${row.wfv_da_mean?` · DA ${fmtDa(row.wfv_da_mean)}`:""}</div>
+        </div>`);
+    });
+  }catch(e){ errEl.textContent=e.toString(); errEl.style.display="block"; grid.innerHTML=""; }
+  btn.disabled=false;
+}
+
+// Auto-load WFV meta on page load if model exists
+window.addEventListener("DOMContentLoaded",()=>{
+  fetch("/api/ai/meta").then(r=>r.json()).then(m=>{
+    if(!m.error){
+      const log=document.getElementById("train-log");
+      const da=m.direction_accuracy_mean;
+      const daCol=da>=0.58?"#69f0ae":da>=0.54?"#ffd740":"#ff5252";
+      log.innerHTML=`📦 Model loaded · Dir Acc: <b style="color:${daCol}">${(da*100).toFixed(1)}%</b>`+
+        ` ±${(m.direction_accuracy_std*100).toFixed(1)}% · Sharpe: <b>${m.paper_sharpe_mean?.toFixed(2)||"—"}</b>`+
+        ` · Trained: ${new Date(m.trained_at+"Z").toLocaleDateString()}`;
+    }
+  }).catch(()=>{});
+  setTimeout(loadScorerValResults, 600);
+});
+</script>
+
+<!-- ═══ SCORER DIRECTION VALIDATION SECTION ════════════════════════════════ -->
+<style>
+.sv-section{background:#0a0f1e;border:1px solid #1e293b;border-radius:16px;padding:2rem;margin-top:2.5rem;max-width:900px;margin-left:auto;margin-right:auto;}
+.sv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;flex-wrap:wrap;gap:.8rem;}
+.sv-title{font-size:1.1rem;font-weight:700;color:#f1f5f9;}
+.sv-sub{font-size:.78rem;color:#64748b;margin-top:.2rem;}
+.sv-run-btn{background:linear-gradient(135deg,#0ea5e9,#7c3aed);border:none;color:#fff;padding:.6rem 1.4rem;border-radius:8px;font-size:.84rem;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.sv-run-btn:hover{opacity:.83;} .sv-run-btn:disabled{opacity:.38;cursor:not-allowed;}
+.sv-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:.8rem;margin-bottom:1.4rem;}
+.sv-metric{background:#1e293b;border-radius:10px;padding:.9rem;text-align:center;}
+.sv-mv{font-size:1.5rem;font-weight:800;margin-bottom:.15rem;}
+.sv-ml{font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;}
+.sv-tbl{width:100%;border-collapse:collapse;font-size:.78rem;}
+.sv-tbl th{color:#64748b;text-align:left;padding:.45rem .55rem;border-bottom:1px solid #1e293b;font-weight:600;}
+.sv-tbl td{padding:.45rem .55rem;border-bottom:1px solid #0f172a;color:#cbd5e1;}
+.sv-log{background:#020617;border:1px solid #1e293b;border-radius:8px;padding:.7rem .9rem;max-height:200px;overflow-y:auto;font-family:monospace;font-size:.72rem;color:#94a3b8;line-height:1.5;margin-top:.8rem;}
+.sv-stat{font-size:.77rem;color:#64748b;margin-bottom:.5rem;}
+</style>
+
+<div class="sv-section">
+  <div class="sv-header">
+    <div>
+      <div class="sv-title">🎯 AI Scorer Direction Validation</div>
+      <div class="sv-sub">Validates score direction (bullish/bearish/neutral) against actual price movement across all available symbols. Random baseline = 50%.</div>
+    </div>
+    <button class="sv-run-btn" id="sv-run-btn" onclick="runScorerVal()">▶ Run Direction Validation</button>
+  </div>
+
+  <div class="sv-metrics" id="sv-metrics" style="display:none">
+    <div class="sv-metric"><div class="sv-mv" id="sv-da" style="color:#22c55e">—</div><div class="sv-ml">Direction Accuracy</div></div>
+    <div class="sv-metric"><div class="sv-mv" id="sv-edge" style="color:#a855f7">—</div><div class="sv-ml">Edge vs 50% baseline</div></div>
+    <div class="sv-metric"><div class="sv-mv" id="sv-na" style="color:#38bdf8">—</div><div class="sv-ml">Neutral Accuracy</div></div>
+    <div class="sv-metric"><div class="sv-mv" id="sv-syms" style="color:#f59e0b">—</div><div class="sv-ml">Symbols Tested</div></div>
+    <div class="sv-metric"><div class="sv-mv" id="sv-preds" style="color:#94a3b8">—</div><div class="sv-ml">Total Predictions</div></div>
+  </div>
+
+  <div id="sv-table-wrap" style="display:none">
+    <div style="font-size:.78rem;color:#38bdf8;background:#0f2233;border-radius:8px;padding:.6rem 1rem;margin-bottom:.8rem;">
+      🔒 <strong>No data leakage:</strong> First 80% of each symbol's history = training period (model trained on this).
+      Last 20% = TEST period (completely unseen future predictions). Model is scored only on the TEST period.
+    </div>
+    <table class="sv-tbl">
+      <thead><tr>
+        <th>Symbol</th><th>Train cutoff</th><th>Test start</th><th>Test end</th>
+        <th>Dir Predictions</th><th>Correct</th>
+        <th>Dir Accuracy</th><th>Neutral Acc</th>
+      </tr></thead>
+      <tbody id="sv-tbody"></tbody>
+    </table>
+    <div style="font-size:.73rem;color:#475569;margin-top:.5rem;">
+      Score &gt;+15 = Bullish | Score &lt;−15 = Bearish | |Score| &lt; 15 = Neutral &nbsp;·&nbsp;
+      Correct if: Bullish &amp; stock rose &gt;1.5% in <span id="sv-fwd-label">5</span>-day window |
+      Bearish &amp; stock fell &gt;1.5% | Neutral &amp; stock moved &lt;±1.5%
+    </div>
+  </div>
+
+
+  <div class="sv-stat" id="sv-status">No validation run yet. Click "Run Direction Validation" to start.</div>
+  <div class="sv-log" id="sv-log" style="display:none"></div>
+</div>
+
+<script>
+let svPollTimer = null;
+
+async function runScorerVal() {
+  const btn = document.getElementById('sv-run-btn');
+  btn.disabled=true; btn.textContent='⏳ Running…';
+  document.getElementById('sv-log').style.display='block';
+  document.getElementById('sv-status').textContent='Starting direction validation…';
+  try {
+    await fetch('/api/ai/scorer-validate', {method:'POST'});
+    svPollTimer = setInterval(pollScorerVal, 3000);
+    pollScorerVal();
+  } catch(e) { btn.disabled=false; btn.textContent='▶ Run Direction Validation'; }
+}
+
+async function pollScorerVal() {
+  try {
+    const s = await (await fetch('/api/ai/scorer-validate-status')).json();
+    const logEl = document.getElementById('sv-log');
+    logEl.textContent = (s.log||[]).join('\n');
+    logEl.scrollTop = logEl.scrollHeight;
+    const symsDone = (s.log||[]).filter(l=>l.trim().startsWith('  ') && l.includes('DA=')).length;
+    document.getElementById('sv-status').textContent = s.running
+      ? `Running… (${symsDone} symbols done)` : s.done ? 'Validation complete ✅' : 'Idle';
+    if (!s.running && s.done) {
+      clearInterval(svPollTimer);
+      document.getElementById('sv-run-btn').disabled=false;
+      document.getElementById('sv-run-btn').textContent='▶ Run Again';
+      loadScorerValResults();
+    }
+  } catch(e) {}
+}
+
+async function loadScorerValResults() {
+  try {
+    const r = await (await fetch('/api/ai/scorer-validate-results')).json();
+    if (r.error) return;
+    document.getElementById('sv-metrics').style.display='grid';
+    document.getElementById('sv-table-wrap').style.display='block';
+    const da = r.overall_dir_accuracy_pct||0;
+    const edge = r.edge_over_random_pp||0;
+    document.getElementById('sv-da').textContent = da+'%';
+    document.getElementById('sv-da').style.color = da>=60?'#22c55e':da>=55?'#f59e0b':'#f87171';
+    document.getElementById('sv-edge').textContent = (edge>=0?'+':'')+edge+'pp';
+    document.getElementById('sv-edge').style.color = edge>=5?'#22c55e':edge>=0?'#f59e0b':'#f87171';
+    document.getElementById('sv-na').textContent = (r.overall_neutral_accuracy_pct||0)+'%';
+    document.getElementById('sv-syms').textContent = r.symbols_validated||0;
+    document.getElementById('sv-preds').textContent = (r.total_dir_predictions||0).toLocaleString();
+    if (r.forward_days) document.getElementById('sv-fwd-label').textContent = r.forward_days;
+    const tbody = document.getElementById('sv-tbody'); tbody.innerHTML='';
+    (r.symbol_results||[]).forEach(s=>{
+      const dac = s.dir_accuracy_pct>=60?'color:#22c55e':s.dir_accuracy_pct>=50?'color:#f59e0b':'color:#f87171';
+      const nac = s.neutral_accuracy_pct>=55?'color:#38bdf8':'color:#94a3b8';
+      tbody.innerHTML += `<tr>
+        <td><strong>${s.symbol}</strong></td>
+        <td style="color:#64748b;font-size:.73rem">${s.train_end||'—'}</td>
+        <td style="color:#38bdf8;font-size:.73rem">${s.test_start||'—'}</td>
+        <td style="color:#64748b;font-size:.73rem">${s.test_end||'—'}</td>
+        <td>${s.dir_predictions}</td>
+        <td>${s.correct}</td>
+        <td style="${dac}"><strong>${s.dir_accuracy_pct}%</strong></td>
+        <td style="${nac}">${s.neutral_accuracy_pct}%</td>
+      </tr>`;
+    });
+    // Summary row
+    tbody.innerHTML += `<tr style="border-top:2px solid #334155;font-weight:700;background:#0f172a">
+      <td style="color:#94a3b8">OVERALL (${r.symbols_validated} symbols)</td>
+      <td colspan="3" style="color:#64748b;font-size:.73rem">${r.split_method||'80/20 split'}</td>
+      <td>${r.total_dir_predictions}</td>
+      <td>—</td>
+      <td style="${da>=60?'color:#22c55e':da>=50?'color:#f59e0b':'color:#f87171'}"><strong>${da}%</strong> <span style="font-size:.7rem;color:#64748b">(random=50%)</span></td>
+      <td style="color:#64748b;font-size:.74rem">fwd=${r.forward_days}d</td>
+    </tr>`;
+
+    document.getElementById('sv-log').style.display='block';
+    const lel=document.getElementById('sv-log');
+    lel.textContent=(r.log||[]).join('\n'); lel.scrollTop=lel.scrollHeight;
+    document.getElementById('sv-status').textContent='Loaded previous results ✅';
+  } catch(e) {}
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,718 @@
+{% extends "base.html" %}
+{% block title %}Strategy Results — Stratosphere{% endblock %}
+{% block content %}
+<style>
+/* ── Layout ── */
+.rw { max-width:1000px; margin:0 auto; padding:0 1rem 4rem; }
+.rh { text-align:center; padding:2rem 0 1.4rem; }
+.rh h1 { font-size:2.2rem; font-weight:900;
+  background:linear-gradient(135deg,#ffd740,#ff6d00,#ff4081);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.rh p { color:#778899; font-size:.9rem; margin-top:.3rem; }
+
+/* Cards */
+.card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:16px; padding:1.5rem 1.8rem; margin-bottom:1.2rem;
+  backdrop-filter:blur(12px); }
+.card h3 { margin:0 0 1rem; font-size:1rem; color:#c8d0e8; font-weight:700; letter-spacing:.3px; }
+
+/* Run controls */
+.ctrl-row { display:flex; gap:.7rem; flex-wrap:wrap; align-items:flex-end; }
+.ctrl-row label { font-size:.82rem; color:#aab; }
+.ctrl-row select, .ctrl-row input {
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);
+  color:#fff; border-radius:10px; padding:.46rem .85rem; font-size:.86rem; }
+.btn { border:none; border-radius:10px; padding:.55rem 1.5rem;
+  font-size:.9rem; font-weight:700; cursor:pointer; color:#fff; white-space:nowrap; }
+.btn:disabled { opacity:.35; cursor:not-allowed; }
+.btn-run  { background:linear-gradient(135deg,#ff6d00,#ffd740); color:#000; }
+.btn-stop { background:linear-gradient(135deg,#ff1744,#ff6d00); }
+.btn-load { background:linear-gradient(135deg,#00e5ff,#7c4dff); }
+
+/* Progress */
+#prog-wrap { display:none; }
+.prog-bar-track { height:12px; background:rgba(255,255,255,.07); border-radius:6px; margin:.6rem 0; }
+.prog-bar-fill  { height:100%; border-radius:6px;
+  background:linear-gradient(90deg,#ff6d00,#ffd740);
+  transition:width .5s ease; }
+.prog-meta { display:flex; gap:1.5rem; flex-wrap:wrap; font-size:.82rem; color:#99aacc; margin-top:.3rem; }
+.prog-meta b { color:#ffd740; }
+.round-list { margin-top:.8rem; }
+.round-item { display:flex; align-items:center; gap:.7rem; font-size:.8rem;
+  padding:.28rem 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.ri-round { width:55px; color:#778899; }
+.ri-sharpe { width:70px; font-weight:700; }
+.ri-ret    { width:70px; }
+.ri-msg    { flex:1; color:#aab; }
+
+/* Stale / interrupted banner */
+#stale-banner { display:none; background:rgba(255,152,0,.12);
+  border:1px solid rgba(255,152,0,.35); border-radius:12px;
+  padding:1rem 1.4rem; margin-bottom:1rem; }
+#stale-banner .sb-title { color:#ffa726; font-weight:700; font-size:.95rem; }
+#stale-banner .sb-msg   { color:#cc9944; font-size:.83rem; margin-top:.3rem; }
+
+/* Metric grid */
+.metrics-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:.8rem; }
+.metric-box   { background:rgba(255,255,255,.05); border-radius:12px; padding:1rem 1.2rem; }
+.metric-box .mv { font-size:1.8rem; font-weight:900; }
+.metric-box .ml { font-size:.72rem; color:#778899; margin-top:.25rem; }
+.green { color:#00c853; } .red { color:#ff5252; } .gold { color:#ffd740; }
+.blue  { color:#00e5ff; } .purple { color:#b388ff; } .warn { color:#ff9800; }
+
+/* Equity chart */
+#eq-canvas-wrap { position:relative; height:220px; margin-top:.8rem; }
+canvas#eq-chart { width:100% !important; height:100% !important; }
+
+/* Trade log */
+.trade-tbl { width:100%; border-collapse:collapse; font-size:.78rem; margin-top:.6rem; }
+.trade-tbl th { color:#778899; font-weight:600; padding:.4rem .6rem;
+  border-bottom:1px solid rgba(255,255,255,.08); text-align:right; white-space:nowrap; }
+.trade-tbl th:first-child { text-align:left; }
+.trade-tbl td { padding:.35rem .6rem; border-bottom:1px solid rgba(255,255,255,.04);
+  text-align:right; color:#c0c8e0; }
+.trade-tbl td:first-child { text-align:left; }
+.tw { color:#00c853; font-weight:700; }
+.tl { color:#ff5252; font-weight:700; }
+
+/* Train vs Test */
+.compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.cmp-col { background:rgba(255,255,255,.04); border-radius:12px; padding:1rem 1.2rem; }
+.cmp-col h4 { margin:0 0 .7rem; font-size:.85rem; font-weight:700; }
+.cmp-row { display:flex; justify-content:space-between; font-size:.82rem;
+  padding:.22rem 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.cmp-row .ck { color:#778899; } .cmp-row .cv { font-weight:600; }
+
+/* Improvement history */
+.imp-timeline { margin-top:.6rem; }
+.imp-row { display:flex; align-items:center; gap:.8rem; font-size:.8rem;
+  padding:.32rem 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.ir-num  { width:28px; color:#556; }
+.ir-rnd  { width:55px; color:#778899; }
+.ir-sh   { width:65px; font-weight:700; color:#ffd740; }
+.ir-ret  { width:65px; color:#69f0ae; }
+.ir-par  { flex:1; color:#aab; font-family:monospace; font-size:.73rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* Strategy Briefing */
+.brief-section { margin-bottom:1.2rem; }
+.brief-section h4 { font-size:.82rem; font-weight:700; color:#778899;
+  text-transform:uppercase; letter-spacing:.8px; margin:0 0 .6rem; }
+.brief-row { display:flex; align-items:flex-start; gap:.8rem;
+  padding:.5rem 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:.85rem; }
+.brief-label { min-width:165px; color:#778899; font-size:.8rem; }
+.brief-value { color:#c8d0e8; line-height:1.7; flex:1; }
+.tag { display:inline-block; border-radius:6px; padding:.15rem .5rem;
+  font-size:.75rem; font-weight:700; margin:.1rem .2rem .1rem 0; }
+.tag-green  { background:rgba(0,200,83,.15);  color:#00c853; }
+.tag-red    { background:rgba(255,82,82,.15);  color:#ff5252; }
+.tag-gold   { background:rgba(255,215,64,.15); color:#ffd740; }
+.tag-blue   { background:rgba(0,229,255,.15);  color:#00e5ff; }
+.tag-orange { background:rgba(255,109,0,.18);  color:#ff9800; }
+.tag-gray   { background:rgba(255,255,255,.08);color:#99aacc; }
+.param-pill { display:inline-flex; align-items:center; gap:.35rem;
+  background:rgba(255,255,255,.07); border-radius:8px;
+  padding:.32rem .75rem; margin:.2rem .2rem 0 0; font-size:.82rem; }
+.param-pill .pk { color:#778899; font-size:.73rem; }
+.param-pill .pv { color:#ffd740; font-weight:700; }
+
+.spinner { display:inline-block; width:14px; height:14px;
+  border:2px solid rgba(255,255,255,.15); border-top-color:#ff6d00;
+  border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.err-box { background:rgba(255,82,82,.1); color:#ff5252; border-radius:8px;
+  padding:.5rem 1rem; font-size:.83rem; margin:.5rem 0; }
+</style>
+
+<div class="rw">
+<div class="rh">
+  <h1>📈 Strategy Backtest Results</h1>
+  <p>Walk-forward out-of-sample · Optimized on train data · Tested on held-out data</p>
+  <div style="margin-top:.6rem;display:flex;justify-content:center;align-items:center;gap:1rem;flex-wrap:wrap">
+    <span id="last-updated" style="font-size:.78rem;color:#556;">Loading…</span>
+    <button onclick="loadResults()" style="background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.25);
+      color:#00e5ff;border-radius:8px;padding:.3rem .9rem;font-size:.78rem;cursor:pointer;font-weight:600;"
+      title="Force reload latest results from disk">
+      🔄 Refresh Results
+    </button>
+  </div>
+</div>
+
+<!-- Stale / interrupted banner -->
+<div id="stale-banner">
+  <div class="sb-title">⚠️ Previous run was interrupted</div>
+  <div class="sb-msg" id="stale-msg">The server was restarted while the optimizer was running.
+    Saved progress above is from the previous session. Start a new run below.</div>
+</div>
+
+<!-- Controls -->
+<div class="card">
+  <h3>🚀 Run Full Pipeline</h3>
+  <div class="ctrl-row">
+    <div>
+      <label>Time Limit</label><br>
+      <select id="c-time">
+        <option value="10">10 min (quick)</option>
+        <option value="20" selected>20 min</option>
+        <option value="40">40 min (thorough)</option>
+        <option value="60">60 min (deep)</option>
+      </select>
+    </div>
+    <div>
+      <label>Target Sharpe (stop early)</label><br>
+      <select id="c-sharpe">
+        <option value="1.0">1.0</option>
+        <option value="1.5" selected>1.5</option>
+        <option value="2.0">2.0</option>
+      </select>
+    </div>
+    <div>
+      <label>Starting Capital (₹)</label><br>
+      <input type="number" id="c-capital" value="500000" min="100000" step="50000" style="width:130px">
+    </div>
+    <button class="btn btn-run"  id="btn-run"  onclick="startPipeline()">▶ Start Optimization</button>
+    <button class="btn btn-stop" id="btn-stop" onclick="stopPipeline()" style="display:none">⏹ Stop</button>
+    <button class="btn btn-load" onclick="loadResults()">Load Saved Results</button>
+  </div>
+  <div id="run-err" class="err-box" style="display:none"></div>
+</div>
+
+<!-- Live progress -->
+<div class="card" id="prog-wrap">
+  <h3>⚡ Live Optimization Progress</h3>
+  <div class="prog-meta" id="prog-meta">
+    <span>Status: <b id="pm-status">—</b></span>
+    <span>Round: <b id="pm-round">—</b></span>
+    <span>Candidates: <b id="pm-cands">—</b></span>
+    <span>Best Sharpe: <b id="pm-sharpe" class="gold">—</b></span>
+    <span>Best Return: <b id="pm-ret" class="green">—</b></span>
+    <span>Win Rate: <b id="pm-wr">—</b></span>
+  </div>
+  <div class="prog-bar-track"><div class="prog-bar-fill" id="prog-fill" style="width:0%"></div></div>
+  <div style="font-size:.75rem;color:#556;margin-top:.2rem" id="prog-params"></div>
+  <h4 style="font-size:.83rem;color:#778899;margin:1rem 0 .3rem">Improvements found</h4>
+  <div class="imp-timeline" id="imp-timeline"></div>
+  <div class="round-list" id="round-list"></div>
+</div>
+
+<!-- Final results -->
+<div id="results-wrap" style="display:none">
+
+  <!-- Header banner -->
+  <div class="card" style="border-color:rgba(255,215,64,.25);background:rgba(255,109,0,.06)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <div>
+        <div style="font-size:.8rem;color:#ff9800;font-weight:700;letter-spacing:.5px">
+          OUT-OF-SAMPLE TEST RESULT (Apr 2025 – Sep 2025)
+        </div>
+        <div style="font-size:2.8rem;font-weight:900;color:#ffd740" id="r-return">—</div>
+        <div style="font-size:1rem;color:#aab" id="r-pnl">—</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.8rem;color:#778899">Strategy</div>
+        <div style="font-size:1.05rem;font-weight:700;color:#fff" id="r-strategy">—</div>
+        <div style="font-size:.78rem;color:#ffd740;margin-top:.3rem" id="r-params">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key metrics -->
+  <div class="card">
+    <h3>📊 Performance Metrics</h3>
+    <div class="metrics-grid" id="metrics-grid"></div>
+  </div>
+
+  <!-- Strategy Briefing -->
+  <div class="card">
+    <h3>🧠 Strategy Briefing — How This Strategy Works</h3>
+    <div id="briefing-body"></div>
+  </div>
+
+  <!-- Equity curve -->
+  <div class="card">
+    <h3>📉 Equity Curve (Test Period)</h3>
+    <div id="eq-canvas-wrap"><canvas id="eq-chart"></canvas></div>
+  </div>
+
+  <!-- Train vs Test -->
+  <div class="card">
+    <h3>🔬 Train vs Test (Validity Check)</h3>
+    <div class="compare-grid" id="cmp-grid"></div>
+    <p style="font-size:.75rem;color:#556;margin-top:.8rem">
+      If test result is significantly worse than training, the strategy may be overfit.
+      Similar results indicate robustness.
+    </p>
+  </div>
+
+  <!-- Methodology -->
+  <div class="card">
+    <h3>📋 Methodology</h3>
+    <div id="methodology-text" style="font-size:.83rem;color:#99aacc;line-height:1.8"></div>
+    <div id="opt-summary" style="margin-top:.8rem"></div>
+  </div>
+
+  <!-- Improvement history -->
+  <div class="card">
+    <h3>🏆 Optimization Improvement History</h3>
+    <div class="imp-timeline" id="imp-history-final"></div>
+  </div>
+
+  <!-- Trade log -->
+  <div class="card">
+    <h3>📝 Trade Log (Test Period)</h3>
+    <p style="font-size:.78rem;color:#99aacc;margin:.2rem 0 .8rem">
+      The <b style="color:#ffd740">NSE symbol</b> (e.g. <code style="color:#69f0ae">ICICIBANK25JUL1450CE</code>) is
+      the exact Zerodha Kite tradingsymbol — paste it in the Kite search bar to pull the chart.
+      <b style="color:#5bc8ff">↗TV options</b> opens the underlying stock's options chain on TradingView where you can filter by expiry &amp; strike.
+    </p>
+    <div style="overflow-x:auto">
+      <table class="trade-tbl">
+        <thead><tr>
+          <th style="text-align:left;min-width:240px">NSE F&amp;O Symbol</th>
+          <th>Entry Date</th><th>Exit Date</th>
+          <th>Spot@Entry</th><th>Entry Rs</th><th>Exit Rs</th>
+          <th>Lots</th><th>PnL Rs</th><th>PnL %</th><th>Exit</th>
+        </tr></thead>
+        <tbody id="trade-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+let pollTimer = null;
+
+async function startPipeline(){
+  const btnRun  = document.getElementById("btn-run");
+  const btnStop = document.getElementById("btn-stop");
+  const errEl   = document.getElementById("run-err");
+  errEl.style.display = "none";
+  hideStaleBanner();
+  btnRun.disabled = true;
+  btnRun.innerHTML = '<span class="spinner"></span> Starting...';
+  try {
+    const r = await fetch("/api/backtest/run", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        time_limit_min: parseFloat(document.getElementById("c-time").value),
+        target_sharpe:  parseFloat(document.getElementById("c-sharpe").value),
+        capital:        parseFloat(document.getElementById("c-capital").value),
+      })
+    });
+    const d = await r.json();
+    if(d.error){ errEl.textContent=d.error; errEl.style.display="block"; setRunningUI(false); return; }
+    document.getElementById("prog-wrap").style.display = "block";
+    setRunningUI(true);
+    startPolling();
+  } catch(e){
+    errEl.textContent = e.toString(); errEl.style.display="block"; setRunningUI(false);
+  }
+}
+
+async function stopPipeline(){
+  const btnStop = document.getElementById("btn-stop");
+  btnStop.disabled = true;
+  btnStop.textContent = "Stopping...";
+  try { await fetch("/api/backtest/stop", {method:"POST"}); } catch(e){}
+}
+
+function setRunningUI(running){
+  const btnRun  = document.getElementById("btn-run");
+  const btnStop = document.getElementById("btn-stop");
+  if(running){
+    btnRun.disabled = true;
+    btnRun.innerHTML = '<span class="spinner"></span> Running...';
+    btnStop.style.display = "inline-block";
+    btnStop.disabled = false;
+    btnStop.textContent = "Stop";
+  } else {
+    btnRun.disabled = false;
+    btnRun.innerHTML = "Start Optimization";
+    btnStop.style.display = "none";
+  }
+}
+
+function showStaleBanner(msg){
+  document.getElementById("stale-banner").style.display = "block";
+  if(msg) document.getElementById("stale-msg").textContent = msg;
+}
+function hideStaleBanner(){
+  document.getElementById("stale-banner").style.display = "none";
+}
+
+function startPolling(){
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    try {
+      const r = await fetch("/api/backtest/status");
+      const d = await r.json();
+      renderProgress(d);
+      const done = ["complete","error","stopped","interrupted"].includes(d.status);
+      if(done){
+        clearInterval(pollTimer); pollTimer = null;
+        setRunningUI(false);
+        if(d.stale_warning) showStaleBanner(d.stale_warning);
+        if(d.status === "complete" || d.status === "stopped") loadResults();
+      }
+    } catch(e){}
+  }, 2000);
+}
+
+function renderProgress(d){
+  if(!d || d.status === "not_started") return;
+  const cands = d.candidates_tried || 0;
+  const pct   = Math.min(95, cands/650*100).toFixed(0);
+  const statusLabel = {
+    running:"Running", stopping:"Stopping...", stopped:"Stopped by user",
+    complete:"Complete", error:"Error", interrupted:"Interrupted (server restart)"
+  }[d.status] || d.status;
+
+  document.getElementById("pm-status").textContent  = statusLabel;
+  document.getElementById("pm-round").textContent   = d.current_round || "—";
+  document.getElementById("pm-cands").textContent   = cands;
+  document.getElementById("pm-sharpe").textContent  = d.best_sharpe != null ? d.best_sharpe.toFixed(3) : "—";
+  document.getElementById("pm-ret").textContent     = d.best_return_pct != null ? d.best_return_pct.toFixed(1)+"%" : "—";
+  document.getElementById("pm-wr").textContent      = d.best_win_rate != null ? d.best_win_rate.toFixed(0)+"%" : "—";
+  document.getElementById("prog-fill").style.width  = pct + "%";
+  document.getElementById("prog-params").textContent= d.best_params ? "Best so far: " + d.best_params : "";
+  document.getElementById("prog-wrap").style.display = "block";
+
+  const tl = document.getElementById("imp-timeline");
+  tl.innerHTML = "";
+  (d.improvements||[]).slice().reverse().forEach((h,i,arr) => {
+    tl.insertAdjacentHTML("beforeend",`<div class="imp-row">
+      <div class="ir-num">#${arr.length-i}</div>
+      <div class="ir-rnd">R${h.round}</div>
+      <div class="ir-sh">${h.sharpe?.toFixed(3)}</div>
+      <div class="ir-ret">${h.return_pct?.toFixed(1)}%</div>
+      <div class="ir-par">${h.params}</div>
+    </div>`);
+  });
+
+  const rl = document.getElementById("round-list");
+  rl.innerHTML = "";
+  (d.rounds_summary||[]).forEach(rs => {
+    rl.insertAdjacentHTML("beforeend",`<div class="round-item">
+      <div class="ri-round">Rnd ${rs.round}</div>
+      <div class="ri-sharpe">${rs.best_sharpe?.toFixed(3)}</div>
+      <div class="ri-ret">${rs.best_return?.toFixed(1)}%</div>
+      <div class="ri-msg">${rs.n_candidates} candidates</div>
+    </div>`);
+  });
+}
+
+async function loadResults(){
+  try {
+    // Cache-bust: always fetch fresh — never use browser-cached version
+    const r = await fetch("/api/backtest/results?t=" + Date.now(), {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" }
+    });
+    if(!r.ok){
+      document.getElementById('last-updated').textContent = 'No results yet — run the pipeline first';
+      return;
+    }
+    const d = await r.json();
+    renderResults(d);
+    // Show when results were saved
+    const ts = d.run_at || d.saved_at || '';
+    if(ts) document.getElementById('last-updated').textContent =
+      'Last run: ' + new Date(ts + 'Z').toLocaleString();
+  } catch(e){
+    document.getElementById('last-updated').textContent = 'Error loading results: ' + e;
+  }
+}
+
+function renderResults(d){
+  document.getElementById("results-wrap").style.display = "block";
+  const tr     = d.test_result || {};
+  const traind = d.training_result || {};
+  const op     = d.optimized_params || {};
+  const os     = d.optimization_summary || {};
+  const retPct = tr.total_return_pct || 0;
+
+  document.getElementById("r-return").textContent   = (retPct>=0?"+":"") + retPct.toFixed(2) + "% Return";
+  document.getElementById("r-pnl").textContent      = "Rs" + (tr.total_pnl||0).toLocaleString('en-IN') + " on Rs" + (tr.capital||500000).toLocaleString('en-IN');
+  document.getElementById("r-strategy").textContent = d.strategy_name || "Stratosphere Alpha";
+  document.getElementById("r-params").textContent   = op.label || "";
+
+  const retCol = retPct >= 0 ? "green" : "red";
+  const shCol  = (tr.sharpe_ratio||0) > 1 ? "green" : (tr.sharpe_ratio||0) > 0 ? "gold" : "red";
+  const ddCol  = (tr.max_drawdown_pct||0) > -15 ? "warn" : "red";
+  document.getElementById("metrics-grid").innerHTML = `
+    <div class="metric-box"><div class="mv ${retCol}">${retPct.toFixed(2)}%</div><div class="ml">Total Return</div></div>
+    <div class="metric-box"><div class="mv ${retCol}">${(tr.cagr_pct||0).toFixed(2)}%</div><div class="ml">Annualized (CAGR)</div></div>
+    <div class="metric-box"><div class="mv ${shCol}">${(tr.sharpe_ratio||0).toFixed(3)}</div><div class="ml">Sharpe Ratio</div></div>
+    <div class="metric-box"><div class="mv ${ddCol}">${(tr.max_drawdown_pct||0).toFixed(2)}%</div><div class="ml">Max Drawdown</div></div>
+    <div class="metric-box"><div class="mv gold">${(tr.win_rate||0).toFixed(1)}%</div><div class="ml">Win Rate</div></div>
+    <div class="metric-box"><div class="mv blue">${(tr.profit_factor||0).toFixed(2)}x</div><div class="ml">Profit Factor</div></div>
+    <div class="metric-box"><div class="mv">${tr.total_trades||0}</div><div class="ml">Total Trades</div></div>
+    <div class="metric-box"><div class="mv green">${tr.winning_trades||0}</div><div class="ml">Winning</div></div>
+    <div class="metric-box"><div class="mv red">${tr.losing_trades||0}</div><div class="ml">Losing</div></div>
+    <div class="metric-box"><div class="mv purple">${(tr.avg_hold_days||0).toFixed(1)}d</div><div class="ml">Avg Hold</div></div>
+    <div class="metric-box"><div class="mv green" style="font-size:.95rem">+Rs${(tr.best_trade?.pnl||0).toLocaleString('en-IN')}</div><div class="ml">Best Trade <span style="font-family:monospace;font-size:.78rem;color:#69f0ae">${tr.best_trade?.nse_symbol||tr.best_trade?.symbol||'—'}</span></div></div>
+    <div class="metric-box"><div class="mv red" style="font-size:.95rem">Rs${(tr.worst_trade?.pnl||0).toLocaleString('en-IN')}</div><div class="ml">Worst Trade <span style="font-family:monospace;font-size:.78rem;color:#ff5252">${tr.worst_trade?.nse_symbol||tr.worst_trade?.symbol||'—'}</span></div></div>
+  `;
+
+  renderBriefing(op, tr);
+  drawEquity(tr.equity_curve || [tr.capital || 500000]);
+
+  document.getElementById("cmp-grid").innerHTML = `
+    <div class="cmp-col">
+      <h4 style="color:#ffd740">Training  (Jan 2022 to Mar 2025)</h4>
+      ${cmpRow("Return", (traind.total_return_pct||0).toFixed(2)+"%")}
+      ${cmpRow("Sharpe", (traind.sharpe||0).toFixed(3))}
+      ${cmpRow("Win Rate", (traind.win_rate||0).toFixed(1)+"%")}
+      ${cmpRow("Trades", traind.total_trades||0)}
+      ${cmpRow("Max Drawdown", (traind.max_drawdown_pct||0).toFixed(2)+"%")}
+    </div>
+    <div class="cmp-col" style="border:1px solid rgba(0,200,83,.25)">
+      <h4 style="color:#00c853">Test (Apr to Sep 2025) -- REAL RESULT</h4>
+      ${cmpRow("Return", retPct.toFixed(2)+"%")}
+      ${cmpRow("Sharpe", (tr.sharpe_ratio||0).toFixed(3))}
+      ${cmpRow("Win Rate", (tr.win_rate||0).toFixed(1)+"%")}
+      ${cmpRow("Trades", tr.total_trades||0)}
+      ${cmpRow("Max Drawdown", (tr.max_drawdown_pct||0).toFixed(2)+"%")}
+    </div>`;
+
+  document.getElementById("methodology-text").textContent = d.methodology || "";
+  document.getElementById("opt-summary").innerHTML = `
+    <div style="font-size:.8rem;color:#99aacc;line-height:1.8">
+      Candidates evaluated: <b style="color:#ffd740">${os.candidates_tried||0}</b> &nbsp;|&nbsp;
+      Rounds: <b>${os.rounds||0}</b> &nbsp;|&nbsp;
+      Stop reason: <b>${os.stop_reason||"—"}</b> &nbsp;|&nbsp;
+      Target Sharpe: <b>${os.target_sharpe||"—"}</b>
+    </div>`;
+
+  const ih = document.getElementById("imp-history-final");
+  ih.innerHTML = "";
+  (os.improvement_history||[]).forEach((h,i) => {
+    ih.insertAdjacentHTML("beforeend",`<div class="imp-row">
+      <div class="ir-num">#${i+1}</div>
+      <div class="ir-rnd">R${h.round}</div>
+      <div class="ir-sh">${h.sharpe?.toFixed(3)}</div>
+      <div class="ir-ret">${h.return_pct?.toFixed(1)}%</div>
+      <div class="ir-par">${h.params}</div>
+    </div>`);
+  });
+
+  const tb = document.getElementById("trade-tbody");
+  tb.innerHTML = "";
+  (tr.trades||[]).forEach(t => {
+    const cls    = t.pnl >= 0 ? "tw" : "tl";
+    const optClr = t.option_type === 'CE' ? '#69f0ae' : '#ff80ab';
+    const sym    = t.nse_symbol || `${t.symbol}${t.option_type}${Math.round(t.strike)}`;
+    const expiry = t.expiry_date || '—';
+    // TradingView: open the underlying's options chain (no direct URL for individual NSE options)
+    const tvUrl  = `https://www.tradingview.com/symbols/NSE-${t.symbol}/options/`;
+    // Kite: search for the exact tradingsymbol in the NFO segment
+    const kiteUrl = `https://kite.zerodha.com/search?q=${sym}&segment=NFO`;
+    tb.insertAdjacentHTML("beforeend",`<tr>
+      <td style="text-align:left">
+        <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
+          <span style="font-family:monospace;font-size:.88rem;font-weight:700;color:${optClr};letter-spacing:.5px">${sym}</span>
+          <button onclick="navigator.clipboard.writeText('${sym}').then(()=>{this.textContent='copied!';setTimeout(()=>this.textContent='copy',1500)})" title="Copy — paste in Kite search bar"
+            style="background:rgba(255,215,64,.12);border:1px solid rgba(255,215,64,.3);
+                   border-radius:4px;padding:1px 6px;font-size:.65rem;cursor:pointer;color:#ffd740">
+            copy
+          </button>
+          <a href="${kiteUrl}" target="_blank" title="Open Kite search for this contract"
+            style="font-size:.65rem;color:#ff8c00;text-decoration:none;font-weight:600">
+            ↗Kite
+          </a>
+          <a href="${tvUrl}" target="_blank" title="Open TradingView options chain for ${t.symbol}"
+            style="font-size:.65rem;color:#5bc8ff;text-decoration:none">
+            ↗TV options
+          </a>
+        </div>
+        <div style="font-size:.68rem;color:#556;margin-top:2px">${t.symbol} &middot; ${t.option_type} &middot; ₹${t.strike} &middot; exp&nbsp;${expiry}</div>
+      </td>
+      <td>${t.entry_date}</td><td>${t.exit_date}</td>
+      <td>Rs${t.spot_entry?.toFixed(0)}</td>
+      <td>Rs${t.entry_premium?.toFixed(2)}</td>
+      <td>Rs${t.exit_premium?.toFixed(2)}</td>
+      <td>${t.lots}</td>
+      <td class="${cls}">${t.pnl>=0?"+":""}Rs${Math.round(t.pnl).toLocaleString('en-IN')}</td>
+      <td class="${cls}">${t.pnl_pct>=0?"+":""}${t.pnl_pct}%</td>
+      <td style="font-size:.72rem;color:#778899">${t.exit_reason}</td>
+    </tr>`);
+  });
+
+  document.getElementById("results-wrap").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+// ── Strategy Briefing ──────────────────────────────────────────────
+function renderBriefing(op, tr){
+  const body = document.getElementById("briefing-body");
+  if(!op || !op.rsi_buy_threshold){
+    body.innerHTML = "<p style='color:#556;font-size:.85rem'>Run the pipeline to see the strategy briefing.</p>";
+    return;
+  }
+  const ema = op.ema_trend_filter !== false;
+  const capital = tr.capital || 500000;
+  const perSlot = Math.round(capital / 5).toLocaleString('en-IN');
+  const rr = Math.abs((op.target_pct||0.5) / (op.stop_pct||-0.3)).toFixed(2);
+  const rrGood = parseFloat(rr) >= 1.5;
+  const rrOk   = parseFloat(rr) >= 1.0;
+
+  body.innerHTML = `
+  <div class="brief-section">
+    <h4>Entry — Bullish Signal (buys a Call Option)</h4>
+    <div class="brief-row">
+      <span class="brief-label">Trigger (ALL must be true)</span>
+      <span class="brief-value">
+        <span class="tag tag-gold">RSI</span> crosses UP through <b>${op.rsi_buy_threshold}</b> — stock was oversold and momentum is reversing<br>
+        <span class="tag tag-blue">MACD</span> histogram is positive — short-term trend accelerating upward<br>
+        ${ema ? `<span class="tag tag-green">EMA</span> 9 &gt; 21 &gt; 50 — all three moving averages aligned in uptrend<br>` : `<span class="tag tag-gray">EMA filter OFF</span> — trend alignment not required<br>`}
+        <span class="tag tag-orange">Volume</span> at least <b>${op.volume_surge_min}x</b> the 20-day average — genuine participation, not thin day<br>
+        &rarr; Buy <b style="color:#69f0ae">ATM Call (CE)</b> on that stock
+      </span>
+    </div>
+  </div>
+
+  <div class="brief-section">
+    <h4>Entry — Bearish Signal (buys a Put Option)</h4>
+    <div class="brief-row">
+      <span class="brief-label">Trigger (ALL must be true)</span>
+      <span class="brief-value">
+        <span class="tag tag-gold">RSI</span> crosses DOWN through <b>${op.rsi_sell_threshold}</b> — stock was overbought and momentum is reversing<br>
+        <span class="tag tag-blue">MACD</span> histogram is negative — downward acceleration confirmed<br>
+        ${ema ? `<span class="tag tag-green">EMA</span> 9 &lt; 21 &lt; 50 — all three moving averages aligned in downtrend<br>` : `<span class="tag tag-gray">EMA filter OFF</span><br>`}
+        <span class="tag tag-orange">Volume</span> at least <b>${op.volume_surge_min}x</b> the 20-day average<br>
+        &rarr; Buy <b style="color:#ff80ab">ATM Put (PE)</b> on that stock
+      </span>
+    </div>
+  </div>
+
+  <div class="brief-section">
+    <h4>Exit Rules (checked every trading day, in this order)</h4>
+    <div class="brief-row">
+      <span class="brief-label"><span class="tag tag-green">Take Profit</span></span>
+      <span class="brief-value">Exit when premium gains <b>+${(op.target_pct*100).toFixed(0)}%</b> from the entry price. Locks in profit immediately.</span>
+    </div>
+    <div class="brief-row">
+      <span class="brief-label"><span class="tag tag-red">Stop Loss</span></span>
+      <span class="brief-value">Exit when premium loses <b>${Math.abs(op.stop_pct*100).toFixed(0)}%</b> from entry. Hard limit — no exceptions.</span>
+    </div>
+    <div class="brief-row">
+      <span class="brief-label"><span class="tag tag-gold">Time Exit</span></span>
+      <span class="brief-value">If neither target nor stop is hit after <b>${op.hold_days} trading days</b>, exit at market close on day ${op.hold_days}.</span>
+    </div>
+    <div class="brief-row">
+      <span class="brief-label"><span class="tag tag-gray">Force Close</span></span>
+      <span class="brief-value">Any position still open at end of the test window is closed at the last available price.</span>
+    </div>
+  </div>
+
+  <div class="brief-section">
+    <h4>Risk / Reward Analysis</h4>
+    <div class="brief-row">
+      <span class="brief-label">Target : Stop ratio</span>
+      <span class="brief-value">
+        <span class="tag ${rrGood ? 'tag-green' : rrOk ? 'tag-gold' : 'tag-red'}">${rr} : 1</span>
+        &nbsp; Target = +${(op.target_pct*100).toFixed(0)}% &nbsp; Stop = -${Math.abs(op.stop_pct*100).toFixed(0)}%
+        <br><small style="color:#778899">
+        ${rrGood
+          ? 'Good R:R — each winner more than compensates for each loser at this win rate.'
+          : rrOk
+          ? 'Acceptable R:R — strategy needs a win rate above 50% to be profitable.'
+          : 'Warning: R:R below 1 — even with 60%+ win rate, large losses can erode gains. This is the key issue when win rate is high but returns are negative.'}
+        </small>
+      </span>
+    </div>
+  </div>
+
+  <div class="brief-section">
+    <h4>Optimized Indicator Parameters (result of training)</h4>
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.3rem">
+      <div class="param-pill"><span class="pk">RSI Buy Level</span><span class="pv">${op.rsi_buy_threshold}</span></div>
+      <div class="param-pill"><span class="pk">RSI Sell Level</span><span class="pv">${op.rsi_sell_threshold}</span></div>
+      <div class="param-pill"><span class="pk">Hold Days</span><span class="pv">${op.hold_days}d</span></div>
+      <div class="param-pill"><span class="pk">Volume Surge Min</span><span class="pv">${op.volume_surge_min}x</span></div>
+      <div class="param-pill"><span class="pk">Take Profit</span><span class="pv">+${(op.target_pct*100).toFixed(0)}%</span></div>
+      <div class="param-pill"><span class="pk">Stop Loss</span><span class="pv">-${Math.abs(op.stop_pct*100).toFixed(0)}%</span></div>
+      <div class="param-pill"><span class="pk">EMA Trend Filter</span><span class="pv">${ema ? "ON" : "OFF"}</span></div>
+    </div>
+    <p style="font-size:.75rem;color:#556;margin-top:.6rem">
+      These numbers were chosen by testing ${(tr.total_trades||0) > 0 ? "thousands of" : "many"} combinations on the
+      Jan 2022–Mar 2025 training data. The combination above produced the highest Sharpe ratio on training.
+      The test result above is from running these exact parameters on Apr–Sep 2025 data that was never used in training.
+    </p>
+  </div>
+
+  <div class="brief-section">
+    <h4>Trade Universe and Position Sizing</h4>
+    <div class="brief-row">
+      <span class="brief-label">Universe scanned</span>
+      <span class="brief-value">40 NSE large-cap F&amp;O-eligible stocks (Nifty 50 tier) — all 40 scanned every trading day for signals</span>
+    </div>
+    <div class="brief-row">
+      <span class="brief-label">Trade frequency</span>
+      <span class="brief-value">Only stocks where ALL 4 conditions fire on the same day. Most days = 0 signals. Never forced into a trade.</span>
+    </div>
+    <div class="brief-row">
+      <span class="brief-label">Max simultaneous positions</span>
+      <span class="brief-value"><span class="tag tag-blue">5 positions max</span> — capital split equally (Rs${perSlot} per slot)</span>
+    </div>
+    <div class="brief-row">
+      <span class="brief-label">Strike selection</span>
+      <span class="brief-value">ATM (At The Money) — nearest Rs50 interval to the closing price on entry day</span>
+    </div>
+    <div class="brief-row">
+      <span class="brief-label">Options pricing</span>
+      <span class="brief-value">Real NSE F&amp;O Bhavcopy settlement prices (official NSE data). Black-Scholes fallback for missing contracts.</span>
+    </div>
+  </div>
+  `;
+}
+
+function cmpRow(k,v){
+  return `<div class="cmp-row"><span class="ck">${k}</span><span class="cv">${v}</span></div>`;
+}
+
+let eqChart = null;
+function drawEquity(curve){
+  const canvas = document.getElementById("eq-chart");
+  if(!canvas) return;
+  const labels   = curve.map((_,i) => `D${i}`);
+  const capital  = curve[0] || 500000;
+  const pctCurve = curve.map(v => +((v/capital-1)*100).toFixed(2));
+  if(eqChart){ eqChart.destroy(); eqChart = null; }
+  const load = () => _drawChart(canvas, labels, pctCurve);
+  if(typeof Chart === "undefined"){
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js";
+    s.onload = load; document.head.appendChild(s);
+  } else { load(); }
+}
+function _drawChart(canvas, labels, pctCurve){
+  const col = pctCurve[pctCurve.length-1] >= 0 ? "#00c853" : "#ff5252";
+  eqChart = new Chart(canvas, {
+    type:"line",
+    data:{ labels, datasets:[{ label:"Return %", data:pctCurve,
+      borderColor:col, backgroundColor:col+"22", borderWidth:2, pointRadius:0, fill:true, tension:0.3 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>(ctx.parsed.y>=0?"+":"")+ctx.parsed.y.toFixed(2)+"%"}} },
+      scales:{ x:{display:false}, y:{grid:{color:"rgba(255,255,255,.05)"},
+        ticks:{color:"#778899", callback:v=>(v>=0?"+":"")+v.toFixed(1)+"%"}} } }
+  });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadResults();
+  fetch("/api/backtest/status").then(r=>r.json()).then(d => {
+    if(!d || d.status === "not_started") return;
+    document.getElementById("prog-wrap").style.display = "block";
+    renderProgress(d);
+    if(d.status === "running" && d.is_alive){
+      setRunningUI(true); startPolling();
+    } else if(d.status === "interrupted" || (d.status === "running" && !d.is_alive)){
+      setRunningUI(false);
+      showStaleBanner(d.stale_warning || "The previous run was interrupted. Start a new run.");
+    } else {
+      setRunningUI(false);
+    }
+  }).catch(()=>{});
+});
+</script>
+{% endblock %}

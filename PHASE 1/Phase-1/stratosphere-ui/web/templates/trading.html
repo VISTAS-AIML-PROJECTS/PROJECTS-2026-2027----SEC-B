@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<style>
+  .mode-banner {
+    width: 100%;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    animation: fadeIn 0.5s ease;
+  }
+  
+  .mode-paper {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+  }
+  
+  @keyframes pulseRed {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  }
+  
+  .mode-live {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #fca5a5;
+    animation: pulseRed 2s infinite;
+  }
+
+  .btn-danger {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .btn-danger:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 900px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .card-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .card-header h3 {
+    font-size: 1.1rem;
+    color: var(--text-main);
+  }
+
+  .badge-inline {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  .bg-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+  .bg-red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+  
+  .text-green { color: #34d399; }
+  .text-red { color: #f87171; }
+
+  .order-form .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .symbol-preview {
+    font-family: monospace;
+    background: rgba(0,0,0,0.3);
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: #69f0ae;
+    margin-bottom: 1rem;
+  }
+
+  table.trading-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  
+  table.trading-table th {
+    text-align: left;
+    color: var(--text-muted);
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+    font-weight: 500;
+  }
+  
+  table.trading-table td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .btn-close { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+  .btn-close:hover { background: rgba(239, 68, 68, 0.4); }
+
+  .signals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .signal-item {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="mode-banner" class="mode-banner mode-paper" style="display: none;">
+    <div id="mode-text">📋 PAPER TRADING MODE — No real money at risk</div>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <span id="kite-badge" class="badge-inline bg-red">Not Connected</span>
+        <button class="btn-danger" onclick="emergencyStop()">🛑 EMERGENCY STOP</button>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Left Column -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Quick Order -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="card-header">
+                <h3>Quick Order</h3>
+            </div>
+            <div class="order-form">
+                <div class="form-group">
+                    <label class="form-label">Symbol</label>
+                    <input type="text" id="qo-symbol" class="form-input" placeholder="e.g. ICICIBANK" value="NIFTY" oninput="updateSymbolPreview()">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select id="qo-type" class="form-select" onchange="updateSymbolPreview()">
+                            <option value="CE">CE (Call)</option>
+                            <option value="PE">PE (Put)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Strike</label>
+                        <input type="number" id="qo-strike" class="form-input" value="22000" oninput="updateSymbolPreview()">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Expiry (YYM/DD)</label>
+                        <input type="text" id="qo-expiry" class="form-input" placeholder="e.g. 24JAN" value="24JAN" oninput="updateSymbolPreview()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Lots / Qty</label>
+                        <input type="number" id="qo-qty" class="form-input" value="50">
+                    </div>
+                </div>
+                
+                <label class="form-label">Target Symbol</label>
+                <div class="symbol-preview" id="qo-preview">NIFTY24JAN22000CE</div>
+                
+                <button class="btn" style="width: 100%; background: linear-gradient(to right, #34d399, #10b981);" onclick="placeOrder()">Place Paper Order</button>
+            </div>
+        </div>
+
+        <!-- Today's Signals -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="card-header">
+                <h3>Today's Signals</h3>
+                <button class="btn-sm" style="background: rgba(255,255,255,0.1); color: white;" onclick="fetchSignals()">Scan</button>
+            </div>
+            <div class="signals-list" id="signals-container">
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Click scan to find opportunities...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Open Positions -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="card-header">
+                <h3>Open Positions</h3>
+                <span id="pos-refresh-indicator" style="font-size: 0.8rem; color: var(--text-muted);">Refreshing...</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="trading-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Entry</th>
+                            <th>Qty</th>
+                            <th>Avg Price</th>
+                            <th>LTP</th>
+                            <th>PnL</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positions-body">
+                        <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No open positions</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Trade History -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="card-header">
+                <h3>Recent Trade History</h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="trading-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Exit Time</th>
+                            <th>Entry</th>
+                            <th>Exit</th>
+                            <th>PnL Rs</th>
+                            <th>Mode</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+                        <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No recent trades</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let positionsInterval;
+
+    async function fetchStatus() {
+        try {
+            const res = await fetch('/api/kite/status');
+            const data = await res.json();
+            
+            const banner = document.getElementById('mode-banner');
+            const text = document.getElementById('mode-text');
+            const badge = document.getElementById('kite-badge');
+            
+            banner.style.display = 'flex';
+            
+            if (data.live_trading) {
+                banner.className = 'mode-banner mode-live';
+                text.textContent = '⚠️ LIVE TRADING ACTIVE — Real orders are being placed';
+            } else {
+                banner.className = 'mode-banner mode-paper';
+                text.textContent = '📋 PAPER TRADING MODE — No real money at risk';
+            }
+            
+            if (data.connected) {
+                badge.className = 'badge-inline bg-green';
+                badge.textContent = `✅ ${data.user_name || 'Connected'}`;
+            } else {
+                badge.className = 'badge-inline bg-red';
+                badge.innerHTML = '<a href="/kite/auth" style="color: inherit; text-decoration: none;">Not connected — Login</a>';
+            }
+        } catch (e) {
+            console.error('Error fetching status', e);
+        }
+    }
+
+    function updateSymbolPreview() {
+        const symbol = document.getElementById('qo-symbol').value.toUpperCase();
+        const expiry = document.getElementById('qo-expiry').value.toUpperCase();
+        const strike = document.getElementById('qo-strike').value;
+        const type = document.getElementById('qo-type').value;
+        
+        document.getElementById('qo-preview').textContent = `${symbol}${expiry}${strike}${type}`;
+    }
+
+    async function placeOrder() {
+        const target = document.getElementById('qo-preview').textContent;
+        const qty = parseInt(document.getElementById('qo-qty').value);
+        
+        if (!target || !qty) return alert('Invalid inputs');
+        
+        try {
+            const res = await fetch('/api/trade/paper_order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbol: target, quantity: qty })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                fetchPositions();
+            } else {
+                alert('Order failed: ' + (data.detail || data.error));
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error placing order');
+        }
+    }
+
+    async function closePosition(id) {
+        if (!confirm('Close position?')) return;
+        try {
+            const res = await fetch(`/api/trade/close/${id}`, { method: 'POST' });
+            if (res.ok) {
+                fetchPositions();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function fetchPositions() {
+        const ind = document.getElementById('pos-refresh-indicator');
+        ind.textContent = 'Refreshing...';
+        try {
+            const res = await fetch('/api/trade/positions');
+            const data = await res.json();
+            // Expected data format: Array of position objects
+            // Render logic...
+            
+            const tbody = document.getElementById('positions-body');
+            if (Array.isArray(data) && data.length > 0) {
+                tbody.innerHTML = data.map(p => {
+                    const pnlClass = p.pnl >= 0 ? 'text-green' : 'text-red';
+                    return `
+                        <tr>
+                            <td style="font-family: monospace;">${p.symbol}</td>
+                            <td>${new Date(p.entry_time).toLocaleTimeString()}</td>
+                            <td>${p.quantity}</td>
+                            <td>${p.entry_price.toFixed(2)}</td>
+                            <td>${p.ltp ? p.ltp.toFixed(2) : '-'}</td>
+                            <td class="${pnlClass}">${p.pnl ? p.pnl.toFixed(2) : '-'}</td>
+                            <td><button class="btn-sm btn-close" onclick="closePosition('${p.id}')">Close</button></td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No open positions</td></tr>';
+            }
+            
+            ind.textContent = 'Live';
+        } catch (e) {
+            console.error(e);
+            ind.textContent = 'Error';
+        }
+    }
+
+    async function emergencyStop() {
+        if (!confirm('Are you sure you want to trigger an EMERGENCY STOP? This will halt all new trades.')) return;
+        try {
+            const res = await fetch('/api/trade/emergency_stop', { method: 'POST' });
+            if (res.ok) {
+                alert('Emergency stop activated! DO_NOT_TRADE flag set.');
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function fetchSignals() {
+        const cont = document.getElementById('signals-container');
+        cont.innerHTML = '<p style="color: var(--text-muted);">Scanning...</p>';
+        try {
+            const res = await fetch('/api/trade/signals');
+            const data = await res.json();
+            
+            if (Array.isArray(data) && data.length > 0) {
+                cont.innerHTML = data.map(s => `
+                    <div class="signal-item">
+                        <div>
+                            <strong style="color: ${s.type === 'CE' ? '#34d399' : '#f87171'}">BUY ${s.type}</strong>
+                            <br>
+                            <span style="font-family: monospace; font-size: 0.9rem;">${s.symbol} ${s.strike}</span>
+                        </div>
+                        <button class="btn-sm" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd;" 
+                            onclick="document.getElementById('qo-symbol').value='${s.symbol}'; document.getElementById('qo-type').value='${s.type}'; document.getElementById('qo-strike').value='${s.strike}'; updateSymbolPreview();">
+                            Load
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                cont.innerHTML = '<p style="color: var(--text-muted);">No signals found.</p>';
+            }
+        } catch (e) {
+            console.error(e);
+            cont.innerHTML = '<p style="color: var(--error);">Error scanning signals</p>';
+        }
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchStatus();
+        fetchPositions();
+        positionsInterval = setInterval(fetchPositions, 5000);
+        updateSymbolPreview();
+    });
+</script>
+{% endblock %}

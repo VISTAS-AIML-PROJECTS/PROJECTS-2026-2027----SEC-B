@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Stratosphere Explorer</h1>
+    <p>Read-only schema explorer and strategy validator for the Stratosphere quantitative trading system.</p>
+</div>
+
+<div class="dashboard-grid">
+    <div class="stat-card glass-panel">
+        <h3>Schema Version</h3>
+        <div class="stat-value">{{ schema_version }}</div>
+        <p>Current StrategyConfig version</p>
+    </div>
+    
+    <div class="stat-card glass-panel">
+        <h3>Indicators</h3>
+        <div class="stat-value">{{ indicators_count }}</div>
+        <p>Registered technical indicators</p>
+    </div>
+    
+    <div class="stat-card glass-panel">
+        <h3>Categories</h3>
+        <div class="stat-value">{{ categories_count }}</div>
+        <p>Distinct indicator families</p>
+    </div>
+</div>
+
+<div class="nav-cards">
+    <a href="/schema" class="nav-card glass-panel">
+        <h3>🧩 Schema Browser</h3>
+        <p>Explore the canonical JSON schema for strategy configuration, with interactive type definitions and constraints.</p>
+    </a>
+    
+    <a href="/indicators" class="nav-card glass-panel">
+        <h3>📊 Indicator Catalog</h3>
+        <p>Browse the comprehensive library of registered technical indicators, including their parameters and output ranges.</p>
+    </a>
+    
+    <a href="/validate" class="nav-card glass-panel">
+        <h3>✓ Strategy Validator</h3>
+        <p>Paste a StrategyConfig JSON payload to run schema and semantic validation with inline feedback.</p>
+    </a>
+</div>
+{% endblock %}
