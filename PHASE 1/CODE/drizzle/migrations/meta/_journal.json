@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790168510740,
+      "tag": "0000_aquasense_core_schema",
+      "breakpoints": true
+    }
+  ]
+}
