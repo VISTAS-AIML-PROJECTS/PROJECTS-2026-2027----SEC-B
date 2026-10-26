@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}
+<header><h1>{{ language }} &mdash; {{ topic }}</h1><p class="muted">{{ 'Submissions are run against test cases automatically.' if language == 'Python' else 'Auto-judging is available for Python only; other languages are saved for review.' }}</p></header>
+<div class="grid">{% for p in problems %}<div class="card"><h3>{{ p.title }} {% if p.id in done %}<span class="badge ok">Solved</span>{% endif %}</h3><p class="muted">{{ p.statement }}</p>
+<a class="btn" href="{{ url_for('coding_problem', language=language, topic=topic, pid=p.id) }}">Solve</a></div>{% endfor %}</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{
+  "data": "Simulated cohort of 3000 students (no real placement outcomes available)",
+  "holdout_accuracy": 0.695,
+  "macro_f1": 0.693,
+  "cv_mean": 0.715,
+  "cv_std": 0.013,
+  "labels": [
+    "Low",
+    "Medium",
+    "High"
+  ],
+  "confusion": [
+    [
+      113,
+      60,
+      1
+    ],
+    [
+      37,
+      169,
+      60
+    ],
+    [
+      0,
+      71,
+      239
+    ]
+  ],
+  "importances": [
+    [
+      "accuracy",
+      0.295
+    ],
+    [
+      "avg_score",
+      0.237
+    ],
+    [
+      "hard_accuracy",
+      0.194
+    ],
+    [
+      "score_std",
+      0.076
+    ],
+    [
+      "time_per_question",
+      0.075
+    ],
+    [
+      "trend",
+      0.068
+    ],
+    [
+      "tests_taken",
+      0.028
+    ],
+    [
+      "topics_covered",
+      0.026
+    ]
+  ],
+  "train_size": 2250,
+  "test_size": 750
+}

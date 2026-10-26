@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block content %}
+<header><h1>Performance analytics</h1><p class="muted">Accuracy is measured per question, so every topic is tracked even inside mixed tests.</p></header>
+{% if stats %}
+<div class="grid2"><div class="card"><h3>Accuracy by topic</h3><canvas id="topics"></canvas></div><div class="card"><h3>Test scores over time</h3><canvas id="hist"></canvas></div></div>
+<div class="card scroll"><table><tr><th>Topic</th><th>Subject</th><th>Accuracy</th><th>Answered</th><th>Ability</th></tr>
+{% for s in stats %}<tr><td>{{ s.topic }}</td><td>{{ s.subject }}</td><td class="{{ 'bad' if s.acc < 0.6 else 'good' if s.acc >= 0.8 else '' }}">{{ '%.0f'|format(s.acc*100) }}%</td><td>{{ s.n }}</td><td>{{ level_name(rt.get(s.topic, 1100)) }} ({{ '%.0f'|format(rt.get(s.topic, 1100)) }})</td></tr>{% endfor %}</table></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+new Chart(document.getElementById('topics'),{type:'bar',data:{labels:{{ topics|tojson }},datasets:[{label:'Accuracy %',data:{{ acc|tojson }},backgroundColor:'#6366f1'}]},options:{indexAxis:'y',scales:{x:{beginAtZero:true,max:100}}}});
+new Chart(document.getElementById('hist'),{type:'line',data:{labels:{{ hist_x|tojson }},datasets:[{label:'Score %',data:{{ hist_y|tojson }},tension:.3,borderColor:'#4f46e5'}]},options:{scales:{y:{beginAtZero:true,max:100}}}});
+</script>
+{% else %}<div class="card"><p class="muted">Take a test to see analytics.</p></div>{% endif %}
+{% endblock %}

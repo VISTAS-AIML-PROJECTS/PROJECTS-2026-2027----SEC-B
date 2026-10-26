@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block content %}
+<div class="timerbar card"><div class="top"><div><b>{{ test.topic }}</b> &middot; {{ test.mode }}<br><small id="cnt">0 / {{ questions|length }} answered</small></div><div class="timer" id="timer">--:--</div></div><div class="prog"><i id="pg"></i></div></div>
+{% if test.mixed %}<div class="alert info">This topic has fewer than 30 questions of its own, so related questions were added to make a full 30-question test.</div>{% endif %}
+<form method="post" action="{{ url_for('submit_test') }}" id="testform"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{% for q in questions %}<div class="card question"><h3>{{ loop.index }}. {{ q.question }}</h3>
+  {% for o in q.options|fromjson %}<label><input type="radio" name="q{{ q.id }}" value="{{ o }}"> {{ o }}</label>{% endfor %}</div>{% endfor %}
+<button>Submit test</button></form>
+<script>
+let left={{ left }};const el=document.getElementById('timer'),f=document.getElementById('testform');
+function tick(){const m=String(Math.floor(left/60)).padStart(2,'0'),s=String(left%60).padStart(2,'0');el.textContent=m+':'+s;if(left<=60)el.classList.add('bad');if(left<=0){f.submit();return}left--;setTimeout(tick,1000)}tick();
+document.querySelectorAll('input[type=radio]').forEach(r=>r.addEventListener('change',()=>{const n=new Set([...document.querySelectorAll('input[type=radio]:checked')].map(x=>x.name)).size,T={{ questions|length }};document.getElementById('cnt').textContent=n+' / '+T+' answered';document.getElementById('pg').style.width=(n/T*100)+'%'}));
+</script>
+{% endblock %}

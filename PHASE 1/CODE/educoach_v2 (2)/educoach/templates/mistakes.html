@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block content %}
+<header><h1>Mistake notebook</h1><p class="muted">Questions you answered wrongly, most recent first.</p></header>
+{% for r in rows %}<div class="card question wrong"><h3>{{ r.question }}</h3>
+<p>You chose: <b class="bad">{{ r.chosen or 'Not answered' }}</b> &middot; Correct: <b class="good">{{ r.answer }}</b></p>
+<p class="muted">{{ r.explanation }} <span class="badge">{{ r.topic }}</span></p></div>
+{% else %}<div class="card"><p class="muted">No mistakes recorded yet. Nice work, or take a test first.</p></div>{% endfor %}
+{% endblock %}
