@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+  .convergence-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 992px) {
+    .convergence-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem;
+    align-items: flex-end;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .filter-group.flex-2 {
+    flex: 2;
+    min-width: 220px;
+  }
+
+  .filter-group label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .filter-group input, .filter-group select {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    color: var(--text-main);
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    outline: none;
+    transition: var(--transition);
+  }
+
+  .filter-group input:focus, .filter-group select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  .filter-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    padding-right: 2.2rem;
+  }
+
+  .filter-group select option {
+    background: #1e293b;
+    color: var(--text-main);
+  }
+
+  .btn-gradient {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+    height: 42px;
+  }
+
+  .btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  }
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+  }
+
+  @keyframes spin { 
+    to { transform: rotate(360deg); } 
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .result-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: var(--transition);
+    animation: fadeInUp 0.5s ease backwards;
+  }
+
+  .result-card:hover {
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 1rem;
+  }
+
+  .result-symbol {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .scores-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .score-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .score-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .score-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .score-val {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .score-val.bullish { color: var(--success); }
+  .score-val.bearish { color: var(--error); }
+  .score-val.neutral { color: var(--text-muted); }
+
+  .bar-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    position: absolute;
+    height: 100%;
+    transition: width 0.6s ease, left 0.6s ease, right 0.6s ease, background 0.6s ease;
+  }
+
+  .bar-fill.bullish {
+    left: 50%;
+    background: var(--success);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .bar-fill.bearish {
+    right: 50%;
+    background: var(--error);
+    border-radius: 4px 0 0 4px;
+  }
+
+  .bar-fill.neutral {
+    left: 48%;
+    width: 4%;
+    background: var(--text-muted);
+    border-radius: 4px;
+  }
+
+  .bar-center-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255,255,255,0.2);
+    transform: translateX(-50%);
+  }
+
+  .sources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .source-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    border: 1px solid transparent;
+  }
+  
+  .source-item-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .source-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-main);
+  }
+
+  .badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .badge-analyst { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+  .badge-news { background: rgba(249, 115, 22, 0.2); color: #fdba74; }
+  .badge-public { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+
+  .badge-long { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; display: flex; align-items: center; gap: 0.2rem; }
+  .badge-short { background: rgba(239, 68, 68, 0.2); color: #fca5a5; display: flex; align-items: center; gap: 0.2rem; }
+
+  .badge-weight {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-muted);
+  }
+
+  .leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  
+  .leaderboard-item:last-child {
+    border-bottom: none;
+  }
+
+  .leaderboard-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Source Convergence</h1>
+  <p>Scans all analyst recommendations for options contracts (CE/PE + expiry) where 2+ independent sources agree on the same trade.</p>
+</div>
+
+<div class="glass-panel filter-bar">
+  <div class="filter-group">
+    <label for="window-select">Lookback Window</label>
+    <select id="window-select">
+      <option value="24">24 Hours</option>
+      <option value="48" selected>48 Hours</option>
+      <option value="72">72 Hours</option>
+      <option value="168">1 Week (168h)</option>
+    </select>
+  </div>
+
+  <div class="filter-group" style="flex: 0; min-width: auto;">
+    <button id="btn-scan" class="btn-gradient">🔍 Scan All Contracts</button>
+  </div>
+</div>
+
+<div id="scan-summary" style="display:none; margin: 1rem 0; padding: 0.75rem 1.25rem; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; font-size: 0.85rem; color: var(--text-muted);">
+</div>
+
+<div class="convergence-layout">
+  <div class="results-section">
+    <div id="loading-spinner" class="spinner" style="display: none;"></div>
+    <div id="results-grid" class="results-grid">
+      <!-- Cards rendered here by JS -->
+    </div>
+    <div id="no-results" style="display: none; text-align: center; padding: 2rem; color: var(--text-muted);">
+      No convergence found. No contracts have 2+ independent analyst recommendations in this window.
+    </div>
+  </div>
+
+  <div class="leaderboard-section">
+    <div class="glass-panel" style="padding: 1.5rem;">
+      <h2 style="margin-bottom: 1.5rem; font-size: 1.25rem;">Source Leaderboard</h2>
+      <div id="sources-list" class="leaderboard-list">
+        <!-- Sources rendered here by JS -->
+        <div class="spinner" id="sources-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/convergence.js"></script>
+{% endblock %}
+

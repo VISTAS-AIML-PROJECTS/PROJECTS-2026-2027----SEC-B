@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Indicator Catalog</h1>
+    <p>Browse all {{ indicators|length }} registered indicators available for strategy condition building.</p>
+</div>
+
+<div class="filter-tabs">
+    <button class="filter-btn active" data-filter="ALL">All</button>
+    {% for cat in categories %}
+    <button class="filter-btn" data-filter="{{ cat.value }}">{{ cat.value }}</button>
+    {% endfor %}
+</div>
+
+<div class="indicators-grid">
+    {% for ind in indicators %}
+    <div class="indicator-card glass-panel" data-category="{{ ind.category.value }}">
+        <div class="indicator-header">
+            <div class="indicator-title">
+                <h3>{{ ind.name }}</h3>
+                <span style="color: var(--text-muted); font-size: 0.8rem;">ID: {{ ind.id }}</span>
+            </div>
+            <span class="badge">{{ ind.category.value }}</span>
+        </div>
+        
+        <div class="indicator-desc">
+            {{ ind.description }}
+            {% if ind.nse_notes %}
+            <div style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(0,0,0,0.2); border-left: 2px solid var(--warning); font-size: 0.8rem;">
+                <strong>NSE Note:</strong> {{ ind.nse_notes }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <h4 style="margin-top: 1rem; font-size: 0.9rem; color: var(--accent-blue);">Parameters</h4>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in ind.parameters %}
+                <tr>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.param_type }}</td>
+                    <td>{{ p.default }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h4 style="margin-top: 1rem; font-size: 0.9rem; color: var(--accent-purple);">Outputs</h4>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in ind.outputs %}
+                <tr>
+                    <td class="
+                        {% if o.output_type.value == 'CONTINUOUS' %}output-type-continuous{% endif %}
+                        {% if o.output_type.value == 'SIGNAL' %}output-type-signal{% endif %}
+                        {% if o.output_type.value == 'CATEGORICAL' %}output-type-categorical{% endif %}
+                    ">{{ o.name }}</td>
+                    <td>{{ o.output_type.value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

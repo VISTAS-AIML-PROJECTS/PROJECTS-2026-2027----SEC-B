@@ -1,0 +1,900 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+  .analyzer-header {
+    margin-bottom: 2rem;
+  }
+  
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem;
+    align-items: flex-end;
+  }
+  
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .filter-group.flex-2 {
+    flex: 2;
+    min-width: 220px;
+  }
+  
+  .filter-group label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  
+  .filter-group input, .filter-group select {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    color: var(--text-main);
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    outline: none;
+    transition: var(--transition);
+  }
+  
+  .filter-group input:focus, .filter-group select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+  
+  .filter-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    padding-right: 2.2rem;
+  }
+  
+  .filter-group select option {
+    background: #1e293b;
+    color: var(--text-main);
+  }
+  
+  #btn-analyze {
+    height: 42px;
+    min-width: 110px;
+    margin-top: 0;
+  }
+  
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: none;
+    margin: 2rem auto;
+  }
+  
+  @keyframes spin { 
+    to { transform: rotate(360deg); } 
+  }
+
+  .stock-info-card {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    display: none;
+    animation: fadeInUp 0.5s ease;
+  }
+
+  .stock-info-card.visible {
+    display: flex;
+  }
+  
+  .stock-primary {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .stock-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  
+  .stock-symbol {
+    color: var(--accent-blue);
+    font-weight: 600;
+  }
+  
+  .stock-meta {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .meta-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .meta-value {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .signal-card {
+    display: flex;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    opacity: 0;
+    animation: fadeInUp 0.5s ease forwards;
+  }
+  
+  .signal-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .signal-card.perfect-win {
+    border-color: rgba(250, 204, 21, 0.4);
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.1);
+  }
+
+  .signal-card.perfect-win:hover {
+    border-color: rgba(250, 204, 21, 0.8);
+    box-shadow: 0 0 30px rgba(250, 204, 21, 0.2);
+  }
+
+  .signal-card.combined-card {
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.12);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.06), var(--glass-bg));
+  }
+
+  .signal-card.combined-card:hover {
+    border-color: rgba(139, 92, 246, 0.8);
+    box-shadow: 0 0 35px rgba(139, 92, 246, 0.2);
+  }
+  
+  .rank-number {
+    font-size: 4rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.05);
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    line-height: 1;
+    z-index: 0;
+  }
+  
+  .signal-content {
+    flex: 1;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .signal-content {
+      grid-template-columns: 1fr;
+    }
+    .filter-bar { flex-direction: column; }
+  }
+
+  .signal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .signal-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+  
+  .badge-category {
+    background: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .badge-dir-bullish {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-dir-bearish {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-dir-both {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .signal-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  
+  .stat-box {
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 0.75rem;
+  }
+  
+  .stat-title {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stat-val {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .stat-val.positive { color: var(--success); }
+  .stat-val.negative { color: var(--error); }
+  
+  .win-rate-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid var(--glass-border);
+    padding-left: 2rem;
+  }
+  
+  .win-rate-title {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+  
+  .win-rate-value {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  
+  .progress-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease-out;
+  }
+  
+  .confidence-badge {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    background: rgba(255,255,255,0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* ── Combine Checkbox ── */
+  .combine-check {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: color 0.2s;
+  }
+
+  .combine-check:hover {
+    color: var(--accent-purple);
+  }
+
+  .combine-check input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--glass-border);
+    border-radius: 4px;
+    background: rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .combine-check input[type="checkbox"]:checked {
+    background: var(--accent-purple);
+    border-color: var(--accent-purple);
+  }
+
+  .combine-check input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* ── Floating Combine Bar ── */
+  .combine-bar {
+    position: fixed;
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1.5rem;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid var(--accent-purple);
+    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+    z-index: 100;
+    transition: bottom 0.3s ease;
+  }
+
+  .combine-bar.visible {
+    bottom: 2rem;
+  }
+
+  .combine-bar .combine-count {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .combine-bar .combine-count span {
+    color: var(--accent-purple);
+  }
+
+  #btn-combine {
+    padding: 0.5rem 1.2rem;
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+  }
+
+  #btn-combine:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  }
+
+  #btn-combine:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  #btn-clear-combine {
+    padding: 0.5rem 0.8rem;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  #btn-clear-combine:hover {
+    color: var(--error);
+    border-color: var(--error);
+  }
+
+  /* ── Combined Result Card ── */
+  #combined-result {
+    display: none;
+    margin-bottom: 1.5rem;
+  }
+
+  #combined-result.visible {
+    display: block;
+  }
+
+  .combined-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent-purple);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── Error message ── */
+  .analyzer-error {
+    display: none;
+    padding: 1rem 1.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    color: #f87171;
+    margin-bottom: 1.5rem;
+  }
+  .analyzer-error.visible { display: block; }
+
+  /* ── Edit Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-overlay.visible {
+    display: flex;
+  }
+
+  .edit-modal {
+    background: var(--bg-secondary, #1e293b);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 520px;
+    max-width: 92vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: fadeInUp 0.3s ease;
+  }
+
+  .edit-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .edit-modal-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .edit-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.2s;
+  }
+
+  .edit-modal-close:hover { color: var(--error); }
+
+  .edit-param-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .edit-param-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+  }
+
+  .edit-param-label span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .edit-param-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    font-family: 'JetBrains Mono', monospace;
+    min-width: 55px;
+    text-align: right;
+  }
+
+  .edit-param-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.1);
+    outline: none;
+    transition: background 0.2s;
+  }
+
+  .edit-param-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    transition: transform 0.15s;
+  }
+
+  .edit-param-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  .edit-param-range {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+  }
+
+  .edit-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  #btn-reeval {
+    flex: 1;
+    padding: 0.7rem 1.2rem;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+  }
+
+  #btn-reeval:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  }
+
+  #btn-reeval:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  #btn-reset-params {
+    padding: 0.7rem 1.2rem;
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  #btn-reset-params:hover {
+    color: var(--text-main);
+    border-color: var(--text-main);
+  }
+
+  .edit-result-preview {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    display: none;
+  }
+
+  .edit-result-preview.visible { display: block; }
+
+  .edit-result-preview .result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    font-size: 0.85rem;
+  }
+
+  .edit-result-preview .result-label { color: var(--text-muted); }
+  .edit-result-preview .result-val { font-weight: 600; color: var(--text-main); }
+  .edit-result-preview .result-val.positive { color: var(--success); }
+  .edit-result-preview .result-val.negative { color: var(--error); }
+
+  .edit-param-unit {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: 0.25rem;
+  }
+
+  /* ── Edit button on card ── */
+  .edit-btn {
+    position: absolute;
+    top: 1rem;
+    right: 5.5rem;
+    z-index: 2;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .edit-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+
+  .edit-btn.no-params {
+    display: none;
+  }
+
+  /* ── Sensitivity Hover Chart ── */
+  .sweep-chart-container {
+    position: relative;
+    margin-top: 0.4rem;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease;
+  }
+
+  .sweep-chart-container.visible {
+    height: 110px;
+  }
+
+  .sweep-chart-container canvas {
+    width: 100%;
+    height: 100px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .sweep-chart-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .sweep-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    color: var(--accent-blue);
+    pointer-events: none;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analyzer-header">
+  <h1>Signal Reliability Analyzer</h1>
+  <p>Test historical trading signals to find what truly works on a specific stock.</p>
+</div>
+
+<div class="glass-panel filter-bar">
+  <div class="filter-group flex-2">
+    <label for="symbol-input">Stock Symbol</label>
+    <input type="text" id="symbol-input" placeholder="Enter NSE symbol, e.g. RELIANCE, TCS, INFY">
+  </div>
+  
+  <div class="filter-group">
+    <label for="interval-select">Timeframe</label>
+    <select id="interval-select">
+      <option value="1m">1 Minute</option>
+      <option value="5m">5 Minutes</option>
+      <option value="15m">15 Minutes</option>
+      <option value="30m">30 Minutes</option>
+      <option value="1h">1 Hour</option>
+      <option value="1d" selected>Daily</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label for="period-select">Period</label>
+    <select id="period-select">
+      <option value="5d">5 Days</option>
+      <option value="60d">60 Days</option>
+      <option value="1y">1 Year</option>
+      <option value="2y" selected>2 Years</option>
+      <option value="5y">5 Years</option>
+    </select>
+  </div>
+  
+  <div class="filter-group">
+    <label for="forward-select">Forward Bars</label>
+    <select id="forward-select">
+      <option value="3">3 Bars</option>
+      <option value="5">5 Bars</option>
+      <option value="10" selected>10 Bars</option>
+      <option value="20">20 Bars</option>
+    </select>
+  </div>
+  
+  <div class="filter-group">
+    <label for="win-threshold">Win Threshold</label>
+    <select id="win-threshold">
+      <option value="0.25">0.25%</option>
+      <option value="0.5">0.5%</option>
+      <option value="1.0" selected>1.0%</option>
+      <option value="2.0">2.0%</option>
+      <option value="3.0">3.0%</option>
+    </select>
+  </div>
+  
+  <div class="filter-group">
+    <label for="sort-select">Sort By</label>
+    <select id="sort-select">
+      <option value="win_rate" selected>Win Rate</option>
+      <option value="confidence">Confidence</option>
+      <option value="avg_return_pct">Avg Return</option>
+      <option value="total_signals">Total Signals</option>
+    </select>
+  </div>
+  
+  <button id="btn-analyze" class="btn">Analyze</button>
+</div>
+
+<div id="analyzer-error" class="analyzer-error"></div>
+<div id="analyzer-loading" class="spinner"></div>
+
+<div id="stock-info" class="glass-panel stock-info-card">
+  <div class="stock-primary">
+    <div id="si-name" class="stock-name">-</div>
+    <div id="si-symbol" class="stock-symbol">-</div>
+  </div>
+  <div class="stock-meta">
+    <div class="meta-item">
+      <span class="meta-label">Sector</span>
+      <span id="si-sector" class="meta-value">-</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Interval</span>
+      <span id="si-interval" class="meta-value">-</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Current Price</span>
+      <span id="si-price" class="meta-value">-</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Bars Analyzed</span>
+      <span id="si-bars" class="meta-value">-</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Date Range</span>
+      <span id="si-date" class="meta-value">-</span>
+    </div>
+  </div>
+</div>
+
+<!-- Combined Result (shown when user combines signals) -->
+<div id="combined-result"></div>
+
+<div id="signal-results" class="results-grid">
+  <!-- Results populated by JS -->
+</div>
+
+<!-- Floating combine bar (appears when 2+ cards checked) -->
+<div id="combine-bar" class="combine-bar">
+  <div class="combine-count"><span id="combine-count-num">0</span> signals selected</div>
+  <button id="btn-combine">⚡ Combine & Evaluate</button>
+  <button id="btn-clear-combine">✕ Clear</button>
+</div>
+
+<!-- Edit Signal Parameters Modal -->
+<div id="edit-modal-overlay" class="modal-overlay">
+  <div class="edit-modal">
+    <div class="edit-modal-header">
+      <h2 id="edit-modal-title">Edit Signal</h2>
+      <button class="edit-modal-close" id="btn-close-modal">×</button>
+    </div>
+    <div id="edit-params-container">
+      <!-- Sliders rendered dynamically by JS -->
+    </div>
+    <div class="edit-modal-actions">
+      <button id="btn-reeval">🔄 Re-evaluate</button>
+      <button id="btn-reset-params">↩ Reset</button>
+    </div>
+    <div id="edit-result-preview" class="edit-result-preview">
+      <!-- Re-evaluation result shown here -->
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/analyzer.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    new StockAutocomplete('symbol-input', { multi: false });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,1273 @@
+{% extends "base.html" %}
+{% block title %}AI Tower — Stratosphere{% endblock %}
+{% block content %}
+<style>
+/* ── Layout ── */
+.rw { max-width:1000px; margin:0 auto; padding:0 1rem 4rem; }
+.rh { text-align:center; padding:2rem 0 1.4rem; }
+.rh h1 { font-size:2.2rem; font-weight:900;
+  background:linear-gradient(135deg,#a78bfa,#6366f1,#818cf8);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.rh p  { color:#778899; font-size:.9rem; margin-top:.3rem; }
+
+/* Cards */
+.card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  border-radius:16px; padding:1.5rem 1.8rem; margin-bottom:1.2rem;
+  backdrop-filter:blur(12px); }
+.card h3 { margin:0 0 1rem; font-size:1rem; color:#c8d0e8; font-weight:700; letter-spacing:.3px; }
+
+/* Run controls */
+.ctrl-row { display:flex; gap:.7rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
+.btn { border:none; border-radius:10px; padding:.55rem 1.5rem;
+  font-size:.9rem; font-weight:700; cursor:pointer; color:#fff; white-space:nowrap; transition:all .2s; }
+.btn:disabled { opacity:.35; cursor:not-allowed; }
+.btn:hover:not(:disabled) { transform:translateY(-1px); filter:brightness(1.1); }
+.btn-train { background:linear-gradient(135deg,#6366f1,#a78bfa); }
+.btn-test  { background:linear-gradient(135deg,#059669,#34d399); color:#fff; }
+.btn-ref   { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:#94a3b8; }
+
+/* Progress */
+.prog-wrap { display:none; background:rgba(99,102,241,.07);
+  border:1px solid rgba(99,102,241,.2); border-radius:10px;
+  padding:12px 18px; margin-bottom:12px; }
+.prog-wrap.show { display:block; }
+.prog-bar-track { height:8px; background:rgba(255,255,255,.07); border-radius:4px; margin:.5rem 0; }
+.prog-bar-fill  { height:100%; border-radius:4px;
+  background:linear-gradient(90deg,#6366f1,#a78bfa); transition:width .4s ease; }
+.prog-msg { font-size:.82rem; color:#94a3b8; }
+.spinner { display:inline-block; width:12px; height:12px;
+  border:2px solid rgba(255,255,255,.15); border-top-color:#a78bfa;
+  border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:6px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* Status strip */
+.status-strip { background:rgba(167,139,250,.06); border:1px solid rgba(167,139,250,.15);
+  border-radius:8px; padding:10px 15px; font-size:.83rem; color:#94a3b8; margin-bottom:1rem; display:none; }
+.status-strip.show { display:block; }
+
+/* Train vs Test header */
+.tt-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.2rem; }
+@media (max-width:700px) { .tt-grid { grid-template-columns:1fr; } }
+
+.period-card { border-radius:16px; padding:1.5rem 1.8rem;
+  border:1px solid rgba(255,255,255,.08); backdrop-filter:blur(12px); }
+.train-card { background:rgba(99,102,241,.08); border-color:rgba(99,102,241,.25); }
+.test-card  { background:rgba(16,185,129,.06); border-color:rgba(16,185,129,.2); }
+.period-card h3 { margin:0 0 1.1rem; font-size:.9rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.8px; }
+.train-card h3 { color:#818cf8; }
+.test-card  h3 { color:#34d399; }
+
+/* Metric grid */
+.metrics-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.7rem; margin-bottom:1rem; }
+.metric-box   { background:rgba(255,255,255,.05); border-radius:12px; padding:.9rem 1rem; }
+.metric-box .mv { font-size:1.6rem; font-weight:900; line-height:1; }
+.metric-box .ml { font-size:.7rem; color:#778899; margin-top:.3rem; }
+.green  { color:#00c853; } .red    { color:#ff5252; } .gold { color:#ffd740; }
+.blue   { color:#00e5ff; } .purple { color:#b388ff; } .warn { color:#ff9800; }
+.violet { color:#a78bfa; }
+
+/* Equity chart */
+.eq-wrap { position:relative; height:180px; margin:0 0 1rem; }
+canvas.eq-chart { width:100% !important; height:100% !important; }
+
+/* AI filter bar */
+.ai-bar { display:flex; gap:1.2rem; flex-wrap:wrap; margin-bottom:1rem; }
+.ai-stat { background:rgba(255,255,255,.05); border-radius:10px; padding:.6rem 1rem; }
+.ai-stat .as-val { font-size:1.3rem; font-weight:900; color:#a78bfa; }
+.ai-stat .as-lbl { font-size:.7rem; color:#64748b; margin-top:.1rem; }
+
+/* Trade log */
+.trade-tbl { width:100%; border-collapse:collapse; font-size:.78rem; margin-top:.6rem; }
+.trade-tbl th { color:#778899; font-weight:600; padding:.4rem .6rem;
+  border-bottom:1px solid rgba(255,255,255,.08); text-align:right; white-space:nowrap; }
+.trade-tbl th:first-child { text-align:left; }
+.trade-tbl td { padding:.35rem .6rem; border-bottom:1px solid rgba(255,255,255,.04);
+  text-align:right; color:#c0c8e0; }
+.trade-tbl td:first-child { text-align:left; }
+.tw { color:#00c853; font-weight:700; } .tl { color:#ff5252; font-weight:700; }
+.tbl-wrap { max-height:320px; overflow-y:auto; }
+
+/* Not-ready state */
+.empty-state { text-align:center; padding:3rem 2rem; color:#475569; font-size:.9rem; }
+.empty-state .big { font-size:2.5rem; margin-bottom:.8rem; }
+</style>
+
+<div class="rw">
+  <div class="rh">
+    <h1>🧠 AI Tower Results</h1>
+    <p>NIFTY 1-min options · Tower 1 (Entry Gate) + Tower 2 (Exit Manager) · Real Greeks from Kaggle dataset</p>
+  </div>
+
+  <!-- Controls -->
+  <div class="card">
+    <!-- Dataset selector row -->
+    <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.9rem;flex-wrap:wrap">
+      <span style="font-size:.8rem;color:#94a3b8;white-space:nowrap;font-weight:600">📊 Dataset for Backtest:</span>
+      <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;
+        background:#1e293b;border:2px solid rgba(99,102,241,.4);border-radius:9px;padding:.35rem .85rem"
+        title="Original Kaggle 1-minute NIFTY options dataset (Oct–Dec 2024)">
+        <input type="radio" name="dataset-sel" id="ds-kaggle" value="kaggle" checked
+          style="accent-color:#818cf8;width:15px;height:15px;cursor:pointer">
+        <span style="font-size:.82rem;color:#818cf8;font-weight:700">🟣 Kaggle 1-Min</span>
+        <span style="font-size:.72rem;color:#475569">(Oct–Dec 2024 · 1-min candles)</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;
+        background:#1e293b;border:2px solid rgba(168,85,247,.3);border-radius:9px;padding:.35rem .85rem"
+        title="Angel One SmartAPI 5-minute candles fetched from live broker data">
+        <input type="radio" name="dataset-sel" id="ds-angel" value="angel"
+          style="accent-color:#a855f7;width:15px;height:15px;cursor:pointer">
+        <span style="font-size:.82rem;color:#a855f7;font-weight:700">🔵 Angel One 5-Min</span>
+        <span style="font-size:.72rem;color:#475569">(SmartAPI broker data · 5-min candles)</span>
+      </label>
+      <span id="dataset-note" style="font-size:.72rem;color:#475569;font-style:italic"></span>
+    </div>
+
+    <!-- Angel One Data Collection Panel (shown only when Angel One is selected) -->
+    <div id="angel-collect-panel" style="display:none;background:#0f172a;border:1px solid rgba(168,85,247,.35);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem">
+        <div>
+          <div style="font-size:.82rem;font-weight:700;color:#a855f7;margin-bottom:.3rem">📡 Angel One Data Collection</div>
+          <div id="angel-cache-msg" style="font-size:.74rem;color:#94a3b8">Loading cache status…</div>
+          <!-- progress bar -->
+          <div style="margin-top:.5rem;background:#1e293b;border-radius:99px;height:7px;width:260px;overflow:hidden">
+            <div id="angel-prog-bar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#7c3aed,#a855f7);transition:width .5s;width:0%"></div>
+          </div>
+          <div id="angel-expiry-list" style="font-size:.68rem;color:#64748b;margin-top:.3rem"></div>
+        </div>
+        <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
+          <button id="btn-collect" onclick="startCollect()"
+            style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;color:#fff;padding:.5rem 1.1rem;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer">
+            📡 Collect Data Now
+          </button>
+          <span id="collect-spinner" style="display:none;color:#a855f7;font-size:.8rem">⏳ Collecting…</span>
+        </div>
+      </div>
+      <!-- collection log -->
+      <div id="angel-collect-log" style="display:none;background:#020617;border:1px solid #1e293b;border-radius:8px;padding:.6rem .9rem;max-height:160px;overflow-y:auto;font-family:monospace;font-size:.7rem;color:#94a3b8;margin-top:.8rem;line-height:1.5;white-space:pre-wrap"></div>
+    </div>
+    <div class="ctrl-row" style="flex-wrap:wrap;gap:.6rem">
+      <button class="btn btn-train" id="btn-train" onclick="doTrain()">🎓 Train Both Towers</button>
+      <div style="display:flex;align-items:center;gap:.4rem;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:.35rem .7rem">
+        <label for="capital-input" style="font-size:.78rem;color:#94a3b8;white-space:nowrap">💰 Capital</label>
+        <span style="font-size:.82rem;color:#38bdf8">₹</span>
+        <input id="capital-input" type="number" value="50000" min="6000" step="1000"
+          style="width:90px;background:transparent;border:none;outline:none;color:#e2e8f0;font-size:.9rem;font-weight:600"
+          title="Trading capital in ₹. Lot size is auto-calculated.">
+      </div>
+      <!-- Sequential mode toggle -->
+      <label style="display:flex;align-items:center;gap:.45rem;cursor:pointer;
+        background:#1e293b;border:1px solid #f59e0b44;border-radius:8px;padding:.35rem .75rem"
+        title="1 trade at a time — next signal only after current position exits">
+        <span style="position:relative;display:inline-block;width:34px;height:18px">
+          <input type="range" id="sequential-mode" min="0" max="1" value="1" step="1"
+            style="display:none">
+          <input type="checkbox" id="sequential-mode-cb" checked
+            onchange="document.getElementById('sequential-mode').value=this.checked?1:0;
+                      document.getElementById('seq-options').style.display=this.checked?'flex':'none';"
+            style="accent-color:#f59e0b;width:16px;height:16px;cursor:pointer">
+        </span>
+        <span style="font-size:.79rem;color:#f59e0b;font-weight:600">📌 1-Trade-at-a-Time</span>
+      </label>
+      <!-- Window + min-conf (shown only in sequential mode) -->
+      <div id="seq-options" style="display:flex;gap:.5rem;align-items:center">
+        <select id="seq-window-sel"
+          style="background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:.78rem;padding:.25rem .45rem">
+          <option value="0">First-available</option>
+          <option value="30" selected>Best in 30m</option>
+          <option value="60">Best in 60m</option>
+          <option value="120">Best in 2h</option>
+        </select>
+        <label style="font-size:.75rem;color:#64748b;white-space:nowrap">Min conf
+          <input id="seq-conf-slider" type="range" min="0" max="0.9" step="0.05" value="0"
+            style="width:60px;accent-color:#818cf8;vertical-align:middle">
+          <span id="seq-conf-val" style="color:#818cf8">0%</span>
+        </label>
+      </div>
+      <button class="btn btn-test"  id="btn-test"  onclick="doTest()">🚀 Run AI Test</button>
+      <button class="btn btn-ref"               onclick="loadAll()">🔄 Refresh</button>
+    </div>
+    <div style="font-size:.78rem;color:#475569;margin-top:.4rem">
+      Train: uses all expiries except the last (holdout) · Test: holdout expiry only, never seen during training ·
+      Capital is <strong style="color:#38bdf8">constant</strong> per trade (profits accumulate separately, same capital re-deployed) ·
+      <span style="color:#f59e0b">₹40 brokerage is flat → more lots = cheaper per lot</span>
+    </div>
+  </div>
+
+  <!-- Server offline banner -->
+  <div id="offline-banner" style="display:none;background:#450a0a;border:1px solid #b91c1c;border-radius:10px;
+    padding:.8rem 1.2rem;margin-bottom:1rem;display:none;align-items:center;gap:.8rem">
+    <span style="font-size:1.3rem">🔴</span>
+    <div>
+      <div style="font-weight:700;color:#fca5a5">Server not reachable</div>
+      <div style="font-size:.78rem;color:#f87171;margin-top:2px">
+        The Stratosphere server is not running. Open a terminal and run:<br>
+        <code style="background:#1e293b;padding:.2rem .5rem;border-radius:4px;color:#38bdf8;font-size:.8rem">
+          cd /home/jeyrenth/.gemini/antigravity/scratch/stratosphere &amp;&amp; python3 -m uvicorn stratosphere.web.app:app --host 0.0.0.0 --port 8000 --reload
+        </code><br>
+        Then open <strong style="color:#38bdf8">http://localhost:8000/ai-tower</strong> in your browser.
+      </div>
+    </div>
+  </div>
+
+  <div class="prog-wrap" id="prog-wrap">
+    <div class="prog-msg"><span class="spinner"></span><span id="prog-text">Working…</span></div>
+    <div class="prog-bar-track"><div class="prog-bar-fill" id="prog-fill" style="width:5%"></div></div>
+  </div>
+  <div class="status-strip" id="status-strip"></div>
+
+  <!-- Train + Test grid -->
+  <div class="tt-grid">
+
+    <!-- TRAIN RESULT -->
+    <div class="period-card train-card" id="train-section">
+      <h3>📚 Train Period Result</h3>
+      <div id="train-body">
+        <div class="empty-state">
+          <div class="big">🎓</div>
+          Click <strong>Train Both Towers</strong> to see training result
+        </div>
+      </div>
+    </div>
+
+    <!-- TEST RESULT -->
+    <div class="period-card test-card" id="test-section">
+      <h3>🔬 Test Period Result (Holdout)</h3>
+      <div id="test-body">
+        <div class="empty-state">
+          <div class="big">🚀</div>
+          Click <strong>Run AI Test</strong> to see holdout result
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Strategy Summary Card -->
+  <div class="result-card" id="strategy-card" style="display:none;margin-bottom:1.5rem">
+    <div class="card-header">
+      <div class="card-icon">🧠</div>
+      <div>
+        <div class="card-title">Learned Strategy</div>
+        <div class="card-sub">What the AI discovered — entry filters + exit rules</div>
+      </div>
+    </div>
+    <div id="strategy-body">
+      <div class="empty-state"><div class="big">📖</div>Train both towers to see the learned strategy</div>
+    </div>
+  </div>
+
+  <!-- Trade Logs -->
+  <div id="trade-section" style="display:none">
+    <div class="card">
+      <h3>📋 Test Period — AI Trade Log</h3>
+      <div class="tbl-wrap">
+        <table class="trade-tbl">
+          <thead>
+            <tr>
+              <th>Strike</th><th>Type</th><th>Underlying (NIFTY)</th><th>Moneyness</th><th>Entry Time</th>
+              <th>Entry LTP</th><th>Exit LTP</th><th>Lots</th><th>Trade Value</th>
+              <th>Gross %</th><th>Net ₹</th><th>Charges</th><th>Hold</th><th>Exit Reason</th><th>P(win)</th>
+            </tr>
+          </thead>
+          <tbody id="trade-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Save Strategy Panel ─────────────────────────────────────────────── -->
+  <div id="save-strategy-panel" style="display:none;margin-bottom:1.5rem">
+    <div class="card" style="border-color:rgba(52,211,153,.3);background:rgba(16,185,129,.04)">
+      <h3 style="color:#34d399">💾 Save This Strategy for Paper Trading</h3>
+      <p style="font-size:.8rem;color:#64748b;margin:-.5rem 0 1rem">
+        Save the currently-trained Twin Tower models under a name. They will immediately appear
+        as a choice on the <strong style="color:#38bdf8">Paper Trade</strong> strategy selector — no server restart needed.
+      </p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end">
+        <div style="flex:1;min-width:220px">
+          <label style="font-size:.76rem;color:#94a3b8;display:block;margin-bottom:.3rem">Strategy Name</label>
+          <input id="save-strat-name" type="text" maxlength="80" placeholder="e.g. Kaggle High-Precision v2"
+            style="width:100%;box-sizing:border-box;background:#1e293b;border:1px solid #334155;border-radius:8px;
+              color:#e2e8f0;font-size:.92rem;padding:.45rem .75rem;outline:none">
+        </div>
+        <div>
+          <label style="font-size:.76rem;color:#94a3b8;display:block;margin-bottom:.3rem">Dataset Used</label>
+          <select id="save-strat-ds"
+            style="background:#1e293b;border:1px solid #334155;border-radius:8px;color:#e2e8f0;
+              font-size:.88rem;padding:.45rem .75rem;cursor:pointer">
+            <option value="kaggle">🟣 Kaggle 1-Min</option>
+            <option value="angel">🔵 Angel One 5-Min</option>
+          </select>
+        </div>
+        <button id="save-strat-btn" onclick="saveStrategy()"
+          style="background:linear-gradient(135deg,#059669,#34d399);border:none;border-radius:10px;
+            padding:.5rem 1.4rem;font-size:.9rem;font-weight:700;color:#fff;cursor:pointer;
+            white-space:nowrap;transition:all .2s"
+          onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">
+          💾 Save Strategy
+        </button>
+      </div>
+      <div id="save-strat-msg" style="margin-top:.7rem;font-size:.82rem;display:none"></div>
+    </div>
+  </div>
+
+</div><!-- /rw -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+let trainChart = null, testChart = null;
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function $(id) { return document.getElementById(id); }
+function showProgress(msg, pct=5) {
+  $('prog-wrap').classList.add('show');
+  $('prog-text').textContent = msg;
+  $('prog-fill').style.width = pct + '%';
+}
+function hideProgress() { $('prog-wrap').classList.remove('show'); }
+function showStatus(msg, err=false) {
+  const el = $('status-strip');
+  el.innerHTML = msg; el.classList.add('show');
+  el.style.borderColor = err ? 'rgba(248,113,113,.3)' : 'rgba(167,139,250,.15)';
+}
+
+function metricsHtml(m, cap, lots) {
+  if (!m || m.total_trades === 0) return '<div style="color:#475569;font-size:.82rem">No trades</div>';
+  const wr      = m.win_rate || 0;
+  const ret     = m.total_return_pct || 0;
+  const avg     = m.avg_pnl_pct || 0;
+  const netAvg  = m.avg_net_pnl_pct !== undefined ? m.avg_net_pnl_pct : avg;
+  const netRsT  = m.total_net_rs !== undefined ? m.total_net_rs : null;
+  const avgNetRs= m.avg_net_rs !== undefined ? m.avg_net_rs : null;
+  const chgRs   = m.avg_charge_rs !== undefined ? m.avg_charge_rs : null;
+  const capUsed = cap || m.capital_used || null;
+  const numLots = lots || m.num_lots || 1;
+  const fmt = v => v >= 0 ? `+₹${v.toFixed(0)}` : `-₹${Math.abs(v).toFixed(0)}`;
+  return `
+    <div class="metrics-grid">
+      <div class="metric-box">
+        <div class="mv ${wr>=55?'green':wr>=45?'gold':'red'}">${wr.toFixed(1)}%</div>
+        <div class="ml">Win Rate (net basis)</div>
+      </div>
+      <div class="metric-box">
+        <div class="mv gold">${m.total_trades}</div>
+        <div class="ml">Total Trades</div>
+      </div>
+      <div class="metric-box">
+        <div class="mv ${avg>=0?'green':'red'}">${avg>=0?'+':''}${avg.toFixed(1)}%</div>
+        <div class="ml">Avg Gross P&amp;L/Trade</div>
+      </div>
+      ${avgNetRs !== null ? `<div class="metric-box" style="border-color:rgba(52,211,153,.3)">
+        <div class="mv green" style="font-size:1.3rem">${fmt(avgNetRs)}</div>
+        <div class="ml" style="color:#34d399">✅ Avg Net/Trade (${numLots} lot${numLots>1?'s':''})</div>
+      </div>` : ''}
+      ${netRsT !== null ? `<div class="metric-box" style="border-color:rgba(52,211,153,.2)">
+        <div class="mv ${netRsT>=0?'green':'red'}" style="font-size:1.1rem">${fmt(netRsT)}</div>
+        <div class="ml" style="color:#34d399">Total Net Profit</div>
+      </div>` : ''}
+      ${chgRs !== null ? `<div class="metric-box" style="border-color:rgba(248,113,113,.2)">
+        <div class="mv red">-₹${chgRs.toFixed(0)}/trade</div>
+        <div class="ml">Avg Charges (brok+STT+exc+GST+stamp)</div>
+      </div>` : ''}
+      ${capUsed !== null ? `<div class="metric-box" style="border-color:rgba(56,189,248,.2)">
+        <div class="mv" style="color:#38bdf8">₹${capUsed.toLocaleString()}</div>
+        <div class="ml" style="color:#38bdf8">Capital per trade (lots vary by entry price)</div>
+      </div>` : ''}
+      ${m.best_pnl !== undefined ? `
+      <div class="metric-box">
+        <div class="mv green">+${m.best_pnl.toFixed(1)}%</div>
+        <div class="ml">Best Trade (gross)</div>
+      </div>` : ''}
+      ${m.worst_pnl !== undefined ? `
+      <div class="metric-box">
+        <div class="mv red">${m.worst_pnl.toFixed(1)}%</div>
+        <div class="ml">Worst Trade (gross)</div>
+      </div>` : ''}
+    </div>`;
+}
+
+function aiBarHtml(meta, t1meta, d) {
+  if (!meta) return '';
+  const raw   = (meta.taken||0) + (meta.skipped||0);
+  const ai_ok = meta.taken||0;
+  const seqSk = meta.seq_skipped||0;
+  const exec  = d && d.test_stats ? (d.test_stats.total_trades||0) : ai_ok;
+  const prec  = t1meta ? (t1meta.wfv_precision*100).toFixed(1) : '—';
+  const thr   = t1meta ? (t1meta.optimal_threshold*100).toFixed(0) + '%' : '—';
+  const isSeq = meta.seq_mode || false;
+
+  // Funnel bars
+  const funnelHtml = `
+    <div style="display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;margin-bottom:.7rem;font-size:.75rem">
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:.3rem .6rem;text-align:center">
+        <div style="color:#94a3b8;font-size:.7rem">Raw signals</div>
+        <div style="color:#e2e8f0;font-weight:700;font-size:1rem">${raw}</div>
+      </div>
+      <div style="color:#334155;font-size:1.2rem">→</div>
+      <div style="background:#1e293b;border:1px solid #818cf8;border-radius:6px;padding:.3rem .6rem;text-align:center">
+        <div style="color:#94a3b8;font-size:.7rem">After Tower 1 AI</div>
+        <div style="color:#818cf8;font-weight:700;font-size:1rem">${ai_ok}</div>
+      </div>
+      ${isSeq ? `
+      <div style="color:#334155;font-size:1.2rem">→</div>
+      <div style="background:#1e293b;border:1px solid #f59e0b;border-radius:6px;padding:.3rem .6rem;text-align:center">
+        <div style="color:#94a3b8;font-size:.7rem">${meta.seq_window_mins>0?'🪟 Best-of-'+meta.seq_window_mins+'min':'⚡ Min conf '+(meta.seq_min_conf>0?(meta.seq_min_conf*100).toFixed(0)+'%':'OFF')}</div>
+        <div style="color:#f59e0b;font-weight:700;font-size:1rem">${ai_ok-(meta.seq_skipped_conf||0)} <span style="font-size:.7rem;font-weight:400;color:#64748b">(${meta.seq_skipped_conf||0} conf↓)</span></div>
+      </div>
+      <div style="color:#334155;font-size:1.2rem">→</div>
+      <div style="background:#1e293b;border:1px solid #22c55e;border-radius:6px;padding:.3rem .6rem;text-align:center">
+        <div style="color:#94a3b8;font-size:.7rem">📌 Executed (1-at-a-time)</div>
+        <div style="color:#22c55e;font-weight:700;font-size:1rem">${exec} <span style="font-size:.7rem;font-weight:400;color:#64748b">(${meta.seq_skipped_busy||seqSk} busy-skip)</span></div>
+      </div>` : `
+      <div style="color:#334155;font-size:1.2rem">→</div>
+      <div style="background:#1e293b;border:1px solid #34d399;border-radius:6px;padding:.3rem .6rem;text-align:center">
+        <div style="color:#94a3b8;font-size:.7rem">⚡ Executed (all parallel)</div>
+        <div style="color:#34d399;font-weight:700;font-size:1rem">${exec}</div>
+      </div>`}
+    </div>`;
+
+  return funnelHtml + `
+    <div class="ai-bar">
+      <div class="ai-stat"><div class="as-val" style="color:#818cf8">${(meta.skipped/(raw||1)*100).toFixed(0)}%</div><div class="as-lbl">T1 filter rate</div></div>
+      <div class="ai-stat"><div class="as-val">${meta.ai_exits||0}</div><div class="as-lbl">AI dynamic exits</div></div>
+      ${isSeq?`<div class="ai-stat"><div class="as-val" style="color:#f59e0b">${(seqSk/Math.max(ai_ok,1)*100).toFixed(0)}%</div><div class="as-lbl">Seq. skip rate</div></div>`:''}
+      <div class="ai-stat"><div class="as-val">${prec}%</div><div class="as-lbl">WFV Precision</div></div>
+      <div class="ai-stat"><div class="as-val">${thr}</div><div class="as-lbl">P(win) threshold</div></div>
+    </div>`;
+}
+
+// ── Date range + hold-time row ───────────────────────────────────────────────
+function durationHtml(stats) {
+  if (!stats) return '';
+  const fmtMins = m => {
+    if (!m) return '—';
+    const h = Math.floor(m/60), mn = Math.round(m%60);
+    return h>0 ? `${h}h ${mn}m` : `${Math.round(m)}m`;
+  };
+  const fmtDate = s => {
+    if (!s) return '—';
+    const d = new Date(s + 'T00:00:00');
+    return d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+  };
+  const from = stats.date_from || '';
+  const to   = stats.date_to   || '';
+  const avg  = stats.avg_hold_mins || 0;
+  const med  = stats.median_hold_mins || 0;
+  const dateBlock = (from && to) ? `
+    <div style="background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);border-radius:8px;
+      padding:.45rem 1rem;display:flex;align-items:center;gap:.7rem">
+      <span style="font-size:1.1rem">📅</span>
+      <div>
+        <div style="font-size:.7rem;color:#94a3b8;margin-bottom:1px">Trades covered</div>
+        <div style="font-size:.97rem;font-weight:700;color:#38bdf8">
+          ${fmtDate(from)} <span style="color:#475569;font-weight:400">→</span> ${fmtDate(to)}
+        </div>
+      </div>
+    </div>` : '';
+  const holdBlock = avg ? `
+    <div style="background:rgba(99,102,241,.09);border:1px solid rgba(99,102,241,.22);border-radius:8px;
+      padding:.45rem .9rem;display:flex;align-items:center;gap:.5rem">
+      <span>⏱</span>
+      <div>
+        <div style="font-size:.7rem;color:#94a3b8">Avg hold / Median</div>
+        <div style="font-size:.9rem;font-weight:700;color:#a78bfa">${fmtMins(avg)} <span style="color:#64748b;font-weight:400;font-size:.8rem">/ ${fmtMins(med)}</span></div>
+      </div>
+    </div>` : '';
+  if (!dateBlock && !holdBlock) return '';
+  return `<div style="display:flex;gap:.6rem;margin:.5rem 0;flex-wrap:wrap">${dateBlock}${holdBlock}</div>`;
+}
+
+
+// ── Projection block (Annual ROC — fixed capital model) ───────────────────────
+function cagrHtml(stats, capital, label) {
+  if (!stats) return '';
+  // Use explicit annual fields if present, fall back to weekly × 52
+  const weekly  = stats.projected_weekly_net_rs || stats.total_net_rs || 0;
+  const annual  = stats.projected_annual_net_rs  || (weekly * 52);
+  const annCon  = stats.projected_annual_net_rs_con || (annual * 0.70);
+  const cap     = capital || stats.capital_used || 50000;
+  // Always recompute ROC from the ₹ figures so stale JSON never shows 99,900%
+  const roc     = cap > 0 ? Math.round(annual / cap * 100 * 10) / 10 : 0;
+  const rocCon  = cap > 0 ? Math.round(annCon / cap * 100 * 10) / 10 : 0;
+  const rocCol  = roc >= 1000 ? '#22c55e' : roc >= 200 ? '#f59e0b' : roc >= 0 ? '#94a3b8' : '#f87171';
+  const fmtRs   = v => (v >= 0 ? '+' : '-') + '₹' + Math.abs(v).toLocaleString('en-IN', {maximumFractionDigits:0});
+  const fmtPct  = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+  return `
+  <div style="background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(16,185,129,.04));
+    border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:.8rem 1rem;margin:.6rem 0">
+    <div style="font-size:.72rem;color:#64748b;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em">
+      📈 Projected Performance · ${label} · Capital ₹${cap.toLocaleString()}
+    </div>
+    <div style="display:flex;gap:1.3rem;flex-wrap:wrap;align-items:flex-end">
+      <div>
+        <div style="font-size:.7rem;color:#94a3b8">This-week net profit</div>
+        <div style="font-size:1.35rem;font-weight:800;color:${weekly>=0?'#22c55e':'#f87171'}">${fmtRs(weekly)}</div>
+      </div>
+      <div style="border-left:1px solid #1e293b;padding-left:1.3rem">
+        <div style="font-size:.7rem;color:#94a3b8">Annualised net profit (52 weeks)</div>
+        <div style="font-size:1.35rem;font-weight:800;color:#f59e0b">${fmtRs(annual)}</div>
+        <div style="font-size:.72rem;color:#64748b;margin-top:1px">Conservative (70%): ${fmtRs(annCon)}</div>
+      </div>
+      <div style="border-left:1px solid #1e293b;padding-left:1.3rem">
+        <div style="font-size:.7rem;color:#94a3b8">Annual ROC on capital</div>
+        <div style="font-size:1.5rem;font-weight:800;color:${rocCol}">${fmtPct(roc)}</div>
+        <div style="font-size:.72rem;color:#64748b;margin-top:1px">Conservative: ${fmtPct(rocCon)}</div>
+      </div>
+    </div>
+    <div style="font-size:.68rem;color:#475569;margin-top:.45rem">
+      ⓘ Fixed capital model: same ₹${cap.toLocaleString()} deployed per trade; profits accumulate separately.
+      Annual ROC = annualised profit ÷ capital × 100. Conservative = 70% of base (bad weeks + slippage).
+      <strong style="color:#94a3b8">Check: ${fmtRs(annual)} ÷ ₹${cap.toLocaleString()} = ${fmtPct(roc)}</strong>
+    </div>
+  </div>`;
+}
+
+function drawChart(canvasId, chartRef, equityCurve, color) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return null;
+  if (chartRef) chartRef.destroy();
+  const n = equityCurve.length;
+  const labels = equityCurve.map((_, i) => i);
+  return new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: equityCurve,
+        borderColor: color,
+        backgroundColor: color.replace('rgb','rgba').replace(')',',0.08)'),
+        borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { mode:'index',intersect:false } },
+      scales: {
+        x: { display: false },
+        y: { grid:{ color:'rgba(255,255,255,.05)' }, ticks:{ color:'#778899', font:{size:10} } }
+      }
+    }
+  });
+}
+
+// ── Render train result ───────────────────────────────────────────────────────
+function renderTrain(d) {
+  if (!d || d.error) {
+    $('train-body').innerHTML = `<div class="empty-state"><div class="big">🎓</div>${d?.error || 'No train data yet'}</div>`;
+    return;
+  }
+  const t1m = d.tower1_meta || {};
+  const html = `
+    ${metricsHtml(d.train_stats)}
+    ${durationHtml(d.train_stats)}
+    <div style="font-size:.74rem;color:#475569;margin:.6rem 0 .3rem">
+      Trained on: <strong style="color:#818cf8">${d.expiries_used||'—'} expiries</strong> 
+      &nbsp;·&nbsp; Period: ${d.train_period||'—'}
+    </div>
+    <div style="font-size:.74rem;color:#475569;margin-bottom:.8rem">
+      Tower 1: ${t1m.n_samples||0} signals · WFV Precision ${t1m.wfv_precision?(t1m.wfv_precision*100).toFixed(1)+'%':'—'}
+      · Threshold ${t1m.optimal_threshold?(t1m.optimal_threshold*100).toFixed(0)+'%':'—'}
+      &nbsp;·&nbsp; Tower 2: ${(d.tower2_meta||{}).n_samples||0} position-minutes
+    </div>
+    ${d.train_equity_curve ? `<div class="eq-wrap"><canvas class="eq-chart" id="train-chart"></canvas></div>` : ''}
+    ${d.top_features ? `
+    <div style="font-size:.74rem;color:#475569;margin-bottom:.4rem">Top entry features:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.8rem">
+      ${Object.entries(d.top_features||{}).slice(0,8).map(([k,v])=>
+        `<span style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2);
+          border-radius:20px;padding:2px 9px;font-size:.7rem">${k} ${(v*100).toFixed(1)}%</span>`
+      ).join('')}
+    </div>` : ''}
+  `;
+  $('train-body').innerHTML = html;
+  if (d.train_equity_curve) {
+    trainChart = drawChart('train-chart', trainChart, d.train_equity_curve, 'rgb(129,140,248)');
+  }
+}
+
+// ── Render test result ────────────────────────────────────────────────────────
+function renderTest(d) {
+  if (!d || d.error) {
+    $('test-body').innerHTML = `<div class="empty-state"><div class="big">🚀</div>${d?.error || 'No test data yet'}</div>`;
+    return;
+  }
+  // Compute date range directly from trades list (works even with cached stats)
+  const ts = d.test_stats || {};
+  if (d.trades && d.trades.length > 0) {
+    const dates = d.trades.map(t => String(t.entry_ts||'').substring(0,10)).filter(Boolean).sort();
+    if (dates.length) { ts.date_from = dates[0]; ts.date_to = dates[dates.length-1]; }
+  }
+  const html = `
+    ${aiBarHtml(d.ai_meta, d.tower1_meta, d)}
+    ${metricsHtml(ts, d.capital_input, d.num_lots)}
+    ${durationHtml(ts)}
+    ${cagrHtml(ts, d.capital_input, 'Test holdout (1 expiry week)')}
+    <div style="font-size:.74rem;color:#475569;margin:.6rem 0 .3rem">
+      Test expiry (holdout): <strong style="color:#34d399">${d.test_expiry||'—'}</strong>&nbsp;·&nbsp; Capital: <strong style="color:#38bdf8">₹${(d.capital_input||0).toLocaleString()}</strong> · ${d.sequential_mode ? '<strong style="color:#f59e0b">📌 1-Trade-at-a-Time mode</strong>' : '<span style="color:#64748b">All signals (parallel)</span>'} · Equity curve = cumulative net ₹ (fixed capital, charges deducted)
+    </div>
+    ${d.equity_curve ? `<div class="eq-wrap"><canvas class="eq-chart" id="test-chart"></canvas></div>` : ''}
+  `;
+  $('test-body').innerHTML = html;
+  if (d.equity_curve) {
+    testChart = drawChart('test-chart', testChart, d.equity_curve, 'rgb(52,211,153)');
+  }
+
+  // Trade log
+  const trades = d.trades || [];
+  if (trades.length > 0) {
+    $('trade-section').style.display = 'block';
+    $('trade-tbody').innerHTML = trades.map(t => {
+      const netOk = t.net_rs !== undefined;
+      const netCol = netOk ? (t.net_rs>=0?'tw':'tl') : (t.pnl_pct>=0?'tw':'tl');
+      const spotVal = t.underlying_price ? `₹${Number(t.underlying_price).toLocaleString('en-IN', {maximumFractionDigits:1})}` : '—';
+      const mTag = t.moneyness_tag || '—';
+      const mCol = mTag.includes('ITM') ? '#34d399' : (mTag.includes('ATM') ? '#38bdf8' : '#94a3b8');
+      return `<tr>
+        <td>${t.strike}</td>
+        <td><span class="${t.opt_type==='CE'?'tw':'tl'}">${t.opt_type}</span></td>
+        <td style="color:#38bdf8;font-weight:700">${spotVal}</td>
+        <td style="color:${mCol};font-weight:600;font-size:.74rem">${mTag}</td>
+        <td>${String(t.entry_ts).substring(0,16)}</td>
+        <td>₹${t.entry_ltp?.toFixed(1)||'—'}</td>
+        <td>₹${t.exit_ltp?.toFixed(1)||'—'}</td>
+        <td style="color:#38bdf8;font-weight:700">${t.num_lots||1}</td>
+        <td style="color:#94a3b8;font-size:.78rem">₹${t.num_lots&&t.entry_ltp?Math.round(t.entry_ltp*50*t.num_lots).toLocaleString():'—'}</td>
+        <td class="${t.pnl_pct>=0?'tw':'tl'}">${t.pnl_pct>=0?'+':''}${t.pnl_pct?.toFixed(1)}%</td>
+        <td class="${netCol}" style="font-weight:700">${netOk?(t.net_rs>=0?'+₹':'-₹')+Math.abs(t.net_rs).toFixed(0):'—'}</td>
+        <td style="font-size:.72rem;color:#f87171">${netOk?'-₹'+t.charges_rs.toFixed(0):'—'}</td>
+        <td>${t.hold_minutes}m</td>
+        <td style="font-size:.72rem">${t.exit_reason}</td>
+        <td>${t.p_win?(t.p_win*100).toFixed(0)+'%':'—'}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+// ── API calls ─────────────────────────────────────────────────────────────────
+
+// Helper: get selected dataset ('kaggle' or 'angel')
+function getSelectedDataset() {
+  const r = document.querySelector('input[name="dataset-sel"]:checked');
+  return r ? r.value : 'kaggle';
+}
+
+async function doTrain() {
+  const ds = getSelectedDataset();
+  const dsLabel = ds === 'angel' ? 'Angel One 5-Min' : 'Kaggle 1-Min';
+  $('btn-train').disabled = true;
+  showProgress(`Generating labeled signals from ${dsLabel} data… (may take 5-10 min)`, 8);
+  showStatus(`Training started on ${dsLabel} dataset. Tower 1 (Entry Gate) + Tower 2 (Exit Manager) learning from all training expiries…`);
+  try {
+    await fetch('/api/ai/nifty-train', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ expiry_limit: 999, dataset: ds }),
+    });
+    let pct = 10;
+    const iv = setInterval(async () => {
+      pct = Math.min(pct + 4, 88);
+      $('prog-fill').style.width = pct + '%';
+      try {
+        const r = await fetch('/api/ai/nifty-status?t=' + Date.now());
+        const s = await r.json();
+        if (s.entry_gate_trained && s.exit_manager_trained) {
+          clearInterval(iv);
+          $('prog-fill').style.width = '100%';
+          $('prog-text').textContent = 'Training complete!';
+          setTimeout(hideProgress, 1200);
+          $('btn-train').disabled = false;
+          showStatus('✅ Both towers trained. Now click <strong>Run AI Test</strong> to see holdout results.');
+          loadAll();
+        }
+      } catch(e) {}
+    }, 14000);
+  } catch(e) {
+    hideProgress(); $('btn-train').disabled = false;
+    showStatus('Error: ' + e.message, true);
+  }
+}
+
+async function doTest() {
+  $('btn-test').disabled = true;
+  showProgress('Running AI-gated simulation on holdout expiry…', 20);
+  showStatus('Testing on holdout expiry (never seen during training)…');
+  try {
+    const capitalVal  = parseFloat(document.getElementById('capital-input')?.value || 50000);
+    const seqCb       = document.getElementById('sequential-mode-cb');
+    const seqMode     = seqCb ? seqCb.checked : true;   // default ON
+    const seqConf     = seqMode ? parseFloat(document.getElementById('seq-conf-slider')?.value || 0) : 0;
+    const seqWindow   = seqMode ? parseInt(document.getElementById('seq-window-sel')?.value || 30) : 0;
+    await fetch('/api/ai/nifty-backtest', { method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({capital: capitalVal, sequential: seqMode, seq_min_conf: seqConf, seq_window: seqWindow, dataset: getSelectedDataset()}) });
+    let pct = 25;
+    const iv = setInterval(async () => {
+      pct = Math.min(pct + 8, 90);
+      $('prog-fill').style.width = pct + '%';
+      try {
+        const r = await fetch('/api/ai/nifty-results?t=' + Date.now());
+        if (r.ok) {
+          const d = await r.json();
+          if (!d.error && d.test_stats) {
+            clearInterval(iv);
+            $('prog-fill').style.width = '100%';
+            $('prog-text').textContent = 'Done!';
+            setTimeout(hideProgress, 1000);
+            $('btn-test').disabled = false;
+            renderTest(d);
+            const ts = d.test_stats || {};
+            const netAvgRs = ts.avg_net_rs !== undefined ? ts.avg_net_rs : 0;
+            const cap  = d.capital_input || 50000;
+            const seqTag = d.sequential_mode ? ' 📌 1-trade-at-a-time' : ' (all signals)';
+            showStatus(`✅ Test done. Trades: ${ts.total_trades}${seqTag} · WR: ${ts.win_rate}% · Net: ₹${netAvgRs>=0?'+':''}${netAvgRs.toFixed(0)}/trade · Total: ₹${(ts.total_net_rs||0).toFixed(0)} · Capital: ₹${cap.toLocaleString()}`);
+            // Reveal Save Strategy panel and sync dataset dropdown
+            const ssp = $('save-strategy-panel');
+            if (ssp) ssp.style.display = 'block';
+            const sds = $('save-strat-ds');
+            if (sds) sds.value = getSelectedDataset();
+          }
+        }
+      } catch(e) {}
+    }, 8000);
+  } catch(e) {
+    hideProgress(); $('btn-test').disabled = false;
+    showStatus('Error: ' + e.message, true);
+  }
+}
+
+// ── Save Strategy ─────────────────────────────────────────────────────────────
+async function saveStrategy() {
+  const name    = ($('save-strat-name')?.value || '').trim();
+  const dataset = $('save-strat-ds')?.value || 'kaggle';
+  const btn     = $('save-strat-btn');
+  const msgEl   = $('save-strat-msg');
+
+  if (!name) {
+    msgEl.style.display = 'block';
+    msgEl.style.color = '#f87171';
+    msgEl.textContent = '⚠ Please enter a strategy name.';
+    $('save-strat-name').focus();
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+  msgEl.style.display = 'none';
+
+  try {
+    const resp = await fetch('/api/ai/nifty-save-strategy', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ name, dataset }),
+    });
+    const j = await resp.json();
+    msgEl.style.display = 'block';
+    if (j.success) {
+      msgEl.style.color = '#34d399';
+      msgEl.innerHTML = `${j.message}<br>
+        <span style="font-size:.74rem;color:#64748b">Strategy ID: <code style="color:#818cf8">${j.strategy_id}</code>
+        · Threshold: ${(j.threshold*100).toFixed(0)}%
+        · Go to <a href="/paper-trade" style="color:#38bdf8">Paper Trade</a> and select it.</span>`;
+      btn.textContent = '✅ Saved!';
+      setTimeout(() => { btn.disabled = false; btn.textContent = '💾 Save Strategy'; }, 3000);
+    } else {
+      msgEl.style.color = '#f87171';
+      msgEl.textContent = '❌ ' + (j.error || 'Save failed');
+      btn.disabled = false; btn.textContent = '💾 Save Strategy';
+    }
+  } catch(e) {
+    msgEl.style.display = 'block';
+    msgEl.style.color = '#f87171';
+    msgEl.textContent = '❌ Network error: ' + e.message;
+    btn.disabled = false; btn.textContent = '💾 Save Strategy';
+  }
+}
+
+// ── Render strategy summary ───────────────────────────────────────────────────
+function renderStrategy(s) {
+  if (!s) return;
+  $('strategy-card').style.display = 'block';
+  const badge = (txt, col) =>
+    `<span style="background:rgba(${col},.15);color:rgb(${col});border:1px solid rgba(${col},.3);
+      border-radius:20px;padding:2px 10px;font-size:.72rem;margin:2px">${txt}</span>`;
+  const entryFeats = (s.exit_trigger_features||[]).map(f=>badge(f,'239,68,68')).join('');
+  const holdFeats  = (s.hold_duration_features||[]).map(f=>badge(f,'52,211,153')).join('');
+  $('strategy-body').innerHTML = `
+    <div style="font-size:.82rem;color:#94a3b8;margin-bottom:1rem;line-height:1.6">
+      ${s.summary||''}
+    </div>
+    <div class="metrics-grid" style="margin-bottom:1rem">
+      <div class="metric-box">
+        <div class="mv green">${s.stop_signal_accuracy||'—'}</div>
+        <div class="ml">Stop signal accuracy</div>
+      </div>
+      <div class="metric-box">
+        <div class="mv violet">${s.hold_prediction_corr||'—'}</div>
+        <div class="ml">Hold prediction corr.</div>
+      </div>
+      <div class="metric-box">
+        <div class="mv gold">${s.stop_threshold||'—'}</div>
+        <div class="ml">Exit condition</div>
+      </div>
+    </div>
+    <div style="margin-bottom:.5rem">
+      <div style="font-size:.72rem;color:#475569;margin-bottom:.3rem">🚨 Top exit-trigger features</div>
+      <div>${entryFeats||'—'}</div>
+    </div>
+    <div>
+      <div style="font-size:.72rem;color:#475569;margin-bottom:.3rem">⏱ Hold duration drivers</div>
+      <div>${holdFeats||'—'}</div>
+    </div>
+  `;
+}
+
+async function loadAll() {
+  try {
+    const [sr, rr] = await Promise.all([
+      fetch('/api/ai/nifty-status?t=' + Date.now()),
+      fetch('/api/ai/nifty-results?t=' + Date.now()),
+    ]);
+    const status  = sr.ok  ? await sr.json()  : null;
+    const results = rr.ok  ? await rr.json()  : null;
+
+    if (status?.strategy_summary) renderStrategy(status.strategy_summary);
+    if (results && !results.error && results.strategy_summary) renderStrategy(results.strategy_summary);
+    if (results && !results.error) {
+      renderTrain(results); renderTest(results);
+    } else if (status?.entry_gate_trained) {
+      // Models trained but no backtest yet
+      const t1m = status.entry_gate || {};
+      const t2m = status.exit_manager || {};
+      $('train-body').innerHTML = `
+        <div style="font-size:.82rem;color:#94a3b8;margin-bottom:.8rem">
+          ✅ Both towers trained
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-box">
+            <div class="mv violet">${t1m.n_samples?.toLocaleString()||'—'}</div>
+            <div class="ml">Signals trained</div>
+          </div>
+          <div class="metric-box">
+            <div class="mv gold">${t1m.base_win_rate||'—'}%</div>
+            <div class="ml">Raw win rate</div>
+          </div>
+          <div class="metric-box">
+            <div class="mv green">${t1m.wfv_precision?(t1m.wfv_precision*100).toFixed(1)+'%':'—'}</div>
+            <div class="ml">WFV Precision</div>
+          </div>
+          <div class="metric-box">
+            <div class="mv blue">${t2m.n_samples?.toLocaleString()||'—'}</div>
+            <div class="ml">Position-minutes</div>
+          </div>
+        </div>
+        <div style="font-size:.74rem;color:#475569;margin-top:.5rem">
+          Tower 1 threshold: ${t1m.optimal_threshold?(t1m.optimal_threshold*100).toFixed(0)+'%':'—'}
+          &nbsp;·&nbsp; Tower 2 stop accuracy: ${t2m.stop_accuracy?(t2m.stop_accuracy*100).toFixed(1)+'%':'—'}
+          &nbsp;·&nbsp; Hold correlation: ${t2m.hold_correlation?.toFixed(3)||'—'}
+        </div>
+      `;
+    }
+  } catch(e) { console.error(e); }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadAll();
+  // Wire slider display
+  const confSlider = document.getElementById('seq-conf-slider');
+  const confVal    = document.getElementById('seq-conf-val');
+  if (confSlider && confVal) {
+    confSlider.addEventListener('input', () => {
+      confVal.textContent = Math.round(parseFloat(confSlider.value)*100) + '%';
+    });
+  }
+  // Wire dataset radio buttons → update note span + collect panel
+  function updateDatasetNote() {
+    const ds = getSelectedDataset();
+    const noteEl  = document.getElementById('dataset-note');
+    const panelEl = document.getElementById('angel-collect-panel');
+    if (panelEl) panelEl.style.display = ds === 'angel' ? 'block' : 'none';
+    if (ds === 'angel') { loadAngelCacheInfo(); }
+    if (!noteEl) return;
+    if (ds === 'angel') {
+      noteEl.innerHTML = '⚠️ <strong style="color:#f59e0b">Insufficient data</strong> — Angel One has only 3 expiries collected (need ≥10). Train/Test/WFV will be blocked. Keep collecting data via the fetcher.';
+      noteEl.style.color = '#f59e0b';
+    } else {
+      noteEl.innerHTML = '✅ Kaggle 1-Min: 78 weekly expiries (Oct 2024 – Mar 2026) · sufficient for full training + WFV';
+      noteEl.style.color = '#22c55e';
+    }
+  }
+  document.querySelectorAll('input[name="dataset-sel"]').forEach(r => r.addEventListener('change', updateDatasetNote));
+  updateDatasetNote(); // set on page load
+  // pre-load angel cache info on startup (so panel is ready when user switches)
+  loadAngelCacheInfo();
+});
+
+// ── Angel One data collection ────────────────────────────────────────────────
+let _collectPollTimer = null;
+
+async function loadAngelCacheInfo() {
+  try {
+    const r = await fetch('/api/angel/cache-info');
+    const d = await r.json();
+    const msgEl  = document.getElementById('angel-cache-msg');
+    const barEl  = document.getElementById('angel-prog-bar');
+    const listEl = document.getElementById('angel-expiry-list');
+    if (msgEl)  msgEl.textContent  = d.message || '';
+    if (barEl) {
+      const pct = Math.min(100, Math.round(((d.expiry_count || 0) / 10) * 100));
+      barEl.style.width      = pct + '%';
+      barEl.style.background = d.sufficient
+        ? 'linear-gradient(90deg,#16a34a,#22c55e)'
+        : 'linear-gradient(90deg,#7c3aed,#a855f7)';
+    }
+    if (listEl) {
+      const exps = d.expiries || [];
+      listEl.textContent = exps.length
+        ? 'Collected: ' + exps.join(', ')
+        : 'No data collected yet';
+    }
+  } catch(e) { console.warn('loadAngelCacheInfo:', e); }
+}
+
+async function startCollect() {
+  const btn     = document.getElementById('btn-collect');
+  const spinner = document.getElementById('collect-spinner');
+  const logEl   = document.getElementById('angel-collect-log');
+  if (btn)     btn.disabled = true;
+  if (spinner) spinner.style.display = 'inline';
+  if (logEl)  { logEl.style.display = 'block'; logEl.textContent = 'Starting collection…\n'; }
+  try {
+    const r = await fetch('/api/angel/collect', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({days: 95})
+    });
+    const d = await r.json();
+    if (logEl) logEl.textContent += (d.message || '') + '\n';
+    if (_collectPollTimer) clearInterval(_collectPollTimer);
+    _collectPollTimer = setInterval(pollCollect, 4000);
+  } catch(e) {
+    if (btn)     btn.disabled = false;
+    if (spinner) spinner.style.display = 'none';
+    if (logEl)   logEl.textContent += 'Error: ' + e.message + '\n';
+  }
+}
+
+async function pollCollect() {
+  try {
+    const r = await fetch('/api/angel/collect-status');
+    const d = await r.json();
+    const logEl = document.getElementById('angel-collect-log');
+    if (logEl) {
+      logEl.textContent = (d.log || []).join('\n');
+      logEl.scrollTop   = logEl.scrollHeight;
+    }
+    // Update progress bar live
+    const barEl  = document.getElementById('angel-prog-bar');
+    const listEl = document.getElementById('angel-expiry-list');
+    if (barEl && d.expiries) {
+      const pct = Math.min(100, Math.round((d.expiries.length / 10) * 100));
+      barEl.style.width = pct + '%';
+    }
+    if (listEl && d.expiries && d.expiries.length) {
+      listEl.textContent = 'Collected: ' + d.expiries.join(', ');
+    }
+    if (!d.running && d.done) {
+      clearInterval(_collectPollTimer);
+      const btn     = document.getElementById('btn-collect');
+      const spinner = document.getElementById('collect-spinner');
+      if (btn)     btn.disabled = false;
+      if (spinner) spinner.style.display = 'none';
+      loadAngelCacheInfo(); // refresh full status
+    }
+  } catch(e) { console.warn('pollCollect:', e); }
+}
+</script>
+
+<!-- ═══ WALK-FORWARD VALIDATION SECTION ════════════════════════════════════ -->
+<style>
+.val-section{background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:2rem;
+  max-width:1000px;margin:0 auto;padding:2rem 1.8rem 2.5rem;}
+.val-wrap{max-width:1000px;margin:0 auto;padding:0 1rem 4rem;}
+.val-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.val-title{font-size:1.15rem;font-weight:700;color:#f1f5f9;}
+.val-subtitle{font-size:.8rem;color:#64748b;margin-top:.2rem;}
+.val-btn{background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;color:#fff;padding:.6rem 1.4rem;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;}
+.val-btn:hover{opacity:.85;}
+.val-btn:disabled{opacity:.4;cursor:not-allowed;}
+.val-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.val-kpi{background:#1e293b;border-radius:10px;padding:1rem;text-align:center;}
+.val-kpi-v{font-size:1.6rem;font-weight:800;margin-bottom:.2rem;}
+.val-kpi-l{font-size:.72rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;}
+.val-green{color:#22c55e;} .val-violet{color:#a855f7;} .val-gold{color:#f59e0b;} .val-blue{color:#38bdf8;}
+.val-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:1.2rem;}
+.val-table th{color:#64748b;text-align:left;padding:.5rem .6rem;border-bottom:1px solid #1e293b;font-weight:600;}
+.val-table td{padding:.5rem .6rem;border-bottom:1px solid #0f172a;color:#cbd5e1;}
+.val-table tr:hover td{background:#1e293b22;}
+.val-log-box{background:#020617;border:1px solid #1e293b;border-radius:8px;padding:.8rem 1rem;max-height:220px;overflow-y:auto;font-family:monospace;font-size:.73rem;color:#94a3b8;line-height:1.5;}
+.val-status{font-size:.78rem;color:#64748b;margin-bottom:.6rem;}
+.val-badge{display:inline-block;padding:.2rem .55rem;border-radius:5px;font-size:.72rem;font-weight:700;}
+.badge-ok{background:#14532d;color:#86efac;} .badge-warn{background:#78350f;color:#fde68a;} .badge-neutral{background:#1e3a5f;color:#93c5fd;}
+</style>
+
+<div class="val-section" id="wfv-section">
+  <div class="val-header">
+    <div>
+      <div class="val-title">&#x1f4ca; Walk-Forward Validation &mdash; Twin Tower AI</div>
+      <div class="val-subtitle">5-fold cross-expiry validation: model tested on 5 different unseen expiries, results averaged for honest accuracy estimate</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.5rem;align-items:flex-end">
+      <!-- WFV Controls -->
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:.35rem;background:#1e293b;border:1px solid #334155;border-radius:7px;padding:.3rem .6rem">
+          <label style="font-size:.74rem;color:#94a3b8">&#x20b9; Capital</label>
+          <input id="wfv-capital" type="number" value="50000" min="6000" step="1000"
+            style="width:80px;background:transparent;border:none;outline:none;color:#e2e8f0;font-size:.88rem;font-weight:600">
+        </div>
+        <label style="display:flex;align-items:center;gap:.35rem;cursor:pointer;
+          background:#1e293b;border:1px solid #f59e0b44;border-radius:7px;padding:.3rem .6rem"
+          title="1 trade at a time mode">
+          <input type="checkbox" id="wfv-sequential" checked
+            onchange="document.getElementById('wfv-seq-opts').style.display=this.checked?'flex':'none'"
+            style="accent-color:#f59e0b;width:14px;height:14px;cursor:pointer">
+          <span style="font-size:.74rem;color:#f59e0b;font-weight:600">&#x1f4cc; 1-at-a-Time</span>
+        </label>
+        <div id="wfv-seq-opts" style="display:flex;gap:.4rem;align-items:center">
+          <select id="wfv-window-sel"
+            style="background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:.74rem;padding:.2rem .4rem">
+            <option value="0">First-avail</option>
+            <option value="30" selected>Best 30m</option>
+            <option value="60">Best 60m</option>
+          </select>
+        </div>
+      </div>
+      <button class="val-btn" id="wfv-run-btn" onclick="runWFV()">&#x25b6; Run Validation (5 folds)</button>
+    </div>
+  </div>
+
+  <div class="val-kpis" id="wfv-kpis" style="display:none">
+    <div class="val-kpi"><div class="val-kpi-v val-green" id="wfv-wr">—</div><div class="val-kpi-l">Avg Win Rate</div></div>
+    <div class="val-kpi"><div class="val-kpi-v" style="color:#f59e0b" id="wfv-pnl">—</div><div class="val-kpi-l">Avg Gross P&amp;L / Trade</div></div>
+    <div class="val-kpi"><div class="val-kpi-v val-green" id="wfv-net-pnl">—</div><div class="val-kpi-l">Avg Net P&amp;L / Trade ✅</div></div>
+    <div class="val-kpi"><div class="val-kpi-v" style="color:#f87171" id="wfv-charge">—</div><div class="val-kpi-l">Avg Charge Drag</div></div>
+    <div class="val-kpi"><div class="val-kpi-v val-violet" id="wfv-trades">—</div><div class="val-kpi-l">Total Trades</div></div>
+    <div class="val-kpi"><div class="val-kpi-v val-blue" id="wfv-filter">—</div><div class="val-kpi-l">Avg Filter Rate</div></div>
+  </div>
+
+  <div id="wfv-table-wrap" style="display:none">
+    <div style="font-size:.78rem;color:#38bdf8;background:#0f2233;border-radius:8px;padding:.6rem 1rem;margin-bottom:.8rem;">
+      <span id="wfv-seq-badge"></span> 💰 <strong>All P&amp;L figures include real NSE charges:</strong>
+      Brokerage ₹40 (₹20×2) &nbsp;+&nbsp; STT 0.02% (sell) &nbsp;+&nbsp;
+      NSE Exchange 0.053% (both legs) &nbsp;+&nbsp; GST 18% &nbsp;+&nbsp; Stamp 0.003% (buy).
+      <strong>Net column = what actually lands in your account.</strong>
+    </div>
+    <table class="val-table">
+      <thead><tr>
+        <th>Fold</th><th>Test Expiry</th><th>Train Set</th><th>Signals</th><th>AI Kept</th>
+        <th>Trades</th><th>Win Rate</th>
+        <th>Gross P&amp;L</th><th>Net P&amp;L ✅</th><th>Charges</th>
+        <th>Best Net</th><th>Worst Net</th><th style="color:#a78bfa">Avg Dur</th><th style="color:#818cf8">Med Dur</th><th>AI Exits</th><th>Time</th>
+      </tr></thead>
+
+      <tbody id="wfv-tbody"></tbody>
+    </table>
+    <div style="font-size:.75rem;color:#475569;margin-top:.3rem;">
+      ✅ No data leakage (test expiry excluded from training) &nbsp;|&nbsp;
+      ✅ Charges deducted per trade (entry+exit premium, lot=50) &nbsp;|&nbsp;
+      ✅ Win/loss determined on net-of-charges P&amp;L
+    </div>
+  </div>
+
+  <div class="val-status" id="wfv-status">No validation run yet. Click "Run Validation" to start.</div>
+  <div class="val-log-box" id="wfv-log" style="display:none"></div>
+</div>
+
+<script>
+let wfvPollTimer = null;
+
+async function runWFV() {
+  const btn = document.getElementById('wfv-run-btn');
+  btn.disabled = true; btn.textContent = '\u23f3 Running\u2026';
+  document.getElementById('wfv-log').style.display = 'block';
+  document.getElementById('wfv-log').textContent = '';
+  document.getElementById('wfv-status').textContent = 'Starting 5-fold walk-forward validation\u2026';
+  // Clear any previous done state on the server before polling
+  if (wfvPollTimer) { clearInterval(wfvPollTimer); wfvPollTimer = null; }
+  try {
+    const wfvCap    = parseFloat(document.getElementById('wfv-capital')?.value || 50000);
+    const wfvSeq    = document.getElementById('wfv-sequential')?.checked ?? true;
+    const wfvConf   = 0;
+    const wfvWindow = wfvSeq ? parseInt(document.getElementById('wfv-window-sel')?.value || 30) : 0;
+    const resp = await fetch('/api/ai/nifty-wfv', {method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({capital: wfvCap, sequential: wfvSeq, seq_min_conf: wfvConf, seq_window: wfvWindow, dataset: getSelectedDataset()})});
+    const j = await resp.json();
+    document.getElementById('wfv-status').textContent = j.message || 'Running\u2026';
+    // Wait 2s then start polling (avoids immediately seeing old done=true state)
+    setTimeout(() => {
+      wfvPollTimer = setInterval(pollWFV, 3000);
+      pollWFV();
+    }, 2000);
+  } catch(e) {
+    btn.disabled=false; btn.textContent='\u25b6 Run Validation (5 folds)';
+    document.getElementById('wfv-status').textContent = 'Error: ' + e.message;
+  }
+}
+
+let wfvSeenRunning = false;
+
+async function pollWFV() {
+  try {
+    const s = await (await fetch('/api/ai/nifty-wfv-status')).json();
+    const logEl = document.getElementById('wfv-log');
+    logEl.textContent = (s.log||[]).join('\n');
+    logEl.scrollTop = logEl.scrollHeight;
+    const foldsDone = (s.log||[]).filter(l=>l.includes('-> Trades=')).length;
+    if (s.running) wfvSeenRunning = true;
+    document.getElementById('wfv-status').textContent = s.running
+      ? `Running\u2026 (${foldsDone}/5 folds complete)`
+      : s.done && wfvSeenRunning ? 'Validation complete \u2705' : s.done ? 'Previous run loaded \u2705' : 'Idle';
+    if (!s.running && s.done && wfvSeenRunning) {
+      clearInterval(wfvPollTimer);
+      document.getElementById('wfv-run-btn').disabled=false;
+      document.getElementById('wfv-run-btn').textContent='\u25b6 Run Again';
+      wfvSeenRunning = false;
+      loadWFVResults();
+    }
+  } catch(e) {}
+}
+
+async function loadWFVResults() {
+  try {
+    const r = await (await fetch('/api/ai/nifty-wfv-results')).json();
+    if (r.error) return;
+    document.getElementById('wfv-kpis').style.display='grid';
+    document.getElementById('wfv-table-wrap').style.display='block';
+    const seqBadge = document.getElementById('wfv-seq-badge');
+    if(seqBadge) seqBadge.innerHTML = r.sequential_mode
+      ? '<strong style="color:#f59e0b">📌 1-Trade-at-a-Time &nbsp;·&nbsp; </strong>'
+      : '<span style="color:#64748b">All signals &nbsp;·&nbsp; </span>';
+    const wr  = r.avg_win_rate||0;
+    const pnl = r.avg_pnl_pct||0;
+    const netPnl  = r.avg_net_pnl_pct !== undefined ? r.avg_net_pnl_pct : pnl;
+    const chgDrag = r.avg_charge_drag_pct !== undefined ? r.avg_charge_drag_pct : (pnl - netPnl);
+    document.getElementById('wfv-wr').textContent = wr+'%';
+    document.getElementById('wfv-wr').style.color = wr>=60?'#22c55e':wr>=50?'#f59e0b':'#f87171';
+    document.getElementById('wfv-pnl').textContent = (pnl>=0?'+':'')+pnl+'%';
+    document.getElementById('wfv-pnl').style.color = pnl>=0?'#f59e0b':'#f87171';
+    const netEl = document.getElementById('wfv-net-pnl');
+    if(netEl){ netEl.textContent=(netPnl>=0?'+':'')+netPnl.toFixed(2)+'%'; netEl.style.color=netPnl>=0?'#22c55e':'#f87171'; }
+    const chEl = document.getElementById('wfv-charge');
+    if(chEl){ chEl.textContent='-'+chgDrag.toFixed(3)+'%'; }
+    document.getElementById('wfv-trades').textContent = r.total_trades||0;
+    document.getElementById('wfv-filter').textContent = (r.avg_filter_rate_pct||0)+'%';
+    const tbody = document.getElementById('wfv-tbody'); tbody.innerHTML='';
+    (r.folds||[]).forEach(f=>{
+      const wrc  = f.win_rate>=60?'val-green':f.win_rate>=50?'val-gold':'';
+      const netP = f.avg_net_pnl_pct !== undefined ? f.avg_net_pnl_pct : f.avg_pnl_pct;
+      const netc = netP>=0?'color:#22c55e':'color:#f87171';
+      const grc  = f.avg_pnl_pct>=0?'color:#f59e0b':'color:#f87171';
+      const chg  = f.avg_charge_pct !== undefined ? f.avg_charge_pct : 0;
+      const bestN  = f.best_net_pnl  !== undefined ? f.best_net_pnl  : f.best_pnl;
+      const worstN = f.worst_net_pnl !== undefined ? f.worst_net_pnl : f.worst_pnl;
+      const fmtM = m => !m ? '—' : m>=60 ? `${Math.floor(m/60)}h ${Math.round(m%60)}m` : `${Math.round(m)}m`;
+      const fmtD = s => { if(!s) return ''; const d=new Date(s+'T00:00:00'); return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}); };
+      tbody.innerHTML += `<tr>
+        <td><strong>#${f.fold}</strong></td>
+        <td>${f.test_expiry}<br><span style="font-size:.7rem;color:#38bdf8">${fmtD(f.date_from||'')}${f.date_from&&f.date_to?' → ':' '}${fmtD(f.date_to||'')}</span></td>
+        <td>${f.train_count} expiries</td>
+        <td>${f.total_signals||0}</td>
+        <td>${f.taken_signals||0} <span style="color:#64748b">(${100-(f.filter_rate_pct||0)}% kept)</span></td>
+        <td><strong>${f.total_trades}</strong></td>
+        <td class="${wrc}"><strong>${f.win_rate}%</strong></td>
+        <td style="${grc}">${f.avg_pnl_pct>=0?'+':''}${f.avg_pnl_pct}%</td>
+        <td style="${netc}"><strong>${netP>=0?'+':''}${netP.toFixed(2)}%</strong></td>
+        <td style="color:#f87171;font-size:.75rem">-${chg.toFixed(3)}%</td>
+        <td style="color:#22c55e">+${bestN}%</td>
+        <td style="color:#f87171">${worstN}%</td>
+        <td style="color:#a78bfa">${fmtM(f.avg_hold_mins||0)}</td>
+        <td style="color:#818cf8;font-size:.78rem">${fmtM(f.median_hold_mins||0)}</td>
+        <td>${f.ai_exits||0}</td>
+        <td style="color:#64748b">${f.elapsed_s}s</td>
+      </tr>`;
+
+    });
+    // Summary row
+    tbody.innerHTML += `<tr style="border-top:2px solid #334155;font-weight:700;">
+      <td colspan="6" style="color:#94a3b8;">AVERAGE (${r.n_folds} folds)</td>
+      <td class="${wr>=60?'val-green':''}">${wr}% <span style="font-size:.7rem;color:#64748b">\u00b1${r.std_win_rate||0}%</span></td>
+      <td style="color:#f59e0b">${pnl>=0?'+':''}${pnl}% <span style="font-size:.7rem;color:#64748b">\u00b1${r.std_pnl_pct||0}%</span></td>
+      <td style="${netPnl>=0?'color:#22c55e':'color:#f87171'}"><strong>${netPnl>=0?'+':''}${netPnl.toFixed(2)}%</strong> <span style="font-size:.7rem;color:#64748b">\u00b1${r.std_net_pnl_pct||0}%</span></td>
+      <td style="color:#f87171;font-size:.75rem">-${chgDrag.toFixed(3)}%</td>
+      <td colspan="6" style="color:#64748b;font-size:.75rem;">Validated ${new Date(r.run_at).toLocaleString()}</td>
+    </tr>`;
+
+        // Annual ROC projection block (fixed capital — no compounding)
+    const projWeekly  = r.projected_weekly_net_rs || r.avg_total_net_rs_per_fold || 0;
+    const projAnnual  = r.projected_annual_net_rs  || (projWeekly * 52);
+    const projAnnCon  = r.projected_annual_net_rs_con || (projAnnual * 0.70);
+    const wfvCap      = r.capital || 50000;
+    // Always recompute ROC from the ₹ figures (never trust stale cagr_pct)
+    const wfvRoc      = wfvCap > 0 ? Math.round(projAnnual / wfvCap * 100 * 10) / 10 : 0;
+    const wfvRocCon   = wfvCap > 0 ? Math.round(projAnnCon / wfvCap * 100 * 10) / 10 : 0;
+    const avgH        = r.avg_hold_mins || 0;
+    const medH        = r.median_hold_mins || 0;
+    const fmtM2 = m => !m?'--':m>=60?`${Math.floor(m/60)}h ${Math.round(m%60)}m`:`${Math.round(m)}m`;
+    const fmtRs2 = v => (v>=0?'+':'-')+'&#x20b9;'+Math.abs(v).toLocaleString('en-IN',{maximumFractionDigits:0});
+    const fmtP2  = v => (v>=0?'+':'')+v.toFixed(1)+'%';
+    const wfvRocCol = wfvRoc>=1000?'#22c55e':wfvRoc>=200?'#f59e0b':wfvRoc>=0?'#94a3b8':'#f87171';
+    let projBlock = document.getElementById('wfv-proj-block');
+    if (!projBlock) {
+      projBlock = document.createElement('div');
+      projBlock.id = 'wfv-proj-block';
+      document.getElementById('wfv-table-wrap').after(projBlock);
+    }
+    projBlock.innerHTML = `
+    <div style="display:flex;gap:.6rem;margin:.7rem 0;flex-wrap:wrap">
+      <div style="background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:.4rem .9rem;display:flex;align-items:center;gap:.5rem">
+        <span>&#x23f1;</span>
+        <div><div style="font-size:.7rem;color:#94a3b8">Avg trade duration (all folds)</div>
+          <div style="font-size:.95rem;font-weight:700;color:#a78bfa">${fmtM2(avgH)}</div></div>
+      </div>
+      <div style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.18);border-radius:8px;padding:.4rem .9rem;display:flex;align-items:center;gap:.5rem">
+        <span>&#x231a;</span>
+        <div><div style="font-size:.7rem;color:#94a3b8">Median duration</div>
+          <div style="font-size:.95rem;font-weight:700;color:#818cf8">${fmtM2(medH)}</div></div>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(16,185,129,.04));
+      border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:.9rem 1.1rem;margin:.3rem 0 .8rem">
+      <div style="font-size:.72rem;color:#64748b;margin-bottom:.55rem;text-transform:uppercase;letter-spacing:.05em">
+        Projected Performance &middot; 5-Fold WFV Average &middot; Capital &#x20b9;${wfvCap.toLocaleString()}
+      </div>
+      <div style="display:flex;gap:1.4rem;flex-wrap:wrap;align-items:flex-end">
+        <div>
+          <div style="font-size:.7rem;color:#94a3b8">Avg weekly net profit / fold</div>
+          <div style="font-size:1.45rem;font-weight:800;color:${projWeekly>=0?'#22c55e':'#f87171'}">${fmtRs2(projWeekly)}</div>
+        </div>
+        <div style="border-left:1px solid #1e293b;padding-left:1.4rem">
+          <div style="font-size:.7rem;color:#94a3b8">Annualised net profit (52 weeks)</div>
+          <div style="font-size:1.35rem;font-weight:800;color:#f59e0b">${fmtRs2(projAnnual)}</div>
+          <div style="font-size:.72rem;color:#64748b;margin-top:1px">Conservative (70%): ${fmtRs2(projAnnCon)}</div>
+        </div>
+        <div style="border-left:1px solid #1e293b;padding-left:1.4rem">
+          <div style="font-size:.7rem;color:#94a3b8">Annual ROC on capital</div>
+          <div style="font-size:1.55rem;font-weight:800;color:${wfvRocCol}">${fmtP2(wfvRoc)}</div>
+          <div style="font-size:.72rem;color:#64748b;margin-top:1px">Conservative: ${fmtP2(wfvRocCon)}</div>
+        </div>
+      </div>
+      <div style="font-size:.68rem;color:#475569;margin-top:.45rem">
+        Fixed capital: same &#x20b9;${wfvCap.toLocaleString()} per trade; profits don't compound into positions.
+        Annual ROC = annualised profit &divide; capital &times; 100. Conservative = 70% of base.
+        <strong style="color:#94a3b8">Check: ${fmtRs2(projAnnual)} &divide; &#x20b9;${wfvCap.toLocaleString()} = ${fmtP2(wfvRoc)}</strong>
+      </div>
+    </div>`;
+
+    document.getElementById('wfv-log').style.display='block';
+
+  } catch(e) {}
+}
+
+// Auto-load existing results on page load
+document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(loadWFVResults,500); });
+</script>
+{% endblock %}
+
