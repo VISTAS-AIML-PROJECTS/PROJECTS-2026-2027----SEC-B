@@ -1,15 +1,26 @@
-# Team 6: NSE & BSE Full Market Coverage Terminal with Stock AI Copilot
+# QuantPulse AI — Source Code Distribution
 
-### Project Overview
-An institutional-grade Indian stock market terminal covering 62,000+ NSE and BSE equity and derivative instruments. Features authentic real-time price feeds, Black-Scholes Greeks, dynamic pivot matrices (Classical & Fibonacci), multi-horizon algorithmic future price targets (15M, 1D, 5D, 1M, 3M), and an integrated Stock AI Copilot.
+### Team 6 • SEC-B • AIML 2026-27
+**Vels Institute of Science, Technology and Advanced Studies (VISTAS)**
 
-### Directory Structure
-- `nse-bse-platform/backend`: FastAPI high-concurrency API server with quantitative and machine learning models.
-- `nse-bse-platform/frontend`: Vite + React + TypeScript responsive trading dashboard with WebSockets.
-- `nse-bse-platform/data`: SQLite master database containing 62,798 instruments and search indexes.
-- `nse-bse-platform/start.bat`: 1-click startup script for Windows.
-- `nse-bse-platform/setup_new_pc.bat`: Automated dependency setup script.
+---
 
-### Quick Start
-1. Double-click `setup_new_pc.bat` inside `nse-bse-platform/` to install dependencies.
-2. Double-click `start.bat` to launch both backend (`http://localhost:8000`) and frontend (`http://localhost:5173`).
+### Directory Structure:
+* **`nse-bse-platform/`**: Complete full-stack application
+  * **`backend/`**: FastAPI REST API server, quantitative engines, ML forecasting service, options Greeks, and SQLite ORM models
+  * **`frontend/`**: React 18 + Vite + Tailwind CSS terminal dashboard with interactive charts, modal dialogs, and AI copilot
+  * **`data/`**: `market_master.db` containing 62,798 indexed instruments across NSE and BSE
+  * **`setup_new_pc.bat` / `setup_new_pc.sh`**: One-click environment configuration
+  * **`start.bat` / `start.sh`**: One-click multi-process launcher
+
+### Quick Start:
+```bash
+cd "PHASE 1/CODE/nse-bse-platform"
+
+# Run automatic setup
+setup_new_pc.bat
+
+# Start platform
+start.bat
+```
+Access the application at `http://localhost:5173`.

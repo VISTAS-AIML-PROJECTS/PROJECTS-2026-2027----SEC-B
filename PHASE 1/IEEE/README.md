@@ -1,10 +1,11 @@
-# Team 6: IEEE Research Paper
+# IEEE Research Paper — QuantPulse AI
 
-### Paper Title:
-**QuantPulse AI: Quantitative Market Intelligence, Multi-Horizon Price Projections & LLM Analyst Architecture for High-Volume NSE & BSE Financial Markets**
+### Manuscript Details
+* **Title**: *QuantPulse AI: Intelligent Stock Market Prediction and Trading Recommendation System Using Machine Learning and Artificial Intelligence*
+* **Authors**: Karthick M, Gopikrishnan R, and Anitha VP
+* **Department**: Department of Artificial Intelligence and Machine Learning, School of Engineering, Vels Institute of Science, Technology and Advanced Studies (VISTAS), Chennai
 
-### Document Information:
-- **File Name:** [`QuantPulse_AI_IEEE_Paper.pdf`](./QuantPulse_AI_IEEE_Paper.pdf)
-- **Format:** IEEE Standard Research Format (Two-Column)
-- **Team:** Team 6
-- **Course:** AIML 2026-2027 Section B
+---
+
+### Files in this Directory:
+* **`QuantPulse_AI_IEEE_Paper.pdf`**: Master publication-ready two-column IEEE format research manuscript.

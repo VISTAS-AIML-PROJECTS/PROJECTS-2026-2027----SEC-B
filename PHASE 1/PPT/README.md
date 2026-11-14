@@ -1,11 +1,14 @@
-# 📊 Team 6: Project Presentation Slides (PPT)
+# Phase 1 Presentation Deck — QuantPulse AI
 
-### Project Title:
-**QuantPulse AI: NSE & BSE Full Market Coverage Terminal with Multi-Horizon Quantitative Predictions & Stock AI Copilot**
+### Team 6 • SEC-B • AIML 2026-27
+**Vels Institute of Science, Technology and Advanced Studies (VISTAS)**
 
-### Presentation File:
-- **File Name:** [`STOCK MARKET PREDICTION PPT FOR REVIEW.pptx`](./STOCK%20MARKET%20PREDICTION%20PPT%20FOR%20REVIEW.pptx)
-- **Format:** Microsoft PowerPoint Presentation (.pptx)
-- **Team:** Team 6
-- **Class / Section:** AIML 2026–2027 (Section B)
-- **Phase:** Phase 1 Project Evaluation
+---
+
+### Files in this Directory:
+* **`STOCK MARKET PREDICTION PPT FOR REVIEW.pptx`**: Official Phase 1 review presentation slides covering problem definition, architecture, ML forecasting models, option chain analytics, live platform demo, and evaluation results.
+
+### Presenters:
+* Karthick M (23619248)
+* Gopikrishnan R (23619209)
+* **Guide**: Mrs. Anitha VP, M.Tech, Assistant Professor

@@ -1,30 +1,64 @@
-# 📈 Team 6: Phase 1 Submission
-### **QuantPulse AI: NSE & BSE Full Market Coverage Terminal with Multi-Horizon Quantitative Predictions & Stock AI Copilot**
-*Department of Artificial Intelligence & Machine Learning | Academic Year 2026–2027 (Section B)*
+# TEAM 6 — QuantPulse AI
+
+### Phase 1 Submission • SEC-B • AIML 2026-27
+
+> **QuantPulse AI: Intelligent Stock Market Prediction and Trading Recommendation System Using Machine Learning and Artificial Intelligence**
 
 ---
 
-## 📂 Phase 1 Deliverables Index
+## 👥 Team 6 Members & Guide
 
-| Deliverable | Description | Path |
+| Role | Name | Register / Contact |
 | :--- | :--- | :--- |
-| **💻 Codebase** | Complete Python backend, React frontend, SQLite database (62k+ instruments), and launch scripts | [`CODE/nse-bse-platform/`](./CODE/nse-bse-platform/) |
-| **📄 IEEE Paper** | Formal two-column IEEE format research paper (**QuantPulse AI**) | [`IEEE/QuantPulse_AI_IEEE_Paper.pdf`](./IEEE/QuantPulse_AI_IEEE_Paper.pdf) |
-| **📊 Project Report** | Complete source code report documenting all 54 files and 9,874 lines of code | [`REPORT/PROJECT_FULL_SOURCE_CODE_REPORT.md`](./REPORT/PROJECT_FULL_SOURCE_CODE_REPORT.md) |
-| **📖 Code Guide** | Implementation overview and quick start manual | [`CODE/README.md`](./CODE/README.md) |
+| **Team Member 1** | Karthick M | 23619248 |
+| **Team Member 2** | Gopikrishnan R | 23619209 |
+| **Project Supervisor / Guide** | Mrs. Anitha VP, M.Tech | Assistant Professor, Dept. of AI & ML |
+| **Head of Department (HOD)** | Dr. K. Ulagapriya, M.E., Ph.D | Associate Professor & Head, Dept. of AI & ML |
+| **Project Coordinator** | Ms. Sowmiya S.M, M.E., (Ph.D) | Assistant Professor, Dept. of AI & ML |
+| **Affiliation** | Dept. of Artificial Intelligence & Machine Learning, School of Engineering, Vels University (VISTAS), Chennai |
 
 ---
 
-## ⚙️ Technical Highlights
+## 📦 Submission Deliverables
 
-- **Language & Frameworks:** Python 3.10+ (FastAPI), React 18, TypeScript, Tailwind CSS, SQLite FTS5.
-- **Coverage:** 62,798 instruments across NSE and BSE (Equities, Indices, Futures, Options).
-- **Quantitative Models:** Multi-horizon forecasting (15M, 1D, 5D, 1M, 3M), Classical Floor Pivots, Fibonacci Pivots, Supertrend, ATR, Black-Scholes Option Greeks.
-- **AI Integration:** Interactive Stock AI Copilot supporting Google Gemini, OpenAI, Groq, and a Built-in Offline Quantitative Synthesis Engine.
+| Folder | Deliverable | Primary File | Description |
+| :--- | :--- | :--- | :--- |
+| **`REPORT/`** | **Final Project Phase-1 Report** | [`QuantPulse_AI_Phase_1_Report.pdf`](REPORT/QuantPulse_AI_Phase_1_Report.pdf) | Complete 63-page signed bonafide institutional project report (PDF) |
+| **`IEEE/`** | **Research Manuscript** | [`QuantPulse_AI_IEEE_Paper.pdf`](IEEE/QuantPulse_AI_IEEE_Paper.pdf) | Full formal IEEE research paper on quantitative market intelligence |
+| **`PPT/`** | **Presentation Slides** | [`STOCK MARKET PREDICTION PPT FOR REVIEW.pptx`](PPT/STOCK%20MARKET%20PREDICTION%20PPT%20FOR%20REVIEW.pptx) | Phase 1 defense & review presentation slide deck |
+| **`CODE/`** | **Complete Source Code** | [`nse-bse-platform/`](CODE/nse-bse-platform/) | Production-ready FastAPI backend, React 18 frontend, SQLite master DB (62k+ instruments), AI Copilot |
 
 ---
 
-## 🚀 How to Run the Project
-1. Open `CODE/nse-bse-platform/`
-2. Double-click **`setup_new_pc.bat`** (installs dependencies)
-3. Double-click **`start.bat`** (launches web application on `http://localhost:5173`)
+## 🔬 Project Overview & Research Focus
+* **Title**: *QuantPulse AI: Intelligent Stock Market Prediction and Trading Recommendation System Using Machine Learning and Artificial Intelligence*
+* **Domain**: Quantitative Finance, Financial Machine Learning, Real-Time Market Analytics
+* **Target Exchanges**: National Stock Exchange of India (NSE) & Bombay Stock Exchange (BSE)
+
+---
+
+## 🛡️ Core Capabilities & Technical Highlights
+
+| # | Capability | Description |
+| :--- | :--- | :--- |
+| 1 | **Full-Market Unified Coverage** | Over 62,798 instruments indexed across NSE & BSE with fast SQLite FTS5 search |
+| 2 | **Multi-Horizon Forecasting** | Predictive quantitative models across 15-Minute, 1-Day, 5-Day, 1-Month, and 3-Month time horizons |
+| 3 | **Quantitative Analytics Engine** | Classical Floor Pivots, Fibonacci Retracement Levels, Supertrend indicator, Average True Range (ATR), and Volatility measures |
+| 4 | **Derivatives & Option Greeks** | Black-Scholes pricing engine computing real-time Delta, Gamma, Theta, Vega, and Rho with visual Option Chain displays |
+| 5 | **Interactive Stock AI Copilot** | Multi-provider LLM synthesis supporting Google Gemini, OpenAI, Groq, plus a built-in offline quantitative heuristics analyst |
+| 6 | **Paper Trading Simulator** | Full simulated order execution with real-time portfolio tracking, P&L calculations, and risk telemetry |
+
+---
+
+## 🚀 How to Run the Code
+
+```bash
+cd "PHASE 1/CODE/nse-bse-platform"
+
+# Quick Setup (Windows)
+setup_new_pc.bat
+
+# Launch Full Stack (Backend + Frontend)
+start.bat
+```
+Open **`http://localhost:5173`** in your browser. (FastAPI backend runs automatically on `http://localhost:8000`).
